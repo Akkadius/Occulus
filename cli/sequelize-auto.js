@@ -24,6 +24,7 @@ var auto = new SequelizeAuto(
     },
     tables: [
       'account',
+      'guilds',
       'character_data',
       'items'
     ]

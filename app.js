@@ -46,14 +46,13 @@ const db        = new Sequelize(
   }
 );
 
-db
-  .authenticate()
-  .then(() => {
-    console.log('MySQL Connection has been established successfully.');
-  })
+db.authenticate().then(() => {
+  console.log('MySQL Connection has been established successfully.');
+})
   .catch(err => {
-    console.error('Unable to connect to the database:', err);
-  });
+      console.error('Unable to connect to the database:', err);
+    }
+  );
 
 models = {};
 fs.readdirSync('models/').forEach(function (filename) {

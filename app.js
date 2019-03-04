@@ -23,15 +23,19 @@ app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+/**
+ * Routes
+ */
 app.use('/', require('./routes/index'));
 app.use('/users', require('./routes/users'));
 app.use('/dashboard/stats', require('./routes/dashboard/stats'));
 
 module.exports = app;
 
-console.log(eqemu_config.server.database);
-const database = eqemu_config.server.database;
-
+/**
+ * Load Database
+ */
+const database  = eqemu_config.server.database;
 const Sequelize = require('sequelize');
 const db        = new Sequelize(
   database.db,

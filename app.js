@@ -6,6 +6,15 @@ var app          = express();
 var fs           = require('fs');
 
 /**
+ * Load Config
+ */
+eqemu_config = {};
+config_path = '../eqemu_config.json';
+if (fs.existsSync(config_path)) {
+  eqemu_config = JSON.parse(fs.readFileSync(config_path, 'utf8'));
+}
+
+/**
  * Express
  */
 app.use(logger('dev'));
@@ -19,11 +28,6 @@ app.use('/users', require('./routes/users'));
 app.use('/dashboard/stats', require('./routes/dashboard/stats'));
 
 module.exports = app;
-
-/**
- * Load Config
- */
-var eqemu_config = JSON.parse(fs.readFileSync('../eqemu_config.json', 'utf8'));
 
 console.log(eqemu_config.server.database);
 const database = eqemu_config.server.database;
@@ -55,9 +59,3 @@ fs.readdirSync('models/').forEach(function (filename) {
   model.resource     = db.import(model.path);
   models[model.name] = model;
 });
-
-console.log(models);
-
-models['account'].resource.count().then(c => {
-  console.log("There are " + c + " accounts!")
-})

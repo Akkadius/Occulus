@@ -34,8 +34,14 @@ app.use(
       secret: 'keyboard cat',
       resave: false,
       saveUninitialized: false,
+
+      /**
+       * 30 days
+       *
+       * 1 minute * 60 minutes * 24 hours * 30 days
+       */
       cookie: {
-        maxAge: 60000
+        maxAge: 60000 * 60 * 24 * 30
       }
     }
   )
@@ -86,8 +92,9 @@ const db        = new Sequelize(
  */
 db.authenticate()
   .then(() => {
-    console.log('MySQL Connection has been established successfully.');
-  })
+      console.log('MySQL Connection has been established successfully.');
+    }
+  )
   .catch(err => {
       console.error('Unable to connect to the database:', err);
     }

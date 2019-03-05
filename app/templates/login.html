@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta http-equiv="Content-Language" content="en" />
+    <meta http-equiv="Content-Language" content="en"/>
     <meta name="msapplication-TileColor" content="#2d89ef">
     <meta name="theme-color" content="#4188c9">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
@@ -13,7 +13,7 @@
     <meta name="HandheldFriendly" content="True">
     <meta name="MobileOptimized" content="320">
     <link rel="icon" href="./favicon.ico" type="image/x-icon"/>
-    <link rel="shortcut icon" type="image/x-icon" href="./favicon.ico" />
+    <link rel="shortcut icon" type="image/x-icon" href="./favicon.ico"/>
 
     <!-- Favicon -->
     <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon"/>
@@ -34,41 +34,66 @@
         <div class="container">
             <div class="row">
                 <div class="col col-login mx-auto">
-                    <div class="text-center mb-6">
-                        <img src="./demo/brand/tabler.svg" class="h-6" alt="">
-                    </div>
-                    <form class="card" action="" method="post">
+
+                    <form class="card login-form" action="" method="post">
                         <div class="card-body p-6">
                             <div class="card-title">Login to your account</div>
+
+                            <!-- Username -->
                             <div class="form-group">
-                                <label class="form-label">Email address</label>
-                                <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+                                <label class="form-label">Username</label>
+                                <input type="text" class="form-control" name="username" aria-describedby="username" placeholder="Enter username">
                             </div>
+
+                            <!-- Password -->
                             <div class="form-group">
                                 <label class="form-label">
                                     Password
-                                    <a href="./forgot-password.html" class="float-right small">I forgot password</a>
                                 </label>
-                                <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+                                <input type="password" class="form-control" name="password" placeholder="Password">
                             </div>
-                            <div class="form-group">
-                                <label class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" />
-                                    <span class="custom-control-label">Remember me</span>
-                                </label>
-                            </div>
+
                             <div class="form-footer">
-                                <button type="submit" class="btn btn-primary btn-block">Sign in</button>
+                                <button type="submit" class="btn btn-primary btn-block" id="#login">Sign in</button>
                             </div>
+
+                            <div class="alert alert-danger" role="alert" id="error-message" style="display:none; margin-top:20px"></div>
+
                         </div>
                     </form>
-                    <div class="text-center text-muted">
-                        Don't have account yet? <a href="./register.html">Sign up</a>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 </body>
+
+<!-- Javascript assets -->
+<script src="./assets/js/require.min.js"></script>
+<script src="./assets/js/dashboard.js"></script>
+<script type="text/javascript">
+  require(['jquery'], function ($) {
+
+    $(document).ready(function () {
+
+      /**
+       * Login submit
+       */
+      $(".login-form").submit(function (e) {
+        var data = $('.login-form').serialize();
+
+        $.post('/login', data, function (data) {
+          if (data.success) {
+            window.location = "/";
+          }
+        }).fail(function (data) {
+          $("#error-message").html(data.responseJSON.error).show();
+        });
+
+        return false;
+      });
+    });
+  });
+</script>
+
 </html>

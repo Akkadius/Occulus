@@ -24,11 +24,41 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 /**
+ * Sessions
+ */
+session = require('express-session')
+app.use(
+  session(
+    {
+      name: 'session',
+      secret: 'keyboard cat',
+      resave: false,
+      saveUninitialized: false,
+      cookie: {
+        maxAge: 60000
+      }
+    }
+  )
+);
+
+app.use(function printSession(req, res, next) {
+  console.log('req.session', req.session);
+  return next();
+});
+
+console.log(session);
+
+/**
  * Routes
  */
 app.use('/', require('./routes/index'));
-app.use('/login', require('./routes/login'));
 app.use('/users', require('./routes/users'));
+
+/**
+ * Login
+ */
+app.use('/login', require('./routes/auth/login'));
+app.use('/logout', require('./routes/auth/logout'));
 
 /**
  * API Routes
@@ -51,14 +81,22 @@ const db        = new Sequelize(
   }
 );
 
-db.authenticate().then(() => {
-  console.log('MySQL Connection has been established successfully.');
-})
+/**
+ * Connect to DB
+ */
+db.authenticate()
+  .then(() => {
+    console.log('MySQL Connection has been established successfully.');
+  })
   .catch(err => {
       console.error('Unable to connect to the database:', err);
     }
   );
 
+/**
+ * Dynamically load models
+ * @type {{}}
+ */
 models = {};
 fs.readdirSync('models/').forEach(function (filename) {
   var model          = {};

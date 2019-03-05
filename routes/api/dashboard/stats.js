@@ -1,6 +1,6 @@
 var express       = require('express');
 var router        = express.Router();
-var telnetService = require('../../app/core/telnet-service.js');
+var telnetService = require('../../../app/core/telnet-service.js');
 
 /* GET home page. */
 router.get('/', function (req, res, next) {

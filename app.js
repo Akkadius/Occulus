@@ -29,7 +29,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', require('./routes/index'));
 app.use('/login', require('./routes/login'));
 app.use('/users', require('./routes/users'));
-app.use('/dashboard/stats', require('./routes/dashboard/stats'));
+
+/**
+ * API Routes
+ */
+app.use('/api/dashboard/stats', require('./routes/api/dashboard/stats'));
 
 module.exports = app;
 

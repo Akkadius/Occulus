@@ -9,7 +9,7 @@ require(['jquery', 'bootstrap'], function ($) {
     /**
      * API: Stats
      */
-    $.get("/dashboard/stats", function (data) {
+    $.get("/api/dashboard/stats", function (data) {
 
       /**
        * Draw stats to page

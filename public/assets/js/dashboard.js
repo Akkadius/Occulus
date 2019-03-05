@@ -21,6 +21,7 @@ require.config({
     'circle-progress': 'assets/js/vendors/circle-progress.min',
   }
 });
+
 window.tabler = {
   colors: {
     'blue': '#467fcf',
@@ -123,4 +124,5 @@ window.tabler = {
     'gray-dark-lightest': '#ebebec'
   }
 };
+
 require(['core']);

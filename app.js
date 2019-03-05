@@ -1,3 +1,7 @@
+/**
+ * app.js
+ * @type {createApplication}
+ */
 var express      = require('express');
 var path         = require('path');
 var cookieParser = require('cookie-parser');
@@ -51,8 +55,6 @@ app.use(function printSession(req, res, next) {
   console.log('req.session', req.session);
   return next();
 });
-
-console.log(session);
 
 /**
  * Routes

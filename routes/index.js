@@ -1,3 +1,7 @@
+/**
+ * index.js
+ * @type {createApplication}
+ */
 var express  = require('express');
 var router   = express.Router();
 var template = require('../app/core/template-render');

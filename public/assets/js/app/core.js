@@ -5,7 +5,15 @@
 require(['jquery', 'bootstrap'], function ($) {
 
   $(document).ready(function () {
+
+    /**
+     * API: Stats
+     */
     $.get("/dashboard/stats", function (data) {
+
+      /**
+       * Draw stats to page
+       */
       $('.characters').html(kFormatter(data.characters));
       $('.accounts').html(kFormatter(data.accounts));
       $('.guilds').html(kFormatter(data.guilds));
@@ -13,7 +21,14 @@ require(['jquery', 'bootstrap'], function ($) {
       $('.zones').html(kFormatter(data.zone_count));
       $('.server-longname').html(data.long_name);
       $('.server-uptime').html(data.uptime);
+
+      /**
+       * Update page title
+       * @type {string}
+       */
       document.title = document.title + " " + data.long_name;
+
+      // modal("test", "test");
     });
   });
 

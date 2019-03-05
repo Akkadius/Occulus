@@ -2,28 +2,46 @@
  * template-render.js
  * @type {module:fs}
  */
-var fs = require('fs');
+let fs = require('fs');
 
 /**
- * @type {{getTemplate: (function(*): string), setVar: (function(*, *, *=): (void | string | never))}}
+ * @type {{template: null, getTemplate: (function(*): exports), var: (function(*, *=): exports)}}
  */
 module.exports = {
 
   /**
-   * @param template
-   * @returns {string}
+   * @string
    */
-  getTemplate: function (template) {
-    return fs.readFileSync('./app/templates/' + template + '.html', 'utf8');
-  },
+  template: null,
 
   /**
    * @param template
+   * @returns {exports}
+   */
+  load: function (template) {
+    this.template = fs.readFileSync(
+      './app/templates/' + template + '.html',
+      'utf8'
+    );
+
+    return this;
+  },
+
+  /**
    * @param variable
    * @param value
-   * @returns {void | string | never}
+   * @returns {exports}
    */
-  setVar: function (template, variable, value) {
-    return template.replace("{{" + variable + "}}", value);
+  var: function (variable, value) {
+    this.template = this.template.replace("{{" + variable + "}}", value);
+
+    return this;
+  },
+
+  /**
+   * @returns {null}
+   */
+  render: function () {
+    return this.template;
   },
 };

@@ -8,8 +8,6 @@ const {exec} = require('child_process');
 
 /* GET home page. */
 router.get('/:downloadType', function (req, res, next) {
-  console.log(req.params.downloadType);
-
   if (req.params.downloadType) {
     const download_type = req.params.downloadType;
     exec('cd ../ && ./export_client_files ' + download_type, (error, stdout, stderr) => {
@@ -18,8 +16,10 @@ router.get('/:downloadType', function (req, res, next) {
         return;
       }
 
-      var file = "";
-
+      /**
+       * @type {string}
+       */
+      let file = "";
       switch (download_type) {
         case "spells":
           file = __dirname + '../../../export/spells_us.txt';
@@ -29,6 +29,9 @@ router.get('/:downloadType', function (req, res, next) {
           break;
         case "basedata":
           file = __dirname + '../../../export/BaseData.txt';
+          break;
+        case "dbstr":
+          file = __dirname + '../../../export/dbstr_us.txt';
           break;
         default:
       }

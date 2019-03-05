@@ -61,6 +61,7 @@ app.use(function printSession(req, res, next) {
  */
 app.use('/', require('./routes/index'));
 app.use('/users', require('./routes/users'));
+app.use('/download', require('./routes/download'));
 
 /**
  * Login

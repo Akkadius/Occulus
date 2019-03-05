@@ -67,6 +67,7 @@ body {
   color: #495057;
   text-align: left;
   background-color: #f5f7fb;
+  /* background: linear-gradient( rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.9) ), url(https://www.wallpaperup.com/uploads/wallpapers/2015/03/18/640370/b231921979c6dd98d54260b9217fa94a-1400.jpg); */
 }
 
 [tabindex="-1"]:focus {

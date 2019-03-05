@@ -8,7 +8,7 @@ var cookieParser = require('cookie-parser');
 var logger       = require('morgan');
 var app          = express();
 var fs           = require('fs');
-
+var path         = require('path')
 /**
  * Load Config
  */
@@ -19,11 +19,16 @@ if (fs.existsSync(config_path)) {
 }
 
 /**
+ * Base server path
+ */
+base_server_path = path.join(__dirname, '../');
+
+/**
  * Express
  */
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({extended: false}));
+app.use(express.urlencoded({ extended : false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -34,23 +39,26 @@ session = require('express-session')
 app.use(
   session(
     {
-      name: 'session',
-      secret: 'mX6s196lLJQdxJ1I7xZk',
-      resave: false,
-      saveUninitialized: false,
+      name              : 'session',
+      secret            : 'mX6s196lLJQdxJ1I7xZk',
+      resave            : false,
+      saveUninitialized : false,
 
       /**
        * 30 days
        *
        * 1 minute * 60 minutes * 24 hours * 30 days
        */
-      cookie: {
-        maxAge: 60000 * 60 * 24 * 30
+      cookie : {
+        maxAge : 60000 * 60 * 24 * 30
       }
     }
   )
 );
 
+/**
+ * Print session debug
+ */
 app.use(function printSession(req, res, next) {
   console.log('req.session', req.session);
   return next();
@@ -85,8 +93,8 @@ const db        = new Sequelize(
   database.db,
   database.username,
   database.password, {
-    host: database.host,
-    dialect: 'mysql',
+    host    : database.host,
+    dialect : 'mysql',
   }
 );
 

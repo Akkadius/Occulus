@@ -2,9 +2,9 @@
  * download.js
  * @type {createApplication}
  */
-var express  = require('express');
-var router   = express.Router();
-const {exec} = require('child_process');
+var express    = require('express');
+var router     = express.Router();
+const { exec } = require('child_process');
 
 /* GET home page. */
 router.get('/:downloadType', function (req, res, next) {
@@ -22,21 +22,48 @@ router.get('/:downloadType', function (req, res, next) {
       let file = "";
       switch (download_type) {
         case "spells":
-          file = __dirname + '../../../export/spells_us.txt';
+          file = base_server_path + 'export/spells_us.txt';
           break;
         case "skills":
-          file = __dirname + '../../../export/SkillCaps.txt';
+          file = base_server_path + 'export/SkillCaps.txt';
           break;
         case "basedata":
-          file = __dirname + '../../../export/BaseData.txt';
+          file = base_server_path + 'export/BaseData.txt';
           break;
         case "dbstr":
-          file = __dirname + '../../../export/dbstr_us.txt';
+          file = base_server_path + 'export/dbstr_us.txt';
           break;
         default:
       }
 
-      res.download(file);
+      /**
+       * Get base file name
+       */
+      var path           = require('path');
+      var base_file_name = path.basename(file).replace(".txt", "");
+      var fs             = require('fs');
+      var yazl           = require("yazl");
+      var zipfile        = new yazl.ZipFile();
+
+      zipfile.addFile(file, base_file_name + ".txt");
+
+      console.log("zipping file: " + file);
+
+      zipfile.outputStream.pipe(
+        fs.createWriteStream(base_file_name + ".zip")
+      ).on("close", function () {
+        console.log("zip file downloaded: " + base_file_name + ".zip");
+        res.download(base_file_name + ".zip");
+
+        /**
+         * Cleanup after 10s because the download callback doesn't work
+         */
+        setTimeout(function () {
+          fs.unlinkSync(base_file_name + ".zip");
+        }, 10000);
+      });
+
+      zipfile.end();
     });
   }
 });

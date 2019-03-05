@@ -6,6 +6,7 @@ var auth     = require('../app/core/auth-service');
 /* GET home page. */
 router.get('/', auth.check, function (req, res, next) {
   const dashboard = template.load("dashboard").render();
+  const username = req.session.username
 
   /**
    * Response
@@ -13,6 +14,7 @@ router.get('/', auth.check, function (req, res, next) {
   res.send(
     template
       .load("index")
+      .var("username", username.charAt(0).toUpperCase() + username.substr(1))
       .var("content", dashboard)
       .render()
   );

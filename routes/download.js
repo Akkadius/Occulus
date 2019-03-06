@@ -14,7 +14,10 @@ router.get('/:downloadType', function (req, res, next) {
      * Request params
      */
     const download_type = req.params.downloadType;
-    
+
+    /**
+     * Exec export binary
+     */
     exec('cd ../ && ./export_client_files ' + download_type, (error, stdout, stderr) => {
       if (error) {
         console.error(`exec error: ${error}`);

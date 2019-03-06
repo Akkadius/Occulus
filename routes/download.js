@@ -59,7 +59,9 @@ router.get('/:downloadType', function (req, res, next) {
          * Cleanup after 10s because the download callback doesn't work
          */
         setTimeout(function () {
-          fs.unlinkSync(base_file_name + ".zip");
+          if (fs.existsSync(base_file_name + ".zip")) {
+            fs.unlinkSync(base_file_name + ".zip");
+          }
         }, 10000);
       });
 

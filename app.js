@@ -28,7 +28,7 @@ base_server_path = path.join(__dirname, '../');
  */
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended : false }));
+app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -39,18 +39,18 @@ session = require('express-session')
 app.use(
   session(
     {
-      name              : 'session',
-      secret            : 'mX6s196lLJQdxJ1I7xZk',
-      resave            : false,
-      saveUninitialized : false,
+      name: 'session',
+      secret: 'mX6s196lLJQdxJ1I7xZk',
+      resave: false,
+      saveUninitialized: false,
 
       /**
        * 30 days
        *
        * 1 minute * 60 minutes * 24 hours * 30 days
        */
-      cookie : {
-        maxAge : 60000 * 60 * 24 * 30
+      cookie: {
+        maxAge: 60000 * 60 * 24 * 30
       }
     }
   )
@@ -84,6 +84,7 @@ app.use('/logout', require('./routes/auth/logout'));
 app.use('/api/dashboard/stats', require('./routes/api/dashboard/stats'));
 app.use('/api/world/servers', require('./routes/api/world/servers'));
 app.use('/api/zoneserver', require('./routes/api/zoneserver'));
+app.use('/api/test', require('./routes/api/test'));
 
 module.exports = app;
 
@@ -96,8 +97,8 @@ const db        = new Sequelize(
   database.db,
   database.username,
   database.password, {
-    host    : database.host,
-    dialect : 'mysql',
+    host: database.host,
+    dialect: 'mysql',
   }
 );
 
@@ -126,3 +127,15 @@ fs.readdirSync('models/').forEach(function (filename) {
   model.resource     = db.import(model.path);
   models[model.name] = model;
 });
+
+
+/**
+ * NetStat Listeners
+ */
+global.last_analyzed_data = {};
+global.time_series_data         = {};
+global.max_seconds_series_store = 300;
+
+setInterval(function () {
+  require('./app/core/netstat-listener').listen();
+}, 1000);

@@ -1,5 +1,4 @@
-const Telnet   = require('telnet-client')
-var connection = new Telnet()
+const Telnet = require('telnet-client')
 
 /**
  * telnet-service
@@ -12,56 +11,18 @@ module.exports = {
    *
    * @param command
    */
-  exec: async function (command) {
-
-    try {
-
-      /**
-       * Setup
-       *
-       * @type {{maxBufferLength: string, shellPrompt: string, port: number, host: string, timeout: number}}
-       */
-      await connection.connect(
-        {
-          host: '127.0.0.1',
-          port: 9000,
-          shellPrompt: '>',
-          timeout: 10,
-          maxBufferLength: '10M',
-        }
-      );
-
-      const response = await connection.send(
-        command,
-        {
-          waitfor: '> $',
-          maxBufferLength: '10M'
-        }
-      );
-
-      return response.replace("\n\r>", "").trim();
-
-    } catch (error) {
-      console.log(error);
-    }
-
-  },
-
-  /**
-   * Execute command
-   *
-   * @param command
-   */
   execWorld: async function (command) {
 
     try {
 
+      let worldConnection = new Telnet()
+
       /**
        * Setup
        *
        * @type {{maxBufferLength: string, shellPrompt: string, port: number, host: string, timeout: number}}
        */
-      await connection.connect(
+      await worldConnection.connect(
         {
           host: '127.0.0.1',
           port: 9000,
@@ -71,7 +32,7 @@ module.exports = {
         }
       );
 
-      const response = await connection.send(
+      const worldResponse = await worldConnection.send(
         command,
         {
           waitfor: '> $',
@@ -79,7 +40,15 @@ module.exports = {
         }
       );
 
-      return response.replace("\n\r>", "").trim();
+      worldConnection.send("quit", {
+          waitfor: 'Connection closed by foreign host$',
+          maxBufferLength: '10M'
+        }
+      );
+
+      worldConnection.destroy();
+
+      return worldResponse.replace("\n\r>", "").trim();
 
     } catch (error) {
       console.log(error);
@@ -97,12 +66,15 @@ module.exports = {
 
     try {
 
+      let zoneConnection   = [];
+      zoneConnection[port] = new Telnet();
+
       /**
        * Setup
        *
        * @type {{maxBufferLength: string, shellPrompt: string, port: number, host: string, timeout: number}}
        */
-      await connection.connect(
+      await zoneConnection[port].connect(
         {
           host: '127.0.0.1',
           port: port,
@@ -112,7 +84,7 @@ module.exports = {
         }
       );
 
-      const response = await connection.send(
+      const zoneResponse = await zoneConnection[port].send(
         command,
         {
           waitfor: '> $',
@@ -120,7 +92,15 @@ module.exports = {
         }
       );
 
-      return response.replace("\n\r>", "").trim();
+      zoneConnection[port].send("quit", {
+          waitfor: 'Connection closed by foreign host$',
+          maxBufferLength: '10M'
+        }
+      );
+
+      zoneConnection[port].destroy();
+
+      return zoneResponse.replace("\n\r>", "").trim();
 
     } catch (error) {
       console.log(error);

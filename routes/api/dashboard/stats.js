@@ -1,6 +1,7 @@
-let express       = require('express');
-let router        = express.Router();
-let telnetService = require('../../../app/core/telnet-service.js');
+let express     = require('express');
+let router      = express.Router();
+let dataService = require('../../../app/core/eqemu-data-service-client.js');
+
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -35,8 +36,8 @@ router.get('/', function (req, res, next) {
     dashboard_stats.items = c;
   })).then(() => models['guilds'].resource.count().then(c => {
     dashboard_stats.guilds = c;
-  })).then(() => telnetService.exec("uptime 0").then(c => {
-    dashboard_stats.uptime = c.replace("Worldserver Uptime: ", "").trim();
+  })).then(() => dataService.getWorldUptime().then(c => {
+    dashboard_stats.uptime = c;
   })).then(() => res.send(dashboard_stats));
 
 });

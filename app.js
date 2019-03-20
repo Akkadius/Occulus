@@ -68,7 +68,8 @@ app.use(function printSession(req, res, next) {
  * Routes
  */
 app.use('/', require('./routes/index'));
-app.use('/users', require('./routes/users'));
+app.use('/zoneservers', require('./routes/zoneservers'));
+app.use('/zoneserver/:port/netstats', require('./routes/zoneserver/netstats'));
 app.use('/download', require('./routes/download'));
 
 /**
@@ -81,6 +82,7 @@ app.use('/logout', require('./routes/auth/logout'));
  * API Routes
  */
 app.use('/api/dashboard/stats', require('./routes/api/dashboard/stats'));
+app.use('/api/world/servers', require('./routes/api/world/servers'));
 
 module.exports = app;
 

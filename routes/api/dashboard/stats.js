@@ -5,7 +5,7 @@ var telnetService = require('../../../app/core/telnet-service.js');
 /* GET home page. */
 router.get('/', function (req, res, next) {
 
-  dashboard_stats = {};
+  let dashboard_stats = {};
 
   dashboard_stats.long_name  = eqemu_config.server.world.longname;
   dashboard_stats.shortname  = eqemu_config.server.world.shortname;

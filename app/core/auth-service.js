@@ -1,3 +1,6 @@
+/**
+ * @type {{check: module.exports.check}}
+ */
 module.exports = {
   check: function (req, res, next) {
 

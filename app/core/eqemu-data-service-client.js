@@ -17,4 +17,14 @@ module.exports = {
 
     return JSON.parse(response).data;
   },
+
+  /**
+   * @param port
+   * @returns {Promise<*>}
+   */
+  getZoneNetStats: async function (port) {
+    const response = await telnetService.execZone(port, "api get_packet_statistics");
+
+    return JSON.parse(response).data;
+  },
 };

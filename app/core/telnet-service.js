@@ -86,4 +86,45 @@ module.exports = {
     }
 
   },
+
+  /**
+   * Execute command
+   *
+   * @param port
+   * @param command
+   */
+  execZone: async function (port, command) {
+
+    try {
+
+      /**
+       * Setup
+       *
+       * @type {{maxBufferLength: string, shellPrompt: string, port: number, host: string, timeout: number}}
+       */
+      await connection.connect(
+        {
+          host: '127.0.0.1',
+          port: port,
+          shellPrompt: '>',
+          timeout: 10,
+          maxBufferLength: '10M',
+        }
+      );
+
+      const response = await connection.send(
+        command,
+        {
+          waitfor: '> $',
+          maxBufferLength: '10M'
+        }
+      );
+
+      return response.replace("\n\r>", "").trim();
+
+    } catch (error) {
+      console.log(error);
+    }
+
+  },
 };

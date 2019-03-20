@@ -60,7 +60,7 @@ app.use(
  * Print session debug
  */
 app.use(function printSession(req, res, next) {
-  console.log('req.session', req.session);
+  // console.log('req.session', req.session);
   return next();
 });
 
@@ -69,7 +69,7 @@ app.use(function printSession(req, res, next) {
  */
 app.use('/', require('./routes/index'));
 app.use('/zoneservers', require('./routes/zoneservers'));
-app.use('/zoneserver/:port/netstats', require('./routes/zoneserver/netstats'));
+app.use('/zoneserver', require('./routes/zoneserver/netstats'));
 app.use('/download', require('./routes/download'));
 
 /**
@@ -83,6 +83,7 @@ app.use('/logout', require('./routes/auth/logout'));
  */
 app.use('/api/dashboard/stats', require('./routes/api/dashboard/stats'));
 app.use('/api/world/servers', require('./routes/api/world/servers'));
+app.use('/api/zoneserver', require('./routes/api/zoneserver'));
 
 module.exports = app;
 

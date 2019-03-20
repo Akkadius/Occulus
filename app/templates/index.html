@@ -25,6 +25,18 @@
     <!-- Stylesheets -->
     <link href="/assets/css/dashboard.css" rel="stylesheet"/>
     <link href="/assets/plugins/charts-c3/plugin.css" rel="stylesheet"/>
+
+    <script src="/assets/js/require.min.js"></script>
+    <script>
+      requirejs.config({
+        baseUrl: '/'
+      });
+    </script>
+
+    <!-- c3.js Charts Plugin -->
+    <link href="/assets/plugins/charts-c3/plugin.css" rel="stylesheet" />
+    <script src="/assets/plugins/charts-c3/plugin.js"></script>
+
 </head>
 
 <body class="">
@@ -160,12 +172,6 @@
             </div>
 
             <!-- Javascript assets -->
-            <script src="/assets/js/require.min.js"></script>
-            <script>
-              requirejs.config({
-                baseUrl: '.'
-              });
-            </script>
 
             <!-- Dashboard Core -->
             <script src="/assets/js/dashboard.js"></script>

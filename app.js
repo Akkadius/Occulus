@@ -128,12 +128,11 @@ fs.readdirSync('models/').forEach(function (filename) {
   models[model.name] = model;
 });
 
-
 /**
  * NetStat Listeners
  */
 global.last_analyzed_data = {};
-global.time_series_data         = {};
+global.sent_packet_series_data  = {};
 global.max_seconds_series_store = 300;
 
 setInterval(function () {

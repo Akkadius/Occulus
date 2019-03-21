@@ -4,6 +4,9 @@
  */
 let dataService = require('./eqemu-data-service-client.js');
 
+/**
+ * @type {{listen: module.exports.listen}}
+ */
 module.exports = {
 
   /**
@@ -12,15 +15,15 @@ module.exports = {
   listen: function () {
 
     dataService.getZoneNetStats(7000).then(response => {
-      const unix_time = Math.floor(new Date() / 1000);
+      let unix_time = Math.floor(new Date() / 1000);
 
       /**
        * Prune back data
        */
-      for (let series_time_unix in time_series_data) {
+      for (let series_time_unix in sent_packet_series_data) {
         if (series_time_unix < (unix_time - max_seconds_series_store)) {
           // console.log("%s falls behind store window, deleting...", series_time_unix);
-          delete global.time_series_data[series_time_unix];
+          delete global.sent_packet_series_data[series_time_unix];
         }
       }
 
@@ -28,36 +31,42 @@ module.exports = {
        * Loop through packet data
        */
       response.forEach(function (row) {
-        const data_set_key = row['client_name'];
+
+        let client_name = row.client_name;
 
         /**
          * Initialize: last_analyzed_data
          */
-        if (typeof last_analyzed_data[data_set_key] === "undefined") {
-          last_analyzed_data[data_set_key] = [];
-        }
-
-        if (typeof last_analyzed_data[data_set_key]['sent_packet_types'] === "undefined") {
-          last_analyzed_data[data_set_key]['sent_packet_types'] = [];
+        if (typeof last_analyzed_data[client_name] === "undefined") {
+          last_analyzed_data[client_name] = [];
         }
 
         /**
          * Loop through sent packet types
+         *
+         * { OP_AAExpUpdate: 1,
+         *   OP_AggroMeterTargetInfo: 7,
+         *   OP_AltCurrency: 1,
+         *   OP_BlockedBuffs: 2 ... }
+         *
          */
         for (let sent_packet_type_key in row.sent_packet_types) {
           // sent_packet_type_key = sent_packet_type_key.toString();
           let sent_packet_type_value = row.sent_packet_types[sent_packet_type_key];
 
-          if (typeof last_analyzed_data[data_set_key]['sent_packet_types'][sent_packet_type_key] === "undefined") {
-            last_analyzed_data[data_set_key]['sent_packet_types'][sent_packet_type_key] = sent_packet_type_value;
+          // console.log(sent_packet_type_key);
+          // console.log(sent_packet_type_value);
+
+          if (typeof last_analyzed_data[client_name][sent_packet_type_key] === "undefined") {
+            last_analyzed_data[client_name][sent_packet_type_key] = sent_packet_type_value;
           } else {
 
             /**
              * Record the deltas
              */
-            const last_value = last_analyzed_data[data_set_key]['sent_packet_types'][sent_packet_type_key];
+            const last_value = last_analyzed_data[client_name][sent_packet_type_key];
             if (last_value !== sent_packet_type_value) {
-              last_analyzed_data[data_set_key]['sent_packet_types'][sent_packet_type_key] = sent_packet_type_value;
+              last_analyzed_data[client_name][sent_packet_type_key] = sent_packet_type_value;
 
               /**
                * If no delta, continue
@@ -70,26 +79,26 @@ module.exports = {
               /**
                * Initialize: time_series_data
                */
-              if (typeof time_series_data[unix_time] === "undefined") {
-                time_series_data[unix_time] = [];
+              if (typeof sent_packet_series_data[sent_packet_type_key] === "undefined") {
+                sent_packet_series_data[sent_packet_type_key] = {};
               }
-
-              if (typeof time_series_data[unix_time]['sent_packet_types'] === "undefined") {
-                time_series_data[unix_time]['sent_packet_types'] = [];
-              }
-
-              if (typeof time_series_data[unix_time]['sent_packet_types'][sent_packet_type_key] === "undefined") {
-                time_series_data[unix_time]['sent_packet_types'][sent_packet_type_key] = 0;
+              if (typeof sent_packet_series_data[sent_packet_type_key][unix_time] === "undefined") {
+                sent_packet_series_data[sent_packet_type_key][unix_time] = 0;
               }
 
               /**
                * Record delta
                */
-              time_series_data[unix_time]['sent_packet_types'][sent_packet_type_key] = delta;
+              if (sent_packet_series_data[sent_packet_type_key][unix_time] > 0) {
+                sent_packet_series_data[sent_packet_type_key][unix_time] += delta;
+              }
+              else {
+                sent_packet_series_data[sent_packet_type_key][unix_time] = delta;
+              }
 
-              console.log("Recording delta (%s) via client (%s) on type (%s), last value: %s new value: %s",
+              console.log("Recording delta (%s) unix: %s on type (%s), last value: %s new value: %s",
                 delta,
-                data_set_key,
+                unix_time,
                 sent_packet_type_key,
                 last_value,
                 sent_packet_type_value

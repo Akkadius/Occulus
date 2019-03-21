@@ -88,7 +88,7 @@ module.exports = {
       if (listen_time < (unix_time - this.maxListeningTimeout)) {
         console.debug("Removing netstat-listener via port %s", port);
         this.removeListener(port);
-        delete global.sent_packet_series_data[port];
+        delete sent_packet_series_data[port];
       }
 
       dataService.getZoneNetStats(port).then(response => {

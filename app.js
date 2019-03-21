@@ -137,6 +137,6 @@ global.sent_packet_series_data  = {};
 const netstatListener = require('./app/core/netstat-listener');
 
 setInterval(function () {
-  netstatListener.listen();
   netstatListener.prune();
+  netstatListener.listen();
 }, 1000);

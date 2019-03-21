@@ -7,7 +7,6 @@ let router          = express.Router();
 let moment          = require('moment');
 let netstatListener = require('../../../app/core/netstat-listener');
 
-/* GET home page. */
 router.get('/:port/chart/packet_types_sent', function (req, res, next) {
   const unix_time   = Math.floor(new Date() / 1000);
   const min_seconds = (unix_time - netstatListener.maxSeriesStoreTime);
@@ -61,10 +60,6 @@ router.get('/:port/chart/packet_types_sent', function (req, res, next) {
     groups: [packet_groups],
     x: 'x',
     xFormat: '%H:%M:%S',
-    // line: {
-    //   connectNull: true,
-    // },
-    // order: 'desc',
     type: 'bar',
   };
 

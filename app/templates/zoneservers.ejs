@@ -12,6 +12,9 @@
                     <tr>
                         <th class="text-center w-1"><i class="icon-people"></i></th>
                         <th class="text-center w-1"><i class="icon-people"></i></th>
+                        <th>CPU</th>
+                        <th>Uptime</th>
+                        <th>Memory</th>
                         <th>Zone</th>
                         <th>Type</th>
                         <th>Short Name</th>
@@ -33,6 +36,15 @@
                             </td>
 
                             <td><i class="fe fe-users"></i> <%= zone.number_players %> </td>
+                            <td>
+                                <div class="mx-auto chart-circle chart-circle-xs" data-value="<%= parseFloat(process_stats[zone.zone_os_pid].cpu / 100).toFixed(2) %>" data-thickness="3" data-color="blue">
+                                    <div class="chart-circle-value"><%= parseFloat(process_stats[zone.zone_os_pid].cpu).toFixed(2) %>%</div>
+                                </div>
+                            </td>
+                            <td>
+                                <%= parseFloat(process_stats[zone.zone_os_pid].elapsed / 1000 / 60 / 60).toFixed(2) %>h
+                            </td>
+                            <td><%= parseFloat(process_stats[zone.zone_os_pid].memory / 1024 / 1024).toFixed(2) %>MB </td>
                             <td><%= zone.zone_long_name %> </td>
                             <td>
                                 <%= zone.is_static_zone === true ? 'Static' : 'Dynamic' %>

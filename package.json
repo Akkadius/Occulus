@@ -19,6 +19,7 @@
     "mysql2": "^1.6.5",
     "nodemon": "^1.18.10",
     "path": "^0.12.7",
+    "pidusage": "^2.0.17",
     "ps-list": "^6.1.0",
     "sequelize": "^4.43.0",
     "sequelize-auto": "^0.4.29",

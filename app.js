@@ -84,7 +84,7 @@ app.use('/logout', require('./routes/auth/logout'));
 app.use('/api/dashboard/stats', require('./routes/api/dashboard/stats'));
 app.use('/api/world/servers', require('./routes/api/world/servers'));
 app.use('/api/zoneserver', require('./routes/api/zoneserver'));
-app.use('/api/test', require('./routes/api/test'));
+app.use('/api/zoneserver/netstat', require('./routes/api/zoneserver/netstat'));
 
 module.exports = app;
 
@@ -135,6 +135,8 @@ global.last_analyzed_data = {};
 global.sent_packet_series_data  = {};
 global.max_seconds_series_store = 300;
 
+const netstatListener = require('./app/core/netstat-listener');
+
 setInterval(function () {
-  require('./app/core/netstat-listener').listen();
+  netstatListener.listen();
 }, 1000);

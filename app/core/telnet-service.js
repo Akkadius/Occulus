@@ -27,7 +27,8 @@ module.exports = {
           host: '127.0.0.1',
           port: 9000,
           shellPrompt: '>',
-          timeout: 10,
+          timeout: 1000,
+          execTimeout: 1000,
           maxBufferLength: '10M',
         }
       );
@@ -79,7 +80,8 @@ module.exports = {
           host: '127.0.0.1',
           port: port,
           shellPrompt: '>',
-          timeout: 10,
+          timeout: 1000,
+          execTimeout: 1000,
           maxBufferLength: '10M',
         }
       );

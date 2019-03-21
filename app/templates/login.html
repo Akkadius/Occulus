@@ -70,6 +70,11 @@
 
 <!-- Javascript assets -->
 <script src="./assets/js/require.min.js"></script>
+<script>
+  requirejs.config({
+    baseUrl: '/'
+  });
+</script>
 <script src="./assets/js/dashboard.js"></script>
 <script type="text/javascript">
   require(['jquery'], function ($) {

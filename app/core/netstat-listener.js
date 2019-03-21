@@ -89,6 +89,7 @@ module.exports = {
         console.debug("Removing netstat-listener via port %s", port);
         this.removeListener(port);
         delete sent_packet_series_data[port];
+        continue;
       }
 
       dataService.getZoneNetStats(port).then(response => {

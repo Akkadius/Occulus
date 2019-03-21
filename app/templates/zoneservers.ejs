@@ -12,11 +12,11 @@
                     <tr>
                         <th class="text-center w-1"><i class="icon-people"></i></th>
                         <th class="text-center w-1"><i class="icon-people"></i></th>
+
                         <th>CPU</th>
                         <th>Uptime</th>
                         <th>Memory</th>
                         <th>Zone</th>
-                        <th>Type</th>
                         <th>Short Name</th>
                         <th>Zone ID</th>
                         <th>Instance ID</th>
@@ -35,7 +35,11 @@
                                 </div>
                             </td>
 
+
+
                             <td><i class="fe fe-users"></i> <%= zone.number_players %> </td>
+
+
                             <td>
                                 <div class="mx-auto chart-circle chart-circle-xs" data-value="<%= parseFloat(process_stats[zone.zone_os_pid].cpu / 100).toFixed(2) %>" data-thickness="3" data-color="blue">
                                     <div class="chart-circle-value"><%= parseFloat(process_stats[zone.zone_os_pid].cpu).toFixed(2) %>%</div>
@@ -45,10 +49,14 @@
                                 <%= parseFloat(process_stats[zone.zone_os_pid].elapsed / 1000 / 60 / 60).toFixed(2) %>h
                             </td>
                             <td><%= parseFloat(process_stats[zone.zone_os_pid].memory / 1024 / 1024).toFixed(2) %>MB </td>
-                            <td><%= zone.zone_long_name %> </td>
+
                             <td>
-                                <%= zone.is_static_zone === true ? 'Static' : 'Dynamic' %>
+                                <div> <%= zone.zone_long_name %> </div>
+                                <div class="small text-muted">
+                                    <%= zone.is_static_zone === true ? 'Static' : 'Dynamic' %>
+                                </div>
                             </td>
+
                             <td><%= zone.zone_name %> </td>
                             <td><%= zone.zone_id %> </td>
                             <td><%= zone.instance_id %> </td>
@@ -67,3 +75,7 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+  setTimeout(function() { window.location.reload(true); }, 1000 * 10);
+</script>

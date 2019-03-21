@@ -10,7 +10,7 @@ let netstatListener = require('../../../app/core/netstat-listener');
 /* GET home page. */
 router.get('/:port/chart/packet_types_sent', function (req, res, next) {
   const unix_time   = Math.floor(new Date() / 1000);
-  const min_seconds = (unix_time - 120);
+  const min_seconds = (unix_time - netstatListener.maxSeriesStoreTime);
   const port        = req.params.port;
 
   /**

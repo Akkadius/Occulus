@@ -133,10 +133,10 @@ fs.readdirSync('models/').forEach(function (filename) {
  */
 global.last_analyzed_data = {};
 global.sent_packet_series_data  = {};
-global.max_seconds_series_store = 300;
 
 const netstatListener = require('./app/core/netstat-listener');
 
 setInterval(function () {
   netstatListener.listen();
+  netstatListener.prune();
 }, 1000);

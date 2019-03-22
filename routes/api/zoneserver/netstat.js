@@ -9,7 +9,7 @@ let netstatListener = require('../../../app/core/netstat-listener');
 
 router.get('/:port/chart/packet_types_sent', function (req, res, next) {
   const unix_time   = Math.floor(new Date() / 1000);
-  const min_seconds = (unix_time - netstatListener.maxSeriesStoreTime);
+  const min_seconds = (unix_time - netstatListener.max_series_store_time);
   const port        = req.params.port;
 
   /**
@@ -34,12 +34,12 @@ router.get('/:port/chart/packet_types_sent', function (req, res, next) {
    *
    * Loop through sent packet series
    */
-  for (let packet_type in sent_packet_series_data[port]) {
+  for (let packet_type in netstatListener.sent_packet_types_series_data[port]) {
     let chart_data_row = [packet_type];
     for (let time = min_seconds; time <= unix_time; time++) {
       let value = (
-        typeof sent_packet_series_data[port][packet_type][time] !== "undefined" ?
-          sent_packet_series_data[port][packet_type][time] :
+        typeof netstatListener.sent_packet_types_series_data[port][packet_type][time] !== "undefined" ?
+          netstatListener.sent_packet_types_series_data[port][packet_type][time] :
           null
       );
 

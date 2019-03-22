@@ -131,9 +131,6 @@ fs.readdirSync('models/').forEach(function (filename) {
 /**
  * NetStat Listeners
  */
-global.last_analyzed_data = {};
-global.sent_packet_series_data  = {};
-
 const netstatListener = require('./app/core/netstat-listener');
 
 setInterval(function () {

@@ -12,20 +12,30 @@ module.exports = {
   /**
    * @string
    */
-  listeningPorts: {},
+  listening_ports: {},
 
   /**
    * @int
    * Time before listener stops polling for data
    */
-  maxListeningTimeout: 60,
+  max_listening_timeout: 60,
 
   /**
    * Number of seconds that the listener will retain data
    *
    * @int
    */
-  maxSeriesStoreTime: 120,
+  max_series_store_time: 120,
+
+  /**
+   * For keeping track of sent packet types last listening round
+   */
+  last_analyzed_sent_types_data: [],
+
+  /**
+   * Keeps track of rolling series data for sent packet types
+   */
+  sent_packet_types_series_data: [],
 
   /**
    * Set our listening port to current unix time to compare later
@@ -33,7 +43,7 @@ module.exports = {
    * @param port
    */
   addListener: function (port) {
-    this.listeningPorts[port] = Math.floor(new Date() / 1000);
+    this.listening_ports[port] = Math.floor(new Date() / 1000);
   },
 
   /**
@@ -42,15 +52,15 @@ module.exports = {
    * @param port
    */
   removeListener: function (port) {
-    delete this.listeningPorts[port];
+    delete this.listening_ports[port];
   },
 
   /**
    *
-   * @returns {module.exports.listeningPorts|{}}
+   * @returns {module.exports.listening_ports|{}}
    */
   getListeningPorts: function () {
-    return this.listeningPorts;
+    return this.listening_ports;
   },
 
   /**
@@ -62,12 +72,12 @@ module.exports = {
       /**
        * Prune sent packet series data
        */
-      for (let packet_type in sent_packet_series_data[port]) {
-        for (let time_entry in sent_packet_series_data[port][packet_type]) {
+      for (let packet_type in this.sent_packet_types_series_data[port]) {
+        for (let time_entry in this.sent_packet_types_series_data[port][packet_type]) {
           let unix_time = Math.floor(new Date() / 1000);
-          if (time_entry < (unix_time - this.maxSeriesStoreTime)) {
+          if (time_entry < (unix_time - this.max_series_store_time)) {
             // console.debug("deleting packet_type: %s time_entry: %s", packet_type, time_entry);
-            delete sent_packet_series_data[port][packet_type][time_entry];
+            delete this.sent_packet_types_series_data[port][packet_type][time_entry];
           }
         }
       }
@@ -85,10 +95,10 @@ module.exports = {
       /**
        * Prune listeners who have dropped off
        */
-      if (listen_time < (unix_time - this.maxListeningTimeout)) {
+      if (listen_time < (unix_time - this.max_listening_timeout)) {
         console.debug("Removing netstat-listener via port %s", port);
         this.removeListener(port);
-        delete sent_packet_series_data[port];
+        delete this.sent_packet_types_series_data[port];
         continue;
       }
 
@@ -110,10 +120,10 @@ module.exports = {
     let unix_time   = Math.floor(new Date() / 1000);
 
     /**
-     * Initialize: last_analyzed_data
+     * Initialize: this.lastAnalyzedSentTypesData
      */
-    if (typeof last_analyzed_data[client_name] === "undefined") {
-      last_analyzed_data[client_name] = [];
+    if (typeof this.last_analyzed_sent_types_data[client_name] === "undefined") {
+      this.last_analyzed_sent_types_data[client_name] = [];
     }
 
     /**
@@ -132,16 +142,16 @@ module.exports = {
       // console.log(sent_packet_type_key);
       // console.log(sent_packet_type_value);
 
-      if (typeof last_analyzed_data[client_name][sent_packet_type_key] === "undefined") {
-        last_analyzed_data[client_name][sent_packet_type_key] = sent_packet_type_value;
+      if (typeof this.last_analyzed_sent_types_data[client_name][sent_packet_type_key] === "undefined") {
+        this.last_analyzed_sent_types_data[client_name][sent_packet_type_key] = sent_packet_type_value;
       } else {
 
         /**
          * Record the deltas
          */
-        const last_value = last_analyzed_data[client_name][sent_packet_type_key];
+        const last_value = this.last_analyzed_sent_types_data[client_name][sent_packet_type_key];
         if (last_value !== sent_packet_type_value) {
-          last_analyzed_data[client_name][sent_packet_type_key] = sent_packet_type_value;
+          this.last_analyzed_sent_types_data[client_name][sent_packet_type_key] = sent_packet_type_value;
 
           /**
            * If no delta, continue
@@ -154,23 +164,23 @@ module.exports = {
           /**
            * Initialize: time_series_data
            */
-          if (typeof sent_packet_series_data[port] === "undefined") {
-            sent_packet_series_data[port] = {};
+          if (typeof this.sent_packet_types_series_data[port] === "undefined") {
+            this.sent_packet_types_series_data[port] = {};
           }
-          if (typeof sent_packet_series_data[port][sent_packet_type_key] === "undefined") {
-            sent_packet_series_data[port][sent_packet_type_key] = {};
+          if (typeof this.sent_packet_types_series_data[port][sent_packet_type_key] === "undefined") {
+            this.sent_packet_types_series_data[port][sent_packet_type_key] = {};
           }
-          if (typeof sent_packet_series_data[port][sent_packet_type_key][unix_time] === "undefined") {
-            sent_packet_series_data[port][sent_packet_type_key][unix_time] = 0;
+          if (typeof this.sent_packet_types_series_data[port][sent_packet_type_key][unix_time] === "undefined") {
+            this.sent_packet_types_series_data[port][sent_packet_type_key][unix_time] = 0;
           }
 
           /**
            * Record delta
            */
-          if (sent_packet_series_data[port][sent_packet_type_key][unix_time] > 0) {
-            sent_packet_series_data[port][sent_packet_type_key][unix_time] += delta;
+          if (this.sent_packet_types_series_data[port][sent_packet_type_key][unix_time] > 0) {
+            this.sent_packet_types_series_data[port][sent_packet_type_key][unix_time] += delta;
           } else {
-            sent_packet_series_data[port][sent_packet_type_key][unix_time] = delta;
+            this.sent_packet_types_series_data[port][sent_packet_type_key][unix_time] = delta;
           }
 
           console.debug("Recording delta on port (%s) (%s) unix: %s on type (%s), last value: %s new value: %s",

@@ -12,48 +12,47 @@ module.exports = {
    * @param command
    */
   execWorld: async function (command) {
+    let worldConnection = new Telnet()
 
-    try {
+    worldConnection.on('error', function () {
+      console.log('execWorld: Cannot connect to world process!');
+      return false;
+    });
 
-      let worldConnection = new Telnet()
+    /**
+     * Setup
+     *
+     * @type {{maxBufferLength: string, shellPrompt: string, port: number, host: string, timeout: number}}
+     */
+    await worldConnection.connect(
+      {
+        host: '127.0.0.1',
+        port: 9000,
+        shellPrompt: '>',
+        timeout: 1000,
+        execTimeout: 1000,
+        maxBufferLength: '10M',
+      }
+    );
 
-      /**
-       * Setup
-       *
-       * @type {{maxBufferLength: string, shellPrompt: string, port: number, host: string, timeout: number}}
-       */
-      await worldConnection.connect(
-        {
-          host: '127.0.0.1',
-          port: 9000,
-          shellPrompt: '>',
-          timeout: 1000,
-          execTimeout: 1000,
-          maxBufferLength: '10M',
-        }
-      );
+    const worldResponse = await worldConnection.send(
+      command,
+      {
+        waitfor: '> $',
+        maxBufferLength: '10M'
+      }
+    );
 
-      const worldResponse = await worldConnection.send(
-        command,
-        {
-          waitfor: '> $',
-          maxBufferLength: '10M'
-        }
-      );
+    worldConnection.send("quit", {
+        waitfor: 'Connection closed by foreign host$',
+        maxBufferLength: '10M'
+      }
+    );
 
-      worldConnection.send("quit", {
-          waitfor: 'Connection closed by foreign host$',
-          maxBufferLength: '10M'
-        }
-      );
+    worldConnection.destroy();
 
-      worldConnection.destroy();
+    return worldResponse.replace("\n\r>", "").trim();
 
-      return worldResponse.replace("\n\r>", "").trim();
-
-    } catch (error) {
-      console.log(error);
-    }
 
   },
 
@@ -69,6 +68,11 @@ module.exports = {
 
       let zoneConnection   = [];
       zoneConnection[port] = new Telnet();
+
+      zoneConnection[port].on('error', function () {
+        console.log('execZone: [%s] Cannot connect to zone process!', port);
+        return false;
+      });
 
       /**
        * Setup

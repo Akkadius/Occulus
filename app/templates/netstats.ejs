@@ -66,6 +66,86 @@
         </div>
     </div>
 
+    <!-- Ping -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Ping (ms)</h3>
+        </div>
+        <div class="card-body">
+            <div id="ping" style="height: 8rem"></div>
+        </div>
+    </div>
+
+    <!-- Packet Loss Inbound -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Packet Loss Inbound %</h3>
+        </div>
+        <div class="card-body">
+            <div id="packet-loss-inbound" style="height: 8rem"></div>
+        </div>
+    </div>
+
+    <!-- Packet Loss Outbound -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Packet Loss Outbound %</h3>
+        </div>
+        <div class="card-body">
+            <div id="packet-loss-outbound" style="height: 8rem"></div>
+        </div>
+    </div>
+
+    <!-- Receive bytes per second -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Server Receive (mbps)</h3>
+        </div>
+        <div class="card-body">
+            <div id="receive-bytes" style="height: 8rem"></div>
+        </div>
+    </div>
+
+    <!-- Sent bytes per second -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Server Sent (mbps)</h3>
+        </div>
+        <div class="card-body">
+            <div id="sent-bytes" style="height: 8rem"></div>
+        </div>
+    </div>
+
+    <!-- Resent Packets -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Resent Packets</h3>
+        </div>
+        <div class="card-body">
+            <div id="resent-packets" style="height: 8rem"></div>
+        </div>
+    </div>
+
+    <!-- Resent Fragments -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Resent Fragments</h3>
+        </div>
+        <div class="card-body">
+            <div id="resent-fragments" style="height: 8rem"></div>
+        </div>
+    </div>
+
+    <!-- Resent Non-Fragments -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Resent Non-Fragments</h3>
+        </div>
+        <div class="card-body">
+            <div id="resent-non-fragments" style="height: 8rem"></div>
+        </div>
+    </div>
+
     <!-- Netstats from all clients -->
     <div class="col-12">
         <div class="card">
@@ -76,7 +156,6 @@
                 <table class="table card-table table-vcenter text-nowrap" id="client-netstats">
                     <thead>
                     <tr>
-
                         <th>Client ID</th>
                         <th>Client Name</th>
                         <th>Average Ping</th>
@@ -87,8 +166,8 @@
                         <th>Packet Loss Out %</th>
                         <th>Realtime Receive Packets</th>
                         <th>Realtime Sent Packets</th>
-                        <th>Receive Bytes</th>
-                        <th>Sent Bytes</th>
+                        <th>Receive bps</th>
+                        <th>Sent bps</th>
                         <th>Resent Packets</th>
                         <th>Resent Fragments</th>
                         <th>Resent Non Fragments</th>
@@ -147,74 +226,129 @@
             npc_list = data;
           });
 
+          var chart_base_config = {
+            bindto: '#packet-loss-inbound',
+            transition: {
+              duration: 0
+            },
+            point: {
+              show: false
+            },
+            line: {
+              connectNull: true,
+            },
+            data: {},
+            legend: {
+              show: false
+            },
+            axis: {
+              x: {
+                type: 'timeseries',
+                tick: {
+                  format: '%H:%M:%S',
+                  fit: true,
+                }
+              },
+              y: {
+                show: true
+              }
+            }
+          };
+
           /**
-           * Sent types
+           * Initialize Charts
            * @type {string}
            */
-          var chart_packet_types_sent_endpoint = '/api/zoneserver/netstat/' + netstat_zone_port + '/chart/packet_types_sent';
-          $.get(chart_packet_types_sent_endpoint, function (data) {
+          var chart_endpoint = '/api/zoneserver/netstat/' + netstat_zone_port + '/chart';
+          $.get(chart_endpoint, function (data) {
             chart_packet_types_sent = c3.generate(
-              {
-                bindto: '#packet-sent-types',
-                transition: {
-                  duration: 0
-                },
-                line: {
-                  connectNull: true,
-                },
-                point: {
-                  show: false
-                },
-                data: data,
-                axis: {
-                  x: {
-                    type: 'timeseries',
-                    tick: {
-                      format: '%H:%M:%S',
-                      fit: true,
-                    }
-                  },
-                  y: {
-                    show: true
-                  }
+              $.extend(chart_base_config, {
+                  bindto: "#packet-sent-types",
+                  data: data.sent_packet_types
                 }
-              });
+              ));
+
+            chart_packet_types_receive = c3.generate(
+              $.extend(chart_base_config, {
+                  bindto: "#packet-receive-types",
+                  data: data.receive_packet_types
+                }
+              ));
+
+            chart_ping = c3.generate(
+              $.extend(chart_base_config, {
+                  bindto: "#ping",
+                  data: data.ping
+                }
+              ));
+
+            chart_packet_loss_inbound = c3.generate(
+              $.extend(chart_base_config, {
+                  bindto: "#packet-loss-inbound",
+                  data: data.packet_loss_inbound
+                }
+              ));
+
+            chart_packet_loss_outbound = c3.generate(
+              $.extend(chart_base_config, {
+                  bindto: "#packet-loss-outbound",
+                  data: data.packet_loss_outbound
+                }
+              ));
+
+            chart_receive_bytes = c3.generate(
+              $.extend(chart_base_config, {
+                  bindto: "#receive-bytes",
+                  data: data.receive_bytes
+                }
+              ));
+
+            chart_sent_bytes = c3.generate(
+              $.extend(chart_base_config, {
+                  bindto: "#sent-bytes",
+                  data: data.sent_bytes
+                }
+              ));
+
+            chart_resent_packets = c3.generate(
+              $.extend(chart_base_config, {
+                  bindto: "#resent-packets",
+                  data: data.resent_packets
+                }
+              ));
+
+            chart_resent_fragments = c3.generate(
+              $.extend(chart_base_config, {
+                  bindto: "#resent-fragments",
+                  data: data.resent_fragments
+                }
+              ));
+
+            chart_resent_non_fragments = c3.generate(
+              $.extend(chart_base_config, {
+                  bindto: "#resent-non-fragments",
+                  data: data.resent_non_fragments
+                }
+              ));
           });
 
           /**
-           * Receive types
-           * @type {string}
+           * Refresh charts
            */
-          var chart_packet_types_receive_endpoint = '/api/zoneserver/netstat/' + netstat_zone_port + '/chart/packet_types_receive';
-          $.get(chart_packet_types_receive_endpoint, function (data) {
-            chart_packet_types_receive = c3.generate(
-              {
-                bindto: '#packet-receive-types',
-                transition: {
-                  duration: 0
-                },
-                line: {
-                  connectNull: true,
-                },
-                point: {
-                  show: false
-                },
-                data: data,
-                axis: {
-                  x: {
-                    type: 'timeseries',
-                    tick: {
-                      format: '%H:%M:%S',
-                      fit: true,
-                    }
-                  },
-                  y: {
-                    show: true
-                  }
-                }
-              });
-
-          });
+          function refreshCharts() {
+            $.get(chart_endpoint, function (data) {
+              chart_packet_types_sent.load(data.sent_packet_types);
+              chart_packet_types_receive.load(data.receive_packet_types);
+              chart_ping.load(data.ping);
+              chart_packet_loss_inbound.load(data.packet_loss_inbound);
+              chart_packet_loss_outbound.load(data.packet_loss_outbound);
+              chart_receive_bytes.load(data.receive_bytes);
+              chart_sent_bytes.load(data.sent_bytes);
+              chart_resent_packets.load(data.resent_packets);
+              chart_resent_fragments.load(data.resent_fragments);
+              chart_resent_non_fragments.load(data.resent_non_fragments);
+            });
+          }
 
           setInterval(function () {
             refreshCharts();
@@ -222,23 +356,14 @@
           }, 1000);
 
           /**
-           * Refresh charts
-           */
-          function refreshCharts() {
-            $.get(chart_packet_types_sent_endpoint, function (data) {
-              chart_packet_types_sent.load(data);
-            });
-            $.get(chart_packet_types_receive_endpoint, function (data) {
-              chart_packet_types_receive.load(data);
-            });
-          }
-
-          /**
            * Client netstats
            */
           function getClientNetstats() {
             $.get('/api/zoneserver/' + netstat_zone_port + '/netstats', function (data) {
 
+              /**
+               * Update table
+               */
               $('#client-netstats tbody').empty();
 
               for (var row in data) {
@@ -254,12 +379,12 @@
                   parseFloat(data[row].packet_loss_out).toFixed(2),
                   commify(data[row].realtime_receive_packets),
                   commify(data[row].realtime_sent_packets),
-                  data[row].receive_bytes,
-                  data[row].sent_bytes,
+                  parseFloat(data[row].receive_bytes / data[row].seconds_since_reset).toFixed(1) + " bps",
+                  parseFloat(data[row].sent_bytes / data[row].seconds_since_reset).toFixed(1) + " bps",
                   commify(data[row].resent_packets),
                   commify(data[row].resent_fragments),
                   commify(data[row].resent_non_fragments),
-                  parseFloat( data[row].seconds_since_reset).toFixed(2),
+                  parseFloat(data[row].seconds_since_reset).toFixed(2),
                 ];
 
                 var row_data = "";

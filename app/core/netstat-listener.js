@@ -30,7 +30,7 @@ module.exports = {
   /**
    * For keeping track of sent packet types last listening round
    */
-  last_analyzed_sent_types_data: [],
+  sent_packet_types_last_analyzed: [],
 
   /**
    * Keeps track of rolling series data for sent packet types
@@ -98,7 +98,7 @@ module.exports = {
       if (listen_time < (unix_time - this.max_listening_timeout)) {
         console.debug("Removing netstat-listener via port %s", port);
         this.removeListener(port);
-        delete this.last_analyzed_sent_types_data[port];
+        delete this.sent_packet_types_last_analyzed[port];
         delete this.sent_packet_types_series_data[port];
         continue;
       }
@@ -125,12 +125,12 @@ module.exports = {
     /**
      * Initialize: this.last_analyzed_sent_types_data
      */
-    if (typeof this.last_analyzed_sent_types_data[port] === "undefined") {
-      this.last_analyzed_sent_types_data[port] = {};
+    if (typeof this.sent_packet_types_last_analyzed[port] === "undefined") {
+      this.sent_packet_types_last_analyzed[port] = {};
     }
 
-    if (typeof this.last_analyzed_sent_types_data[port][client_name] === "undefined") {
-      this.last_analyzed_sent_types_data[port][client_name] = [];
+    if (typeof this.sent_packet_types_last_analyzed[port][client_name] === "undefined") {
+      this.sent_packet_types_last_analyzed[port][client_name] = [];
     }
 
     /**
@@ -149,16 +149,16 @@ module.exports = {
       // console.log(sent_packet_type_key);
       // console.log(sent_packet_type_value);
 
-      if (typeof this.last_analyzed_sent_types_data[port][client_name][sent_packet_type_key] === "undefined") {
-        this.last_analyzed_sent_types_data[port][client_name][sent_packet_type_key] = sent_packet_type_value;
+      if (typeof this.sent_packet_types_last_analyzed[port][client_name][sent_packet_type_key] === "undefined") {
+        this.sent_packet_types_last_analyzed[port][client_name][sent_packet_type_key] = sent_packet_type_value;
       } else {
 
         /**
          * Record the deltas
          */
-        const last_value = this.last_analyzed_sent_types_data[port][client_name][sent_packet_type_key];
+        const last_value = this.sent_packet_types_last_analyzed[port][client_name][sent_packet_type_key];
         if (last_value !== sent_packet_type_value) {
-          this.last_analyzed_sent_types_data[port][client_name][sent_packet_type_key] = sent_packet_type_value;
+          this.sent_packet_types_last_analyzed[port][client_name][sent_packet_type_key] = sent_packet_type_value;
 
           /**
            * If no delta, continue

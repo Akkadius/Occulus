@@ -48,6 +48,36 @@ module.exports = {
   receive_packet_types_series_data: [],
 
   /**
+   * Generic stat last analyzed tracker
+   */
+  stat_last_analyzed: [],
+
+  /**
+   * Generic stat series data
+   */
+  stat_series_data: [],
+
+  /**
+   * Recording stats
+   */
+  recording_stats: {
+    'last_ping': true,
+    'packet_loss_in': true,
+    'packet_loss_out': true,
+  },
+
+  /**
+   * Recording delta stats
+   */
+  recording_delta_stats: {
+    'receive_bytes': true,
+    'sent_bytes': true,
+    'resent_packets': true,
+    'resent_non_fragments': true,
+    'resent_fragments': true,
+  },
+
+  /**
    * Set our listening port to current unix time to compare later
    *
    * @param port
@@ -104,6 +134,21 @@ module.exports = {
           }
         }
       }
+
+      /**
+       * Prune stat series data
+       */
+      for (let client in this.stat_series_data[port]) {
+        for (let stat in this.stat_series_data[port][client]) {
+          for (let time_entry in this.stat_series_data[port][client][stat]) {
+            let unix_time = Math.floor(new Date() / 1000);
+            if (time_entry < (unix_time - this.max_series_store_time)) {
+              delete this.stat_series_data[port][client][stat][time_entry];
+            }
+          }
+        }
+      }
+      
     }
   },
 
@@ -121,10 +166,14 @@ module.exports = {
       if (listen_time < (unix_time - this.max_listening_timeout)) {
         console.debug("Removing netstat-listener via port %s", port);
         this.removeListener(port);
+
         delete this.sent_packet_types_last_analyzed[port];
         delete this.sent_packet_types_series_data[port];
         delete this.receive_packet_types_last_analyzed[port];
         delete this.receive_packet_types_series_data[port];
+        delete this.stat_last_analyzed[port];
+        delete this.stat_series_data[port];
+
         continue;
       }
 
@@ -136,6 +185,7 @@ module.exports = {
           response.forEach(function (row) {
             module.exports.parseSentPacketTypes(port, row);
             module.exports.parseReceivePacketTypes(port, row);
+            module.exports.parseStats(port, row);
           });
         }
       });
@@ -324,4 +374,94 @@ module.exports = {
     }
   },
 
+  /**
+   * Parse stats
+   *
+   * @param port
+   * @param row
+   */
+  parseStats: function (port, row) {
+    let client_name = row.client_name;
+    let unix_time   = Math.floor(new Date() / 1000);
+
+    if (typeof this.stat_last_analyzed[port] === "undefined") {
+      this.stat_last_analyzed[port] = {};
+    }
+
+    if (typeof this.stat_last_analyzed[port][client_name] === "undefined") {
+      this.stat_last_analyzed[port][client_name] = [];
+    }
+
+    for (let stat in row) {
+      let stat_value = row[stat];
+
+      /**
+       * Static stats
+       */
+      if (this.recording_stats[stat]) {
+
+        if (typeof this.stat_series_data[port] === "undefined") {
+          this.stat_series_data[port] = {};
+        }
+        if (typeof this.stat_series_data[port][client_name] === "undefined") {
+          this.stat_series_data[port][client_name] = [];
+        }
+        if (typeof this.stat_series_data[port][client_name][stat] === "undefined") {
+          this.stat_series_data[port][client_name][stat] = [];
+        }
+        if (typeof this.stat_series_data[port][client_name][stat][unix_time] === "undefined") {
+          this.stat_series_data[port][client_name][stat][unix_time] = stat_value;
+        }
+
+        console.debug("Recording static stat (%s) on port (%s) unix: %s value: %s",
+          stat,
+          port,
+          unix_time,
+          stat_value
+        );
+      }
+
+      /**
+       * Delta stats
+       */
+      if (this.recording_delta_stats[stat]) {
+        if (typeof this.stat_last_analyzed[port][client_name][stat] === "undefined") {
+          this.stat_last_analyzed[port][client_name][stat] = [];
+        } else {
+
+          const last_value = this.stat_last_analyzed[port][client_name][stat];
+          if (last_value !== stat_value) {
+            this.stat_last_analyzed[port][client_name][stat] = stat_value;
+
+            const delta = stat_value - last_value;
+            if (delta < 0) {
+              continue;
+            }
+
+            if (typeof this.stat_series_data[port] === "undefined") {
+              this.stat_series_data[port] = {};
+            }
+            if (typeof this.stat_series_data[port][client_name] === "undefined") {
+              this.stat_series_data[port][client_name] = [];
+            }
+            if (typeof this.stat_series_data[port][client_name][stat] === "undefined") {
+              this.stat_series_data[port][client_name][stat] = [];
+            }
+            if (typeof this.stat_series_data[port][client_name][stat][unix_time] === "undefined") {
+              this.stat_series_data[port][client_name][stat][unix_time] = delta;
+            }
+
+            console.debug("Recording delta stat (%s) on port (%s) unix: %s last value: %s new value: %s",
+              stat,
+              port,
+              unix_time,
+              last_value,
+              delta
+            );
+
+          }
+        }
+      }
+    }
+  }
 };

@@ -8,10 +8,10 @@ module.exports = {
      * Check against session if logged in
      */
     if (req.session.loggedIn) {
-      next();
-      return false;
+      return next();
     }
-
-    res.redirect('/login');
+    else {
+      res.redirect('/login');
+    }
   },
 };

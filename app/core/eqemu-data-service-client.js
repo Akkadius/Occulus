@@ -29,6 +29,36 @@ module.exports = {
   },
 
   /**
+   * @param port
+   * @returns {Promise<*>}
+   */
+  getZoneAttributes: async function (port) {
+    const response = await telnetService.execZone(port, "api get_zone_attributes");
+
+    return JSON.parse(response).data;
+  },
+
+  /**
+   * @param port
+   * @returns {Promise<*>}
+   */
+  getClientListDetail: async function (port) {
+    const response = await telnetService.execZone(port, "api get_client_list_detail");
+
+    return JSON.parse(response).data;
+  },
+
+  /**
+   * @param port
+   * @returns {Promise<*>}
+   */
+  getNpcListDetail: async function (port) {
+    const response = await telnetService.execZone(port, "api get_npc_list_detail");
+
+    return JSON.parse(response).data;
+  },
+
+  /**
    * @returns {Promise<string>}
    */
   getWorldUptime: async function () {

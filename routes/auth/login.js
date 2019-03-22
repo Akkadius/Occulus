@@ -34,7 +34,7 @@ router.post('/', function (req, res, next) {
   if (username === "admin" && password === "admin") {
     req.session.loggedIn = true;
     req.session.username = username;
-    res.send({success: "Login success"});
+    return res.send({success: "Login success"});
   }
 
   /**

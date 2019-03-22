@@ -79,7 +79,7 @@ app.use('/login', require('./routes/auth/login'));
 app.use('/logout', require('./routes/auth/logout'));
 
 /**
- * API Routes
+ * API
  */
 app.use('/api/dashboard/stats', require('./routes/api/dashboard/stats'));
 app.use('/api/world/servers', require('./routes/api/world/servers'));

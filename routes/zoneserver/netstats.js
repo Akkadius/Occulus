@@ -9,7 +9,7 @@ let auth     = require('../../app/core/auth-service');
 
 /* GET home page. */
 router.get('/:port/netstats', auth.check, function (req, res, next) {
-  const content  = template.load("netstats").renderEjs({port: req.params.port});
+  const content  = template.load("netstats").renderEjs({ port: req.params.port });
   const navbar   = template.load("navbar").render();
   const username = req.session.username;
 

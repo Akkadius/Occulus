@@ -1,10 +1,20 @@
 <div class="col-lg-12 col-xl-12">
+
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">Packet Types Sent from Server</h3>
         </div>
         <div class="card-body">
-            <div id="packet-sent-types" style="height: 32rem"></div>
+            <div id="packet-sent-types" style="height: 16rem"></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Packet Types Received from Server</h3>
+        </div>
+        <div class="card-body">
+            <div id="packet-receive-types" style="height: 16rem"></div>
         </div>
     </div>
 
@@ -15,17 +25,15 @@
       require(['c3', 'jquery'], function (c3, $) {
         $(document).ready(function () {
 
-          var chart_endpoint = '/api/zoneserver/netstat/' + netstat_zone_port + '/chart/packet_types_sent';
-
-          $.get(chart_endpoint, function (data) {
-            console.log(data);
-
-            chart = c3.generate(
+          /**
+           * Sent types
+           * @type {string}
+           */
+          var chart_packet_types_sent_endpoint = '/api/zoneserver/netstat/' + netstat_zone_port + '/chart/packet_types_sent';
+          $.get(chart_packet_types_sent_endpoint, function (data) {
+            chart_packet_types_sent = c3.generate(
               {
                 bindto: '#packet-sent-types',
-                // subchart: {
-                //   show: true
-                // },
                 transition: {
                   duration: 0
                 },
@@ -50,25 +58,50 @@
                 }
               });
 
-          }).fail(function (data) {
-            // $("#error-message").html(data.responseJSON.error).show();
+          });
+
+          /**
+           * Receive types
+           * @type {string}
+           */
+          var chart_packet_types_receive_endpoint = '/api/zoneserver/netstat/' + netstat_zone_port + '/chart/packet_types_receive';
+          $.get(chart_packet_types_receive_endpoint, function (data) {
+            chart_packet_types_receive = c3.generate(
+              {
+                bindto: '#packet-receive-types',
+                transition: {
+                  duration: 0
+                },
+                line: {
+                  connectNull: true,
+                },
+                point: {
+                  show: false
+                },
+                data: data,
+                axis: {
+                  x: {
+                    type: 'timeseries',
+                    tick: {
+                      format: '%H:%M:%S',
+                      fit: true,
+                    }
+                  },
+                  y: {
+                    show: true
+                  }
+                }
+              });
+
           });
 
           setInterval(function () {
             refreshCharts();
           }, 1000);
 
-
           function refreshCharts() {
-            $.get(chart_endpoint, function (data) {
-              // var chart_data = { unload: true };
-              // $.extend(data, chart_data);
-              // console.log(data);
-
-              chart.load(data);
-            }).fail(function (data) {
-              // $("#error-message").html(data.responseJSON.error).show();
-            });
+            $.get(chart_packet_types_sent_endpoint, function (data) { chart_packet_types_sent.load(data); });
+            $.get(chart_packet_types_receive_endpoint, function (data) { chart_packet_types_receive.load(data); });
           }
         });
       });

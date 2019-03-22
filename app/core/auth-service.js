@@ -9,7 +9,7 @@ module.exports = {
      */
     if (req.session.loggedIn) {
       next();
-      return;
+      return false;
     }
 
     res.redirect('/login');

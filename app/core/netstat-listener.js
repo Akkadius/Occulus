@@ -115,7 +115,7 @@ module.exports = {
       for (let packet_type in this.sent_packet_types_series_data[port]) {
         for (let time_entry in this.sent_packet_types_series_data[port][packet_type]) {
           let unix_time = Math.floor(new Date() / 1000);
-          if (time_entry < (unix_time - this.max_series_store_time)) {
+          if (time_entry < (unix_time - (this.max_series_store_time + 5))) {
             // console.debug("deleting packet_type: %s time_entry: %s", packet_type, time_entry);
             delete this.sent_packet_types_series_data[port][packet_type][time_entry];
           }
@@ -128,7 +128,7 @@ module.exports = {
       for (let packet_type in this.receive_packet_types_series_data[port]) {
         for (let time_entry in this.receive_packet_types_series_data[port][packet_type]) {
           let unix_time = Math.floor(new Date() / 1000);
-          if (time_entry < (unix_time - this.max_series_store_time)) {
+          if (time_entry < (unix_time - (this.max_series_store_time + 5))) {
             // console.debug("deleting packet_type: %s time_entry: %s", packet_type, time_entry);
             delete this.receive_packet_types_series_data[port][packet_type][time_entry];
           }
@@ -142,7 +142,7 @@ module.exports = {
         for (let stat in this.stat_series_data[port][client]) {
           for (let time_entry in this.stat_series_data[port][client][stat]) {
             let unix_time = Math.floor(new Date() / 1000);
-            if (time_entry < (unix_time - this.max_series_store_time)) {
+            if (time_entry < (unix_time - (this.max_series_store_time + 5))) {
               delete this.stat_series_data[port][client][stat][time_entry];
             }
           }

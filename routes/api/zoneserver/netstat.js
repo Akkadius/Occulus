@@ -120,7 +120,7 @@ router.get('/:port/chart', function (req, res, next) {
           netstatListener.stat_series_data[port][client_name][stat][time] :
           null
       );
-      chart_data_row.push(value);
+      chart_data_row.push(parseFloat(value).toFixed(2));
     }
     packet_loss_inbound_columns.push(chart_data_row);
   }
@@ -204,7 +204,7 @@ router.get('/:port/chart', function (req, res, next) {
           netstatListener.stat_series_data[port][client_name][stat][time] :
           null
       );
-      chart_data_row.push(parseFloat((value / 1024 / 1024)).toFixed(2));
+      chart_data_row.push(value);
     }
     resent_packets_columns.push(chart_data_row);
   }
@@ -225,7 +225,7 @@ router.get('/:port/chart', function (req, res, next) {
           netstatListener.stat_series_data[port][client_name][stat][time] :
           null
       );
-      chart_data_row.push(parseFloat((value / 1024 / 1024)).toFixed(2));
+      chart_data_row.push(value);
     }
     resent_fragments_columns.push(chart_data_row);
   }
@@ -246,7 +246,7 @@ router.get('/:port/chart', function (req, res, next) {
           netstatListener.stat_series_data[port][client_name][stat][time] :
           null
       );
-      chart_data_row.push(parseFloat((value / 1024 / 1024)).toFixed(2));
+      chart_data_row.push(value);
     }
     resent_non_fragments_columns.push(chart_data_row);
   }
@@ -271,21 +271,18 @@ router.get('/:port/chart', function (req, res, next) {
     },
     "ping": {
       columns: ping_columns,
-      groups: [clients],
       x: 'x',
       xFormat: '%H:%M:%S',
       type: 'line',
     },
     "packet_loss_inbound": {
       columns: packet_loss_inbound_columns,
-      groups: [clients],
       x: 'x',
       xFormat: '%H:%M:%S',
       type: 'line',
     },
     "packet_loss_outbound": {
       columns: packet_loss_outbound_columns,
-      groups: [clients],
       x: 'x',
       xFormat: '%H:%M:%S',
       type: 'line',
@@ -306,21 +303,18 @@ router.get('/:port/chart', function (req, res, next) {
     },
     "resent_packets": {
       columns: resent_packets_columns,
-      groups: [clients],
       x: 'x',
       xFormat: '%H:%M:%S',
       type: 'line',
     },
     "resent_fragments": {
       columns: resent_fragments_columns,
-      groups: [clients],
       x: 'x',
       xFormat: '%H:%M:%S',
       type: 'line',
     },
     "resent_non_fragments": {
       columns: resent_non_fragments_columns,
-      groups: [clients],
       x: 'x',
       xFormat: '%H:%M:%S',
       type: 'line',

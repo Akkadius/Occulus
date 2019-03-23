@@ -185,13 +185,13 @@
         </div>
     </div>
 
-    <script>
+    <script type="text/javascript">
       netstat_zone_port = <%= port %>;
 
       var npc_list    = [];
       var client_list = [];
 
-      require(['c3', 'jquery'], function (c3, $) {
+      require(['c3'], function (c3) {
         $('.zone-port').html("Port: " + netstat_zone_port);
 
         $(document).ready(function () {

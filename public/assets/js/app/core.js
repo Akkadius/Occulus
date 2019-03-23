@@ -30,6 +30,34 @@ require(['jquery', 'bootstrap'], function ($) {
 
       // modal("test", "test");
     });
+
+    /**
+     * Highlight top level nav-bar link
+     *
+     * Few different ways we determine matches
+     *
+     * 1) The navbar link is contained in the window.location.pathname
+     * 2) Children attribute is contained in window.location.pathname
+     * 3) Exact path match "/" == "/"
+     */
+    $(".nav-tabs > .nav-item > a").each(function (index) {
+      if (window.location.pathname.includes($(this).attr('href')) && $(this).attr('href') !== "/") {
+        $(this).addClass("active");
+      } else if ($(this).attr('children-links')) {
+        var links = $(this).attr("children-links").split(",");
+        for (var link in links) {
+          var children_link = links[link];
+          if (window.location.pathname.includes(children_link)) {
+            $(this).addClass("active");
+          }
+        }
+      } else if (window.location.pathname === $(this).attr('href')) {
+        $(this).addClass("active");
+      }
+    });
+
+    // window.location.pathname
+
   });
 
   /**

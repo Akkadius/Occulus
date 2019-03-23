@@ -47,7 +47,8 @@
                 <div class="d-flex">
                     <a class="header-brand" href="/">
                         <img src="/assets/images/eqemu-logo.png" class="header-brand-img">
-                        Server Admin <small class="server-longname" style="margin-left:10px; font-size: 16px;"></small>
+                        Server Admin
+                        <small class="server-longname" style="margin-left:10px; font-size: 16px;"></small>
                     </a>
                     <div class="d-flex order-lg-2 ml-auto">
                         <div class="nav-item d-none d-md-flex">
@@ -85,7 +86,7 @@
             </div>
         </div>
 
-        {{navbar}}
+        <%- include(process.env.PWD + '/app/templates/navbar'); %>
 
         <div class="my-3 my-md-5">
             <div class="container">
@@ -180,7 +181,7 @@
             <script src="/assets/js/app/core.js"></script>
 
             <!-- c3.js Charts Plugin -->
-            <link href="/assets/plugins/charts-c3/plugin.css" rel="stylesheet" />
+            <link href="/assets/plugins/charts-c3/plugin.css" rel="stylesheet"/>
 
 
         </footer>

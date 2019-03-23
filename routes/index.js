@@ -22,7 +22,7 @@ router.get('/', auth.check, function (req, res, next) {
       .var("username", username.charAt(0).toUpperCase() + username.substr(1))
       .var("navbar", navbar)
       .var("content", dashboard)
-      .render()
+      .renderEjs()
   );
 });
 

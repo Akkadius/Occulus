@@ -28,7 +28,6 @@ router.get('/', auth.check, function (req, res, next) {
           }
         );
 
-      const navbar   = template.load("navbar").render();
       const username = req.session.username
 
       /**
@@ -38,14 +37,11 @@ router.get('/', auth.check, function (req, res, next) {
         template
           .load("index")
           .var("username", username.charAt(0).toUpperCase() + username.substr(1))
-          .var("navbar", navbar)
           .var("content", content)
-          .render()
+          .renderEjs()
       );
 
     });
-
-
   });
 });
 

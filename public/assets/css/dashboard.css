@@ -70,6 +70,17 @@ body {
   /* background: linear-gradient( rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.9) ), url(https://www.wallpaperup.com/uploads/wallpapers/2015/03/18/640370/b231921979c6dd98d54260b9217fa94a-1400.jpg); */
 }
 
+@media screen and (max-width: 800px) {
+  .mobile-hide {
+    visibility: hidden;
+    clear: both;
+    float: left;
+    margin: 10px auto 5px 20px;
+    width: 28%;
+    display: none;
+  }
+}
+
 [tabindex="-1"]:focus {
   outline: 0 !important;
 }
@@ -11400,7 +11411,7 @@ a.text-dark:hover, a.text-dark:focus {
   .table, .text-wrap table {
     border-collapse: collapse !important;
   }
-  
+
   .table td,
   .text-wrap table td, .table th, .text-wrap table th {
     background-color: #fff !important;

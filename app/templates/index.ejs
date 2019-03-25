@@ -22,6 +22,12 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,300i,400,400i,500,500i,600,600i,700,700i&amp;subset=latin-ext">
 
+    <script src="/assets/js/vendors/jquery-3.2.1.min.js"></script>
+
+    <!-- For dark mode -->
+    <style dark-mode></style>
+    <script src="/assets/js/app/dark-mode.js"></script>
+
     <!-- Stylesheets -->
     <link href="/assets/css/dashboard.css" rel="stylesheet"/>
     <link href="/assets/plugins/charts-c3/plugin.css" rel="stylesheet"/>
@@ -33,8 +39,6 @@
       });
     </script>
 
-    <!-- Javascript assets -->
-    <script src="/assets/js/vendors/jquery-3.2.1.min.js"></script>
     <!-- c3.js Charts Plugin -->
     <script src="/assets/plugins/charts-c3/plugin.js"></script>
 </head>
@@ -48,9 +52,20 @@
                     <a class="header-brand" href="/">
                         <img src="/assets/images/eqemu-logo.png" class="header-brand-img">
                         Server Admin
-                        <small class="server-longname" style="margin-left:10px; font-size: 16px;"></small>
+                        <small class="server-longname mobile-hide" style="margin-left:10px; font-size: 16px;"></small>
                     </a>
                     <div class="d-flex order-lg-2 ml-auto">
+
+                        <!-- Night mode toggle -->
+                        <div class="nav-item d-none d-md-flex">
+                            <label class="custom-switch">
+                                <i class="fe fe-sun" style="margin-right:10px"></i>
+                                <input type="checkbox" name="custom-switch-checkbox" class="custom-switch-input night-mode-toggle" onclick="toggleDarkMode()">
+                                <span class="custom-switch-indicator"></span>
+                            </label>
+                        </div>
+
+                        <!-- EQEmu Github -->
                         <div class="nav-item d-none d-md-flex">
                             <a href="https://github.com/EQEmu/Server"
                                class="btn btn-outline-primary btn-sm"

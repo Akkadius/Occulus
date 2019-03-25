@@ -56,11 +56,11 @@ function checkLightModeToggleInput() {
   // console.log("dark mode is %s", darkMode);
   if (typeof darkMode !== "undefined" && darkMode === "1") {
     $(".night-mode-toggle").prop("checked", true);
-    $(".custom-switch").fadeIn(200);
     return false;
   }
 }
 
 $(document).ready(function() {
   checkLightModeToggleInput();
+  $(".custom-switch").fadeIn(200);
 });

@@ -62,4 +62,5 @@ function checkLightModeToggleInput() {
 
 $(document).ready(function() {
   checkLightModeToggleInput();
+  $(".custom-switch").fadeIn(200);
 });

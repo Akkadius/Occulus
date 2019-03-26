@@ -102,14 +102,30 @@ require(['jquery', 'bootstrap'], function ($) {
    * Keypress event
    */
   $( "body" ).keypress(function( event ) {
+
+    /**
+     * '1'
+     */
     if (event.which === 49) {
       window.location = "/";
       event.preventDefault();
     }
+
+    /**
+     * '2'
+     */
     if (event.which === 50) {
       window.location = "/zoneservers";
       event.preventDefault();
     }
+
+    /**
+     * 'd'
+     */
+    if (event.which === 100) {
+      toggleDarkMode();
+    }
+
     // console.log("keypress: %s", event.which);
   });
 

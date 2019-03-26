@@ -15,6 +15,7 @@ function toggleDarkMode() {
   if (typeof darkMode !== "undefined" && darkMode === "1") {
     setLightMode();
     localStorage.setItem("dark_mode", "0");
+    $(".night-mode-toggle").prop("checked", false);
     // console.log("Dark mode is now %s", localStorage.getItem("dark_mode"));
     return false;
   }
@@ -24,6 +25,7 @@ function toggleDarkMode() {
   $("style[dark-mode]")
     .html("body { filter: invert(100%); background-color: #040404 !important; }" +
       "img, .avatar { filter: invert(100%); }");
+  $(".night-mode-toggle").prop("checked", true);
 
   localStorage.setItem("dark_mode", "1");
 

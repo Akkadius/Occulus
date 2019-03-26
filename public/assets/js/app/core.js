@@ -97,4 +97,20 @@ require(['jquery', 'bootstrap'], function ($) {
   function kFormatter(num) {
     return num > 999 ? (num / 1000).toFixed(1) + 'k' : num
   }
+
+  /**
+   * Keypress event
+   */
+  $( "body" ).keypress(function( event ) {
+    if (event.which === 49) {
+      window.location = "/";
+      event.preventDefault();
+    }
+    if (event.which === 50) {
+      window.location = "/zoneservers";
+      event.preventDefault();
+    }
+    // console.log("keypress: %s", event.which);
+  });
+
 });

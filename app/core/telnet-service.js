@@ -1,5 +1,11 @@
-const Telnet = require('telnet-client')
-
+/**
+ * telnet-service.js
+ * @type {module.Telnet|*}
+ */
+const Telnet  = require('telnet-client');
+const tcpp    = require('tcp-ping');
+const util    = require('util');
+const tcpping = util.promisify(tcpp.ping);
 /**
  * telnet-service
  * @type {{exec: module.exports.exec}}
@@ -18,6 +24,15 @@ module.exports = {
       console.log('execWorld: Cannot connect to world process!');
       return false;
     });
+
+    /**
+     * TCP ping first, respond with error
+     * @type {any | void}
+     */
+    const ping = await tcpping({address: '127.0.0.1', port: 9000, timeout: 500, attempts: 1});
+    if (!ping.avg) {
+      return false;
+    }
 
     /**
      * Setup
@@ -52,8 +67,6 @@ module.exports = {
     worldConnection.destroy();
 
     return worldResponse.replace("\n\r>", "").trim();
-
-
   },
 
   /**

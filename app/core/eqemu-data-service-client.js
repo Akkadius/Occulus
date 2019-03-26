@@ -63,6 +63,9 @@ module.exports = {
    */
   getWorldUptime: async function () {
     const response = await telnetService.execWorld("uptime 0");
+    if (!response) {
+      return 0;
+    }
 
     return response.replace("Worldserver Uptime: ", "").trim();
   },

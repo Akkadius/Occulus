@@ -8,25 +8,13 @@ const { exec } = require('child_process');
  * @type {{serverStop: (function(): *)}}
  */
 module.exports = {
-
-  /**
-   * @returns {Buffer | string}
-   */
   serverStop: function () {
-    return execSync("cd ../ && ./server_stop.sh");
+    exec("cd ../ && ./server_stop.sh");
   },
-
-  /**
-   * @returns {Promise<*>}
-   */
-  serverStart: async function () {
-    return await exec('cd ../ && ./server_start.sh');
+  serverStart: function () {
+    exec('cd ../ && ./server_start.sh');
   },
-
-  /**
-   * @returns {Promise<*>}
-   */
-  serverRestart: async function () {
-    return await exec('cd ../ && ./server_stop.sh && ./server_start.sh');
+  serverRestart: function () {
+    exec('cd ../ && ./server_stop.sh && ./server_start.sh');
   },
 };

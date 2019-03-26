@@ -4,7 +4,7 @@ let dataService = require('../../../app/core/eqemu-data-service-client.js');
 
 
 /* GET home page. */
-router.get('/', function (req, res, next) {
+router.get('/', async function (req, res, next) {
 
   let dashboard_stats = {};
 
@@ -28,17 +28,13 @@ router.get('/', function (req, res, next) {
     }
   });
 
-  models['account'].resource.count().then(c => {
-    dashboard_stats.accounts = c;
-  }).then(() => models['character_data'].resource.count().then(c => {
-    dashboard_stats.characters = c;
-  })).then(() => models['items'].resource.count().then(c => {
-    dashboard_stats.items = c;
-  })).then(() => models['guilds'].resource.count().then(c => {
-    dashboard_stats.guilds = c;
-  })).then(() => dataService.getWorldUptime().then(c => {
-    dashboard_stats.uptime = c;
-  })).then(() => res.send(dashboard_stats));
+  dashboard_stats.accounts   = await models['account'].resource.count();
+  dashboard_stats.characters = await models['character_data'].resource.count();
+  dashboard_stats.items      = await models['items'].resource.count();
+  dashboard_stats.guilds     = await models['guilds'].resource.count();
+  dashboard_stats.uptime     = await dataService.getWorldUptime();
+
+  res.send(dashboard_stats);
 
 });
 

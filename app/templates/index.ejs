@@ -32,6 +32,9 @@
     <link href="/assets/css/dashboard.css" rel="stylesheet"/>
     <link href="/assets/plugins/charts-c3/plugin.css" rel="stylesheet"/>
 
+    <link href="/assets/plugins/izi-toast/css/iziToast.min.css" rel="stylesheet"/>
+
+    <script src="/assets/plugins/izi-toast/js/iziToast.min.js"></script>
     <script src="/assets/js/require.min.js"></script>
     <script>
       requirejs.config({
@@ -159,6 +162,14 @@
         </div>
         -->
 
+        <!--
+        <div class="card card-collapsed" style="position:fixed;top:100px;right:10px;width:400px">
+            <div class="card-header">
+                <small class="card-title"><i class="fe fe-power"></i> Server is rebooting in 10.4 minute(s)</small>
+            </div>
+        </div>
+        -->
+
         <!-- Footer -->
         <footer class="footer">
             <div class="container">
@@ -194,6 +205,8 @@
             <!-- Datatables Plugin -->
             <script src="/assets/plugins/datatables/plugin.js"></script>
             <script src="/assets/js/app/core.js"></script>
+            <script src="/assets/js/app/server.js"></script>
+            <script src="/assets/js/app/api-client.js"></script>
 
             <!-- c3.js Charts Plugin -->
             <link href="/assets/plugins/charts-c3/plugin.css" rel="stylesheet"/>

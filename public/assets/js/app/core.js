@@ -1,7 +1,6 @@
 /**
  * core.js
  */
-
 require(['jquery', 'bootstrap'], function ($) {
 
   $(document).ready(function () {
@@ -61,28 +60,6 @@ require(['jquery', 'bootstrap'], function ($) {
   });
 
   /**
-   * modal("Test Title", "Test Body");
-   * @param title
-   * @param body
-   * @param footer
-   */
-  function modal(title, body, footer = null) {
-    if (title) {
-      $("#app-modal-title").html(title);
-    }
-
-    if (body) {
-      $("#app-modal-body").html(body);
-    }
-
-    if (footer) {
-      $("#app-modal-footer").html(footer);
-    }
-
-    $("#app-modal").modal('show');
-  }
-
-  /**
    * @param x
    * @returns {string}
    */
@@ -101,7 +78,7 @@ require(['jquery', 'bootstrap'], function ($) {
   /**
    * Keypress event
    */
-  $( "body" ).keypress(function( event ) {
+  $("body").keypress(function (event) {
 
     /**
      * '1'
@@ -130,3 +107,29 @@ require(['jquery', 'bootstrap'], function ($) {
   });
 
 });
+
+/**
+ * modal("Test Title", "Test Body");
+ * @param title
+ * @param body
+ * @param footer
+ */
+function modal(title, body, footer = null) {
+  if (title) {
+    $("#app-modal-title").html(title);
+  }
+
+  if (body) {
+    $("#app-modal-body").html(body);
+  }
+
+  if (footer) {
+    $("#app-modal-footer").html(footer);
+  }
+
+  $("#app-modal").modal('show');
+}
+
+function modalClose() {
+  $("#app-modal").modal('hide');
+}

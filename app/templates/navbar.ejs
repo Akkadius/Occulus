@@ -20,10 +20,23 @@
                         <a href="/" class="nav-link"><i class="fe fe-home"></i> Dashboard</a>
                     </li>
 
+                    <!-- Zoneserver -->
                     <li class="nav-item">
                         <a href="/zoneservers" class="nav-link" children-links="zoneserver">
                             <i class="fe fe-box"></i> Zone Servers
                         </a>
+                    </li>
+
+                    <!-- Power -->
+                    <li class="nav-item">
+                        <a href="javascript:void(0)" class="nav-link" data-toggle="dropdown">
+                            <i class="fe fe-power"></i> Power
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-arrow">
+                            <a href="javascript:;" onclick="ServerManager.stop()" class="dropdown-item"><i class="fe fe-power"></i> Power Off</a>
+                            <a href="javascript:;" onclick="ServerManager.start()" class="dropdown-item"><i class="fe fe-power"></i> Power On</a>
+                            <a href="javascript:;" onclick="ServerManager.restart()" class="dropdown-item"><i class="fe fe-power"></i> Restart</a>
+                        </div>
                     </li>
 
                     <!--

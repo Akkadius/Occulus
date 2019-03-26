@@ -85,6 +85,7 @@ app.use('/api/dashboard/stats', require('./routes/api/dashboard/stats'));
 app.use('/api/world/servers', require('./routes/api/world/servers'));
 app.use('/api/zoneserver', require('./routes/api/zoneserver'));
 app.use('/api/zoneserver/netstat', require('./routes/api/zoneserver/netstat'));
+app.use('/api/server', require('./routes/api/server'));
 
 module.exports = app;
 

@@ -11972,8 +11972,7 @@ body.fixed-header .header {
   font-size: 0.875rem;
   padding: 1.25rem 0;
   color: #9aa0ac;
-
-  position: fixed;
+  
   width: 100%;
   bottom: 0;
 }

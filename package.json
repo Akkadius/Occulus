@@ -1,10 +1,19 @@
 {
-  "name": "eqemu-web-test",
-  "version": "0.0.0",
+  "name": "eqemu-web",
+  "version": "1.0.0",
   "private": true,
+  "bin": "./bin/www",
   "scripts": {
     "start": "node ./bin/www",
     "watch": "nodemon npm start --ignore public/"
+  },
+  "pkg": {
+    "assets": [
+      "public/*"
+    ],
+    "targets": [
+      "node10-linux-x64"
+    ]
   },
   "dependencies": {
     "child_process": "^1.0.2",
@@ -24,6 +33,7 @@
     "ps-list": "^6.1.0",
     "sequelize": "^4.43.0",
     "sequelize-auto": "^0.4.29",
+    "tcp-ping": "^0.1.1",
     "telnet-client": "^0.16.3",
     "yazl": "^2.5.1"
   }

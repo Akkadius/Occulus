@@ -35,6 +35,7 @@
     "nodemon": "^1.18.10",
     "path": "^0.12.7",
     "pidusage": "^2.0.17",
+    "process-list": "^1.2.3",
     "ps-list": "^6.1.0",
     "sequelize": "^4.43.0",
     "sequelize-auto": "^0.4.29",

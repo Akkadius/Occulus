@@ -3,6 +3,12 @@
  */
 module.exports = {
   createModel: function (table) {
+
+    if (!table) {
+      console.log("Table name must be specified");
+      process.exit();
+    }
+
     const sequelize_auto = require('sequelize-auto');
 
     /**
@@ -38,6 +44,8 @@ module.exports = {
 
       console.log(auto.tables); // table list
       console.log(auto.foreignKeys); // foreign key list
+
+      console.log("Model created from '%s'", table);
     });
   },
 };

@@ -9,10 +9,14 @@
   },
   "pkg": {
     "assets": [
-      "public/*"
+      "app/**",
+      "bin/**",
+      "public/**",
+      "models/**"
     ],
     "targets": [
-      "node10-linux-x64"
+      "node10-linux-x64",
+      "node10-win-x64"
     ]
   },
   "dependencies": {

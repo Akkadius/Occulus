@@ -24,9 +24,9 @@ module.exports = {
     /**
      * Vanilla .html
      */
-    if (fs.existsSync('./app/templates/' + template + '.html')) {
+    if (fs.existsSync(app_root + '/app/templates/' + template + '.html')) {
       this.template = fs.readFileSync(
-        './app/templates/' + template + '.html',
+        app_root + '/app/templates/' + template + '.html',
         'utf8'
       );
 
@@ -36,9 +36,9 @@ module.exports = {
     /**
      * EJS
      */
-    if (fs.existsSync('./app/templates/' + template + '.ejs')) {
+    if (fs.existsSync(app_root + '/app/templates/' + template + '.ejs')) {
       this.template = fs.readFileSync(
-        './app/templates/' + template + '.ejs',
+        app_root + '/app/templates/' + template + '.ejs',
         'utf8'
       );
 
@@ -72,6 +72,10 @@ module.exports = {
    * @returns {String|Promise<String>}
    */
   renderEjs: function (data, options) {
+    if (!options) {
+      options = { root: app_root + "/app/templates/" };
+    }
+
     return ejs.render(this.template, data, options);
   },
 };

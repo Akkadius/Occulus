@@ -2,13 +2,13 @@
  * app.js
  * @type {createApplication}
  */
-var express      = require('express');
-var path         = require('path');
-var cookieParser = require('cookie-parser');
-var logger       = require('morgan');
-var app          = express();
-var fs           = require('fs');
-var path         = require('path')
+let express      = require('express');
+let cookieParser = require('cookie-parser');
+let logger       = require('morgan');
+let app          = express();
+let fs           = require('fs');
+let path         = require('path')
+
 /**
  * Load Config
  */
@@ -21,7 +21,8 @@ if (fs.existsSync(config_path)) {
 /**
  * Base server path
  */
-base_server_path = path.join(__dirname, '../');
+global.base_server_path = path.join(__dirname, '../');
+global.app_root = path.resolve(__dirname).split('/node_modules')[0];
 
 /**
  * Express
@@ -55,6 +56,8 @@ app.use(
     }
   )
 );
+
+console.log("app root is '%s'", app_root);
 
 /**
  * Print session debug
@@ -121,9 +124,9 @@ db.authenticate()
  * @type {{}}
  */
 models = {};
-fs.readdirSync('./models/').forEach(function (filename) {
+fs.readdirSync(app_root + '/models/').forEach(function (filename) {
   var model          = {};
-  model.path         = path.join(__dirname, 'models/', filename)
+  model.path         = path.join(app_root, '/models/', filename)
   model.name         = filename.replace(/\.[^/.]+$/, "");
   model.resource     = db.import(model.path);
   models[model.name] = model;

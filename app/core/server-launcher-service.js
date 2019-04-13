@@ -1,5 +1,5 @@
 const {spawn}           = require("child_process");
-const serverDataService = require(app_root + '/app/core/eqemu-data-service-client.js');
+const serverDataService = require('./eqemu-data-service-client.js');
 
 /**
  * @type {{check: module.exports.check}}
@@ -138,16 +138,19 @@ module.exports = {
    * @returns {Promise<void>}
    */
   startProcess: async function (process_name) {
-    // let is_windows = process.platform === "win32";
-    // let is_linux   = process.platform === "linux";
+    let is_windows           = process.platform === "win32";
+    let is_linux             = process.platform === "linux";
+    let start_process_string = "";
+    if (is_windows) {
+      start_process_string = process_name + '.exe';
+    }
+    if (is_linux) {
+      start_process_string = './' + process_name;
+    }
 
-    console.log("starting process '%s'", process_name);
+    console.log("starting process '%s'", start_process_string);
 
-    const child = await spawn('./' + process_name, [], {
-      detached: true,
-      // stdio: 'ignore',
-      cwd: server_root
-    });
+    const child = await spawn(start_process_string, [], { detached: true, cwd: server_root });
 
     child.stderr.on('data', function (data) {
       console.log('stderr: ' + data);

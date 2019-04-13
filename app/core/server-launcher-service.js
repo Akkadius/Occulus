@@ -60,12 +60,12 @@ module.exports = {
    * @returns {Promise<void>}
    */
   stopServer: async function () {
-    this.processList = await require("process-list").snapshot('pid', 'name', 'threads');
+    this.processList = await require("process-list").snapshot('pid', 'name', 'threads', 'cmdline');
     let self         = this;
     let ps           = require('ps-node');
 
     this.processList.forEach(function (process) {
-      if (self.serverProcessNames.includes(process.name)) {
+      if (self.serverProcessNames.includes(process.name) || process.cmdline.includes("server_launcher")) {
         ps.kill(process.pid, function (err) {
           if (err) {
             // throw new Error(err);
@@ -160,7 +160,7 @@ module.exports = {
    * @returns {Promise<void>}
    */
   pollProcessList: async function () {
-    this.processList             = await require("process-list").snapshot('pid', 'name', 'threads');
+    this.processList             = await require("process-list").snapshot('pid', 'name', 'threads', 'cmdline');
     this.zoneProcessCount        = 0;
     this.worldProcessCount       = 0;
     this.ucsProcessCount         = 0;
@@ -170,7 +170,6 @@ module.exports = {
     let self = this;
 
     this.processList.forEach(function (process) {
-      // console.log(process);
 
       if (process.name === "zone") {
         self.zoneProcessCount++;

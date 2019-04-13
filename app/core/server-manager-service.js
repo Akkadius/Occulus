@@ -1,20 +1,22 @@
 /**
  * server-manager-service.js
  */
-const execSync = require('child_process').execSync;
-const { exec } = require('child_process');
+const {exec}                = require('child_process');
+const {spawn}               = require("child_process");
+const serverLauncherService = require('../../app/core/server-launcher-service');
 
 /**
  * @type {{serverStop: (function(): *)}}
  */
 module.exports = {
   serverStop: function () {
-    exec("cd ../ && ./server_stop.sh");
+    serverLauncherService.stopServer();
   },
   serverStart: function () {
-    exec('cd ../ && ./server_start.sh');
+    spawn('node', ['cli.js', 'server_launcher'], {detached: true}).unref();
   },
   serverRestart: function () {
-    exec('cd ../ && ./server_stop.sh && ./server_start.sh');
+    this.serverStop();
+    this.serverStart();
   },
 };

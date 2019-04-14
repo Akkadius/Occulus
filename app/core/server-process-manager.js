@@ -1,3 +1,6 @@
+/**
+ * server-process-manager.js
+ */
 const {spawn}           = require("child_process");
 const serverDataService = require('./eqemu-data-service-client.js');
 
@@ -36,7 +39,7 @@ module.exports = {
       }
 
       if (this.loginServerProcessCount === 0) {
-        this.startLoginserver();
+        this.startLoginServer();
       }
 
       while (this.zoneProcessCount < (this.zoneBootedProcessCount + this.minZoneProcesses)) {
@@ -91,8 +94,9 @@ module.exports = {
   /**
    * @returns {exports}
    */
-  restartServer: function() {
-    this.stopServer().startServerLauncher();
+  restartServer: async function () {
+    this.stopServer();
+    this.startServerLauncher();
 
     return this;
   },
@@ -138,7 +142,7 @@ module.exports = {
     this.zoneProcessCount++;
   },
 
-  startLoginserver: function () {
+  startLoginServer: function () {
     this.startProcess('loginserver');
     this.loginServerProcessCount++;
   },
@@ -170,7 +174,7 @@ module.exports = {
 
     console.log("starting process '%s'", start_process_string);
 
-    const child = await spawn(start_process_string, [], { detached: true, cwd: server_root });
+    const child = await spawn(start_process_string, [], {detached: true, cwd: server_root});
 
     child.stderr.on('data', function (data) {
       console.log('stderr: ' + data);
@@ -189,11 +193,9 @@ module.exports = {
     this.ucsProcessCount         = 0;
     this.qsProcessCount          = 0;
     this.loginServerProcessCount = 0;
-
-    let self = this;
+    let self                     = this;
 
     this.processList.forEach(function (process) {
-
       if (process.name === "zone") {
         self.zoneProcessCount++;
       }
@@ -209,9 +211,23 @@ module.exports = {
       if (process.name === "loginserver") {
         self.loginServerProcessCount++;
       }
-
     });
 
     await this.getBootedZoneCount();
-  }
+  },
+
+  /**
+   * @returns {Promise<{world: number, ucs: number, zone: number, queryserv: number, loginserver: number}>}
+   */
+  getProcessCounts: async function () {
+    await this.pollProcessList();
+
+    return {
+      "zone": this.zoneProcessCount,
+      "world": this.worldProcessCount,
+      "ucs": this.ucsProcessCount,
+      "queryserv": this.qsProcessCount,
+      "loginserver": this.loginServerProcessCount,
+    };
+  },
 };

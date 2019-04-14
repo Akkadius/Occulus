@@ -3,9 +3,9 @@
  */
 module.exports = {
   serverLauncher: function (options) {
-    require('../core/server-launcher-service').start(options);
+    require('../core/server-process-manager').start(options);
   },
   stopServer: function (options) {
-    require('../core/server-launcher-service').stopServer(options);
+    require('../core/server-process-manager').stopServer(options);
   },
 };

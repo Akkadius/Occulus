@@ -75,6 +75,26 @@ module.exports = {
         });
       }
     });
+
+    return this;
+  },
+
+  /**
+   * @returns {exports}
+   */
+  startServerLauncher: function () {
+    spawn('node', ['cli.js', 'server_launcher'], {detached: true}).unref();
+
+    return this;
+  },
+
+  /**
+   * @returns {exports}
+   */
+  restartServer: function() {
+    this.stopServer().startServerLauncher();
+
+    return this;
   },
 
   /**

@@ -4,24 +4,24 @@
  */
 let express                = require('express');
 let router                 = express.Router();
-const serverManagerService = require('../../app/core/server-manager-service')
+const serverProcessManager = require('../../app/core/server-process-manager')
 
 router.get('/hello', function (req, res, next) {
   res.send({"data": "hello"});
 });
 
 router.get('/stop', function (req, res, next) {
-  serverManagerService.serverStop();
+  serverProcessManager.stopServer();
   res.send({"data": "Server has been stopped successfully"});
 });
 
 router.get('/start', function (req, res, next) {
-  serverManagerService.serverStart();
+  serverProcessManager.startServerLauncher();
   res.send({"data": "Server has been started successfully!"});
 });
 
 router.get('/restart', function (req, res, next) {
-  serverManagerService.serverRestart();
+  serverProcessManager.restartServer();
   res.send({"data": "Server has been restarted successfully!"});
 });
 

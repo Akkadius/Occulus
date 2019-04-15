@@ -8,7 +8,7 @@ const pathManager          = require('../../app/core/path-manager')
 /**
  * Init path manager
  */
-pathManager.initAppPaths(path.join(__dirname, '../../'));
+pathManager.init(path.join(__dirname, '../../'));
 
 const PROCESS_BOOT_TIME = 1000;
 

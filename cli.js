@@ -9,7 +9,7 @@ const pathManager = require("./app/core/path-manager")
  * Path Manager
  */
 const path_root = path.resolve(__dirname).split('/node_modules')[0];
-pathManager.initAppPaths(path_root);
+pathManager.init(path_root);
 
 /**
  * CLI

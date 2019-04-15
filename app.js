@@ -12,11 +12,9 @@ let pathManager        = require('./app/core/path-manager')
 let eqemuConfigService = require('./app/core/eqemu-config-service')
 
 /**
- * Path Manager
+ * Init services
  */
-const path_root = path.resolve(__dirname).split('/node_modules')[0];
-pathManager.initAppPaths(path_root);
-
+pathManager.init(__dirname);
 eqemuConfigService.init();
 
 /**

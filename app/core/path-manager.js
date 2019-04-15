@@ -10,7 +10,7 @@ module.exports = {
   /**
    * @param app_root
    */
-  initAppPaths : function (app_root) {
+  init : function (app_root) {
     this.appRoot = app_root;
 
     if (!fs.existsSync(app_root + "/node_modules")) {

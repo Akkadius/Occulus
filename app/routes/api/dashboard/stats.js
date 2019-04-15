@@ -16,7 +16,7 @@ router.get('/', async function (req, res, next) {
   dashboard_stats.guilds     = await models['guilds'].resource.count();
   dashboard_stats.npcs       = await models['npc_types'].resource.count();
   dashboard_stats.uptime     = await dataService.getWorldUptime();
-  
+
   res.send(dashboard_stats);
 });
 

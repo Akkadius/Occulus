@@ -17,7 +17,7 @@ require(['jquery', 'bootstrap'], function ($) {
       $('.accounts').html(kFormatter(data.accounts));
       $('.guilds').html(kFormatter(data.guilds));
       $('.items').html(kFormatter(data.items));
-      $('.zones').html(kFormatter(data.zone_count));
+      $('.npcs').html(kFormatter(data.npcs));
       $('.server-longname').html(data.long_name);
       $('.server-uptime').html(data.uptime);
 

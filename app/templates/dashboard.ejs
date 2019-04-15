@@ -45,19 +45,6 @@
         </div>
     </div>
 
-    <!-- Zones -->
-    <div class="col-6 col-sm-4 col-lg-2">
-        <div class="card">
-            <div class="card-body p-3 text-center">
-                <div class="text-right text-red">
-                    &nbsp;
-                </div>
-                <div class="h1 m-0 zones">0</div>
-                <div class="text-muted mb-4">Zones</div>
-            </div>
-        </div>
-    </div>
-
     <!-- Items -->
     <div class="col-6 col-sm-4 col-lg-2">
         <div class="card">
@@ -67,6 +54,19 @@
                 </div>
                 <div class="h1 m-0 items">0</div>
                 <div class="text-muted mb-4">Items</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NPCs -->
+    <div class="col-6 col-sm-4 col-lg-2">
+        <div class="card">
+            <div class="card-body p-3 text-center">
+                <div class="text-right text-red">
+                    &nbsp;
+                </div>
+                <div class="h1 m-0 npcs">0</div>
+                <div class="text-muted mb-4">NPCs</div>
             </div>
         </div>
     </div>
@@ -120,4 +120,30 @@
         </div>
     </div>
 
+    <!-- Server Process Status -->
+    <div class="col-sm-6 col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Server Processes</h2>
+            </div>
+            <table class="table card-table">
+                <tbody>
+                    <% Object.keys(process_counts).forEach(function (key){ %>
+                        <tr>
+                            <td><i class="fe fe-circle"></i> <%= key.charAt(0).toUpperCase() + key.slice(1) %></td>
+                            <td class="text-right">
+                                <% if (process_counts[key] === 0) { %>
+                                    <span class="badge badge-danger">Offline</span>
+                                <% } %>
+
+                                <% if (process_counts[key] !== 0) { %>
+                                    <span class="badge badge-success">Online (<%= process_counts[key] %>)</span>
+                                <% } %>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>

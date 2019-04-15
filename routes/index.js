@@ -2,16 +2,22 @@
  * index.js
  * @type {createApplication}
  */
-var express  = require('express');
-var router   = express.Router();
-var template = require('../app/core/template-render');
-var auth     = require('../app/core/auth-service');
+var express                = require('express');
+var router                 = express.Router();
+var template               = require('../app/core/template-render');
+var auth                   = require('../app/core/auth-service');
+const serverProcessManager = require('../app/core/server-process-manager');
 
 /* GET home page. */
-router.get('/', auth.check, function (req, res, next) {
-  const dashboard = template.load("dashboard").render();
-  const navbar    = template.load("navbar").render();
-  const username  = req.session.username
+router.get('/', auth.check, async function (req, res, next) {
+  console.log(await serverProcessManager.getProcessCounts());
+
+  const process_counts = await serverProcessManager.getProcessCounts();
+  const dashboard      = template.load("dashboard").renderEjs(
+    { "process_counts" : process_counts }
+  );
+
+  const username = req.session.username;
 
   /**
    * Response
@@ -20,7 +26,6 @@ router.get('/', auth.check, function (req, res, next) {
     template
       .load("index")
       .var("username", username.charAt(0).toUpperCase() + username.substr(1))
-      .var("navbar", navbar)
       .var("content", dashboard)
       .renderEjs()
   );

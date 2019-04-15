@@ -5,7 +5,7 @@
 const express     = require('express');
 const router      = express.Router();
 const { exec }    = require('child_process');
-const pathManager = require('../app/core/path-manager');
+const pathManager = require('../core/path-manager');
 
 /* GET home page. */
 router.get('/:downloadType', function (req, res, next) {

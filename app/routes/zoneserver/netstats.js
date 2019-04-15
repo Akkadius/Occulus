@@ -4,8 +4,8 @@
  */
 let express  = require('express');
 let router   = express.Router();
-let template = require('../../app/core/template-render');
-let auth     = require('../../app/core/auth-service');
+let template = require('../../core/template-render');
+let auth     = require('../../core/auth-service');
 
 /* GET home page. */
 router.get('/:port/netstats', auth.check, function (req, res, next) {

@@ -5,7 +5,7 @@
 let express         = require('express');
 let router          = express.Router();
 let moment          = require('moment');
-let netstatListener = require('../../../app/core/netstat-listener');
+let netstatListener = require('../../../core/netstat-listener');
 
 router.get('/:port/chart', function (req, res, next) {
   const unix_time   = Math.floor(new Date() / 1000);
@@ -49,7 +49,7 @@ router.get('/:port/chart', function (req, res, next) {
   sent_bytes_columns.push(x_axis_row);
   sent_packet_type_columns.push(x_axis_row);
 
-  const packet_groups = require('../../../app/config/packet-types.js');
+  const packet_groups = require('../../../config/packet-types.js');
 
   /**
    * Sent Packet Types

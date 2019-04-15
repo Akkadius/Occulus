@@ -4,9 +4,9 @@
  */
 var express                = require('express');
 var router                 = express.Router();
-var template               = require('../app/core/template-render');
-var auth                   = require('../app/core/auth-service');
-const serverProcessManager = require('../app/core/server-process-manager');
+var template               = require('../core/template-render');
+var auth                   = require('../core/auth-service');
+const serverProcessManager = require('../core/server-process-manager');
 
 /* GET home page. */
 router.get('/', auth.check, async function (req, res, next) {

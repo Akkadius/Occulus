@@ -1,6 +1,6 @@
 let express     = require('express');
 let router      = express.Router();
-let dataService = require('../../../app/core/eqemu-data-service-client.js');
+let dataService = require('../../../core/eqemu-data-service-client.js');
 
 
 /* GET home page. */

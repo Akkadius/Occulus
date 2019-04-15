@@ -2,7 +2,7 @@
  * @type {{check: module.exports.check}}
  */
 module.exports = {
-  createModel: function (table) {
+  createModel : function (table) {
 
     if (!table) {
       console.log("Table name must be specified");
@@ -26,16 +26,16 @@ module.exports = {
       database.db,
       database.username,
       database.password, {
-        host: database.host,
-        dialect: 'mysql',
-        directory: "app/models/", // prevents the program from writing to disk
-        port: '3306',
+        host      : database.host,
+        dialect   : 'mysql',
+        directory : "app/models/", // prevents the program from writing to disk
+        port      : '3306',
 
-        additional: {
-          timestamps: false,
-          freezeTableName: true,
+        additional : {
+          timestamps      : false,
+          freezeTableName : true,
         },
-        tables: [table]
+        tables     : [table]
       }
     );
 

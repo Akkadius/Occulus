@@ -4,7 +4,7 @@
  */
 let express     = require('express');
 let router      = express.Router();
-let dataService = require('../../app/core/eqemu-data-service-client.js');
+let dataService = require('../../core/eqemu-data-service-client.js');
 
 router.get('/:port/netstats', function (req, res, next) {
   const port = req.params.port;

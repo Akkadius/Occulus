@@ -4,9 +4,9 @@
  */
 let express     = require('express');
 let router      = express.Router();
-let template    = require('../app/core/template-render');
-let auth        = require('../app/core/auth-service');
-let dataService = require('../app/core/eqemu-data-service-client.js');
+let template    = require('../core/template-render');
+let auth        = require('../core/auth-service');
+let dataService = require('../core/eqemu-data-service-client.js');
 let pidusage    = require('pidusage')
 
 /* GET home page. */

@@ -4,7 +4,7 @@
  */
 let express                = require('express');
 let router                 = express.Router();
-const serverProcessManager = require('../../app/core/server-process-manager')
+const serverProcessManager = require('../../core/server-process-manager')
 
 router.get('/hello', function (req, res, next) {
   res.send({"data": "hello"});

@@ -119,9 +119,9 @@ db.authenticate()
  * @type {{}}
  */
 models = {};
-fs.readdirSync(pathManager.appRoot + '/models/').forEach(function (filename) {
+fs.readdirSync(pathManager.appRoot + '/app/models/').forEach(function (filename) {
   var model          = {};
-  model.path         = path.join(pathManager.appRoot, '/models/', filename)
+  model.path         = path.join(pathManager.appRoot, '/app/models/', filename)
   model.name         = filename.replace(/\.[^/.]+$/, "");
   model.resource     = db.import(model.path);
   models[model.name] = model;

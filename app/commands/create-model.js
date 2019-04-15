@@ -28,7 +28,7 @@ module.exports = {
       database.password, {
         host: database.host,
         dialect: 'mysql',
-        directory: "models/", // prevents the program from writing to disk
+        directory: "app/models/", // prevents the program from writing to disk
         port: '3306',
 
         additional: {

@@ -2,13 +2,14 @@
  * app.js
  * @type {createApplication}
  */
-let express      = require('express');
-let cookieParser = require('cookie-parser');
-let logger       = require('morgan');
-let app          = express();
-let fs           = require('fs');
-let path         = require('path')
-let pathManager  = require('./app/core/path-manager')
+let express            = require('express');
+let cookieParser       = require('cookie-parser');
+let logger             = require('morgan');
+let app                = express();
+let fs                 = require('fs');
+let path               = require('path')
+let pathManager        = require('./app/core/path-manager')
+let eqemuConfigService = require('./app/core/eqemu-config-service')
 
 /**
  * Path Manager
@@ -16,17 +17,14 @@ let pathManager  = require('./app/core/path-manager')
 const path_root = path.resolve(__dirname).split('/node_modules')[0];
 pathManager.initAppPaths(path_root);
 
-/**
- * Load Config
- */
-eqemu_config = JSON.parse(fs.readFileSync(pathManager.getEmuServerPath('eqemu_config.json'), 'utf8'));
+eqemuConfigService.init();
 
 /**
  * Express
  */
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended : false }));
+app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -37,18 +35,18 @@ session = require('express-session')
 app.use(
   session(
     {
-      name              : 'session',
-      secret            : 'mX6s196lLJQdxJ1I7xZk',
-      resave            : false,
-      saveUninitialized : false,
+      name: 'session',
+      secret: 'mX6s196lLJQdxJ1I7xZk',
+      resave: false,
+      saveUninitialized: false,
 
       /**
        * 30 days
        *
        * 1 minute * 60 minutes * 24 hours * 30 days
        */
-      cookie : {
-        maxAge : 60000 * 60 * 24 * 30
+      cookie: {
+        maxAge: 60000 * 60 * 24 * 30
       }
     }
   )
@@ -90,14 +88,14 @@ module.exports = app;
 /**
  * Load Database
  */
-const database  = eqemu_config.server.database;
+const database  = eqemuConfigService.getServerConfig().server.database;
 const Sequelize = require('sequelize');
 const db        = new Sequelize(
   database.db,
   database.username,
   database.password, {
-    host    : database.host,
-    dialect : 'mysql',
+    host: database.host,
+    dialect: 'mysql',
   }
 );
 

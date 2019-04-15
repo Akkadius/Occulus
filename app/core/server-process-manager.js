@@ -58,6 +58,10 @@ module.exports = {
     }
   },
 
+  /**
+   * @param process_name
+   * @returns {boolean}
+   */
   doesProcessNeedToBoot : function (process_name) {
     if (this.erroredStartsCount[process_name] >= this.erroredStartsMaxHalt) {
       if (!this.hasErroredHaltMessage[process_name]) {
@@ -77,6 +81,10 @@ module.exports = {
     return this.processCount[process_name] === 0;
   },
 
+  /**
+   * @param zone_short_name
+   * @returns {Promise<void>}
+   */
   startStaticZone : async function (zone_short_name) {
     return await this.startProcess("zone", [zone_short_name]);
   },
@@ -202,6 +210,11 @@ module.exports = {
     child.unref();
   },
 
+  /**
+   * @param process_name
+   * @param args
+   * @param data
+   */
   handleProcessError : function (process_name, args, data) {
     console.error("[Error] Process '%s' via path: '%s', with args failed to start [%s]\n%s",
       process_name,
@@ -220,6 +233,9 @@ module.exports = {
 
   },
 
+  /**
+   * @param process_id
+   */
   killProcess : function (process_id) {
     try {
       require('child_process').execSync("kill -9 " + process_id);

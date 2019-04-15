@@ -49,6 +49,7 @@ describe('Server Process Manager', function () {
     this.timeout(10000);
 
     await serverProcessManager.stopServer();
+    await helper.sleep(100);
     await serverProcessManager.startServerLauncher();
     await helper.sleep(PROCESS_BOOT_TIME);
     await serverProcessManager.startStaticZone("soldungb");
@@ -69,6 +70,25 @@ describe('Server Process Manager', function () {
     const process_counts = await serverProcessManager.getProcessCounts();
 
     assert.ok(process_counts.loginserver === 1);
+
+  });
+
+  it('Should not run the launcher twice', async function () {
+    this.timeout(10000);
+
+    await serverProcessManager.stopServer();
+    await helper.sleep(500);
+    await serverProcessManager.startServerLauncher(["--with-loginserver"]);
+    await serverProcessManager.startServerLauncher(["--with-loginserver"]);
+
+    let launcher_count = 0;
+    serverProcessManager.systemProcessList.forEach(function (process) {
+      if (process.cmdline.includes("server_launch")) {
+        launcher_count++;
+      }
+    });
+
+    assert.ok(launcher_count === 1);
 
   });
 

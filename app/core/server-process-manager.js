@@ -42,6 +42,7 @@ module.exports = {
 
     while (1) {
       await this.pollProcessList();
+      await this.getBootedZoneCount();
 
       /**
        * Single processes
@@ -129,6 +130,24 @@ module.exports = {
     let args = ['cli.js', 'server_launcher'];
     if (options) {
       args.push(options);
+    }
+
+    /**
+     * Check if launcher is booted first
+     * @type {exports}
+     */
+    let self               = this;
+    let is_launcher_booted = false;
+    await this.pollProcessList();
+    this.systemProcessList.forEach(function (process) {
+      if (process.cmdline.includes("server_launch")) {
+        is_launcher_booted = true;
+      }
+    });
+
+    if (is_launcher_booted) {
+      console.log("Launcher is already booted");
+      return false;
     }
 
     const child_process = await spawn('node', args, {
@@ -292,8 +311,6 @@ module.exports = {
         self.processCount[process.name]++;
       }
     });
-
-    await this.getBootedZoneCount();
   },
 
   /**

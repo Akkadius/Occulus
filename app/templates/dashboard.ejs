@@ -130,7 +130,7 @@
                 <tbody>
                     <% Object.keys(process_counts).forEach(function (key){ %>
                         <tr>
-                            <td><i class="fe fe-circle"></i> <%= key.charAt(0).toUpperCase() + key.slice(1) %></td>
+                            <td> <%= key.charAt(0).toUpperCase() + key.slice(1) %></td>
                             <td class="text-right">
                                 <% if (process_counts[key] === 0) { %>
                                     <span class="badge badge-danger">Offline</span>

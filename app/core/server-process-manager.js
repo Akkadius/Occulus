@@ -16,8 +16,15 @@ module.exports = {
   processCount          : {},
   serverProcessNames    : ["zone", "world", "ucs", "queryserv", "loginserver"],
   systemProcessList     : {},
+  launchOptions         : {},
 
-  init : function () {
+  /**
+   * Launcher initialization
+   * @param options
+   */
+  init : function (options) {
+    this.launchOptions = options;
+
     let self = this;
     this.serverProcessNames.forEach(function (process_name) {
       self.erroredStartsCount[process_name]    = 0;
@@ -30,27 +37,33 @@ module.exports = {
    * @param options
    * @returns {Promise<void>}
    */
-  start : async function (options) {
-
-    this.init();
+  start : async function (options = []) {
+    this.init(options);
 
     while (1) {
       await this.pollProcessList();
 
+      /**
+       * Single processes
+       * @type {exports}
+       */
       let self = this;
-
       ["loginserver", "ucs", "world", "queryserv"].forEach(function (process_name) {
         if (self.doesProcessNeedToBoot(process_name)) {
           self.startProcess(process_name);
         }
       });
 
+      /**
+       * Zone
+       */
       while (this.doesProcessNeedToBoot("zone")) {
         await self.startProcess("zone");
       }
 
       console.log("Zone Processes: '%s'", this.processCount["zone"]);
       console.log("World Process: '%s'", this.processCount["world"]);
+      console.log("Loginserver Process: '%s'", this.processCount["loginserver"]);
       console.log("UCS Process: '%s'", this.processCount["ucs"]);
       console.log("Booted Zone Processes: '%s'", this.zoneBootedProcessCount);
 
@@ -76,6 +89,10 @@ module.exports = {
       this.processCount[process_name] < (this.zoneBootedProcessCount + this.minZoneProcesses)) {
 
       return true;
+    }
+    if (process_name === "loginserver") {
+      return this.launchOptions && this.launchOptions.withLoginserver && this.processCount[process_name] === 0;
+
     }
 
     return this.processCount[process_name] === 0;
@@ -108,12 +125,30 @@ module.exports = {
   /**
    * @returns {exports}
    */
-  startServerLauncher : async function () {
-    const child_process = await spawn('node', ['cli.js', 'server_launcher'], {
+  startServerLauncher : async function (options) {
+    let args = ['cli.js', 'server_launcher'];
+    if (options) {
+      args.push(options);
+    }
+
+    const child_process = await spawn('node', args, {
       detached : true,
-      stdio    : 'ignore',
+      // stdio    : 'ignore',
       cwd      : pathManager.appRoot
     });
+
+    child_process.stdout.on('data', (data) => {
+      if (/\[Error]|Error/i.test(data)) {
+        self.handleProcessError(process_name, args, data);
+      }
+    });
+
+    child_process.stderr.on('data', (data) => {
+      if (/\[Error]|Error/i.test(data)) {
+        self.handleProcessError(process_name, args, data);
+      }
+    });
+
     child_process.unref();
 
     return this;
@@ -228,9 +263,6 @@ module.exports = {
     }
 
     this.erroredStartsCount[process_name]++;
-
-    console.log(this.erroredStartsCount);
-
   },
 
   /**

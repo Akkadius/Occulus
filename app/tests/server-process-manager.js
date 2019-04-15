@@ -20,7 +20,9 @@ describe('Server Process Manager', function () {
   });
 
   it('Stop server should stop all processes', async function () {
+    await serverProcessManager.startServerLauncher();
     serverProcessManager.stopServer();
+    await helper.sleep(PROCESS_BOOT_TIME);
 
     const process_counts = await serverProcessManager.getProcessCounts();
 
@@ -40,6 +42,7 @@ describe('Server Process Manager', function () {
     assert.ok(process_counts.zone > 0);
     assert.ok(process_counts.queryserv > 0);
     assert.ok(process_counts.ucs > 0);
+    assert.ok(process_counts.zone === serverProcessManager.minZoneProcesses);
   });
 
   it('Should return booted zone count', async function () {
@@ -53,6 +56,19 @@ describe('Server Process Manager', function () {
     const booted_zone_count = await serverProcessManager.getBootedZoneCount();
 
     assert.ok(booted_zone_count > 0);
+
+  });
+
+  it('Should boot the server with the loginserver', async function () {
+    this.timeout(10000);
+
+    await serverProcessManager.stopServer();
+    await helper.sleep(100);
+    await serverProcessManager.startServerLauncher(["--with-loginserver"]);
+    await helper.sleep(PROCESS_BOOT_TIME);
+    const process_counts = await serverProcessManager.getProcessCounts();
+
+    assert.ok(process_counts.loginserver === 1);
 
   });
 

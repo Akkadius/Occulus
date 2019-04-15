@@ -9,53 +9,72 @@ const pathManager       = require('./path-manager');
  * @type {{check: module.exports.check}}
  */
 module.exports = {
-  processList             : {},
-  zoneProcessCount        : 0,
-  zoneBootedProcessCount  : 0,
-  worldProcessCount       : 0,
-  ucsProcessCount         : 0,
-  qsProcessCount          : 0,
-  loginServerProcessCount : 0,
-  minZoneProcesses        : 3,
-  serverProcessNames      : ["zone", "world", "ucs", "queryserv", "loginserver"],
+  erroredStartsCount    : {},
+  hasErroredHaltMessage : {},
+  erroredStartsMaxHalt  : 5,
+  minZoneProcesses      : 3,
+  processCount          : {},
+  serverProcessNames    : ["zone", "world", "ucs", "queryserv", "loginserver"],
+  systemProcessList     : {},
+
+  init : function () {
+    let self = this;
+    this.serverProcessNames.forEach(function (process_name) {
+      self.erroredStartsCount[process_name]    = 0;
+      self.hasErroredHaltMessage[process_name] = 0;
+      self.processCount[process_name]          = 0;
+    });
+  },
 
   /**
    * @param options
    * @returns {Promise<void>}
    */
   start : async function (options) {
+
+    this.init();
+
     while (1) {
       await this.pollProcessList();
 
-      if (this.worldProcessCount === 0) {
-        this.startWorld();
+      let self = this;
+
+      ["loginserver", "ucs", "world", "queryserv"].forEach(function (process_name) {
+        if (self.doesProcessNeedToBoot(process_name)) {
+          self.startProcess(process_name);
+        }
+      });
+
+      while (this.doesProcessNeedToBoot("zone")) {
+        await self.startProcess("zone");
       }
 
-      if (this.qsProcessCount === 0) {
-        this.startQueryServ();
-      }
-
-      if (this.ucsProcessCount === 0) {
-        this.startUcs();
-      }
-
-      if (this.loginServerProcessCount === 0) {
-        this.startLoginServer();
-      }
-
-      while (this.zoneProcessCount < (this.zoneBootedProcessCount + this.minZoneProcesses)) {
-        this.startZone();
-      }
-
-      /// console.log(options.withLoginserver);
-
-      console.log("Zone Processes: '%s'", this.zoneProcessCount);
-      console.log("World Process: '%s'", this.worldProcessCount);
-      console.log("UCS Process: '%s'", this.ucsProcessCount);
+      console.log("Zone Processes: '%s'", this.processCount["zone"]);
+      console.log("World Process: '%s'", this.processCount["world"]);
+      console.log("UCS Process: '%s'", this.processCount["ucs"]);
       console.log("Booted Zone Processes: '%s'", this.zoneBootedProcessCount);
 
       await this.sleep(5000);
     }
+  },
+
+  doesProcessNeedToBoot : function (process_name) {
+    if (this.erroredStartsCount[process_name] >= this.erroredStartsMaxHalt) {
+      if (!this.hasErroredHaltMessage[process_name]) {
+        console.error("Process '%s' has tried to boot too many (%s) times... Halting attempts", process_name, this.erroredStartsMaxHalt)
+        this.hasErroredHaltMessage[process_name] = 1;
+      }
+
+      return false;
+    }
+
+    if (process_name === "zone" &&
+      this.processCount[process_name] < (this.zoneBootedProcessCount + this.minZoneProcesses)) {
+
+      return true;
+    }
+
+    return this.processCount[process_name] === 0;
   },
 
   startStaticZone : async function (zone_short_name) {
@@ -66,10 +85,10 @@ module.exports = {
    * @returns {Promise<void>}
    */
   stopServer : async function () {
-    this.processList = await require("process-list").snapshot('pid', 'name', 'threads', 'cmdline');
-    let self         = this;
+    this.systemProcessList = await require("process-list").snapshot('pid', 'name', 'threads', 'cmdline');
+    let self               = this;
 
-    this.processList.forEach(function (process) {
+    this.systemProcessList.forEach(function (process) {
       if (self.serverProcessNames.includes(process.name) || process.cmdline.includes("server_launcher")) {
         self.killProcess(process.pid);
       }
@@ -133,31 +152,6 @@ module.exports = {
     return this.zoneBootedProcessCount;
   },
 
-  startWorld : function () {
-    this.startProcess('world');
-    this.worldProcessCount++;
-  },
-
-  startZone : function () {
-    this.startProcess('zone');
-    this.zoneProcessCount++;
-  },
-
-  startLoginServer : function () {
-    this.startProcess('loginserver');
-    this.loginServerProcessCount++;
-  },
-
-  startUcs : function () {
-    this.startProcess('ucs');
-    this.ucsProcessCount++;
-  },
-
-  startQueryServ : function () {
-    this.startProcess('queryserv');
-    this.qsProcessCount++;
-  },
-
   /**
    * @param process_name
    * @param args
@@ -189,6 +183,8 @@ module.exports = {
       }
     );
 
+    this.processCount[process_name]++;
+
     const self = this;
 
     child.stdout.on('data', (data) => {
@@ -213,6 +209,15 @@ module.exports = {
       args,
       data
     );
+
+    if (typeof this.erroredStartsCount[process_name] === "undefined") {
+      this.erroredStartsCount[process_name] = 0;
+    }
+
+    this.erroredStartsCount[process_name]++;
+
+    console.log(this.erroredStartsCount);
+
   },
 
   killProcess : function (process_id) {
@@ -227,36 +232,21 @@ module.exports = {
    * @returns {Promise<void>}
    */
   pollProcessList : async function () {
-    this.processList             = await require("process-list").snapshot('pid', 'name', 'threads', 'cmdline');
-    this.zoneProcessCount        = 0;
-    this.worldProcessCount       = 0;
-    this.ucsProcessCount         = 0;
-    this.qsProcessCount          = 0;
-    this.loginServerProcessCount = 0;
-    let self                     = this;
+    this.systemProcessList = await require("process-list").snapshot('pid', 'name', 'threads', 'cmdline');
 
-    this.processList.forEach(function (process) {
-      if (process.name === "zone") {
-        self.zoneProcessCount++;
-      }
-      if (process.name === "world") {
-        self.worldProcessCount++;
-      }
-      if (process.name === "ucs") {
-        self.ucsProcessCount++;
-      }
-      if (process.name === "queryserv") {
-        self.qsProcessCount++;
-      }
-      if (process.name === "loginserver") {
-        self.loginServerProcessCount++;
+    let self = this;
+    this.serverProcessNames.forEach(function (process_name) {
+      self.processCount[process_name] = 0;
+    });
+
+    this.systemProcessList.forEach(function (process) {
+      if (self.serverProcessNames.includes(process.name)) {
+        self.processCount[process.name]++;
       }
     });
 
     await this.getBootedZoneCount();
-  }
-
-  ,
+  },
 
   /**
    * @returns {Promise<{world: number, ucs: number, zone: number, queryserv: number, loginserver: number}>}
@@ -265,11 +255,11 @@ module.exports = {
     await this.pollProcessList();
 
     return {
-      "zone"        : this.zoneProcessCount,
-      "world"       : this.worldProcessCount,
-      "ucs"         : this.ucsProcessCount,
-      "queryserv"   : this.qsProcessCount,
-      "loginserver" : this.loginServerProcessCount,
+      "zone"        : this.processCount["zone"],
+      "world"       : this.processCount["world"],
+      "ucs"         : this.processCount["ucs"],
+      "queryserv"   : this.processCount["queryserv"],
+      "loginserver" : this.processCount["loginserver"],
     };
   }
   ,

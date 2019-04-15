@@ -16,7 +16,7 @@ router.get('/', function (req, res, next) {
    */
   const login = template
     .load("login")
-    .render();
+    .renderEjs();
 
   /**
    * Response

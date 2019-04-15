@@ -2,8 +2,9 @@
  * template-render.js
  * @type {module:fs}
  */
-let fs  = require('fs');
-let ejs = require('ejs');
+const fs          = require('fs');
+const ejs         = require('ejs');
+const pathManager = require('./path-manager');
 
 /**
  * @type {{template: null, getTemplate: (function(*): exports), var: (function(*, *=): exports)}}
@@ -13,20 +14,20 @@ module.exports = {
   /**
    * @string
    */
-  template: null,
+  template : null,
 
   /**
    * @param template
    * @returns {exports}
    */
-  load: function (template) {
+  load : function (template) {
 
     /**
      * Vanilla .html
      */
-    if (fs.existsSync(app_root + '/app/templates/' + template + '.html')) {
+    if (fs.existsSync(pathManager.appRoot + '/app/templates/' + template + '.html')) {
       this.template = fs.readFileSync(
-        app_root + '/app/templates/' + template + '.html',
+        pathManager.appRoot + '/app/templates/' + template + '.html',
         'utf8'
       );
 
@@ -36,9 +37,9 @@ module.exports = {
     /**
      * EJS
      */
-    if (fs.existsSync(app_root + '/app/templates/' + template + '.ejs')) {
+    if (fs.existsSync(pathManager.appRoot + '/app/templates/' + template + '.ejs')) {
       this.template = fs.readFileSync(
-        app_root + '/app/templates/' + template + '.ejs',
+        pathManager.appRoot + '/app/templates/' + template + '.ejs',
         'utf8'
       );
 
@@ -53,7 +54,7 @@ module.exports = {
    * @param value
    * @returns {exports}
    */
-  var: function (variable, value) {
+  var : function (variable, value) {
     this.template = this.template.replace("{{" + variable + "}}", value);
 
     return this;
@@ -62,7 +63,7 @@ module.exports = {
   /**
    * @returns {null}
    */
-  render: function () {
+  render : function () {
     return this.template;
   },
 
@@ -71,9 +72,9 @@ module.exports = {
    * @param options
    * @returns {String|Promise<String>}
    */
-  renderEjs: function (data, options) {
+  renderEjs : function (data, options) {
     if (!options) {
-      options = { root: app_root + "/app/templates/" };
+      options = { root : pathManager.appRoot + "/app/templates/" };
     }
 
     return ejs.render(this.template, data, options);

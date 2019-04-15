@@ -8,28 +8,25 @@ let logger       = require('morgan');
 let app          = express();
 let fs           = require('fs');
 let path         = require('path')
+let pathManager  = require('./app/core/path-manager')
+
+/**
+ * Path Manager
+ */
+const path_root = path.resolve(__dirname).split('/node_modules')[0];
+pathManager.initAppPaths(path_root);
 
 /**
  * Load Config
  */
-eqemu_config = {};
-config_path = '../eqemu_config.json';
-if (fs.existsSync(config_path)) {
-  eqemu_config = JSON.parse(fs.readFileSync(config_path, 'utf8'));
-}
-
-/**
- * Base server path
- */
-global.base_server_path = path.join(__dirname, '../');
-global.app_root = path.resolve(__dirname).split('/node_modules')[0];
+eqemu_config = JSON.parse(fs.readFileSync(pathManager.getEmuServerPath('eqemu_config.json'), 'utf8'));
 
 /**
  * Express
  */
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({extended: false}));
+app.use(express.urlencoded({ extended : false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -40,24 +37,22 @@ session = require('express-session')
 app.use(
   session(
     {
-      name: 'session',
-      secret: 'mX6s196lLJQdxJ1I7xZk',
-      resave: false,
-      saveUninitialized: false,
+      name              : 'session',
+      secret            : 'mX6s196lLJQdxJ1I7xZk',
+      resave            : false,
+      saveUninitialized : false,
 
       /**
        * 30 days
        *
        * 1 minute * 60 minutes * 24 hours * 30 days
        */
-      cookie: {
-        maxAge: 60000 * 60 * 24 * 30
+      cookie : {
+        maxAge : 60000 * 60 * 24 * 30
       }
     }
   )
 );
-
-console.log("app root is '%s'", app_root);
 
 /**
  * Print session debug
@@ -101,8 +96,8 @@ const db        = new Sequelize(
   database.db,
   database.username,
   database.password, {
-    host: database.host,
-    dialect: 'mysql',
+    host    : database.host,
+    dialect : 'mysql',
   }
 );
 
@@ -124,9 +119,9 @@ db.authenticate()
  * @type {{}}
  */
 models = {};
-fs.readdirSync(app_root + '/models/').forEach(function (filename) {
+fs.readdirSync(pathManager.appRoot + '/models/').forEach(function (filename) {
   var model          = {};
-  model.path         = path.join(app_root, '/models/', filename)
+  model.path         = path.join(pathManager.appRoot, '/models/', filename)
   model.name         = filename.replace(/\.[^/.]+$/, "");
   model.resource     = db.import(model.path);
   models[model.name] = model;

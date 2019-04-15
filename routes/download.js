@@ -2,9 +2,10 @@
  * download.js
  * @type {createApplication}
  */
-var express    = require('express');
-var router     = express.Router();
-const { exec } = require('child_process');
+const express     = require('express');
+const router      = express.Router();
+const { exec }    = require('child_process');
+const pathManager = require('../app/core/path-manager');
 
 /* GET home page. */
 router.get('/:downloadType', function (req, res, next) {
@@ -30,16 +31,16 @@ router.get('/:downloadType', function (req, res, next) {
       let file = "";
       switch (download_type) {
         case "spells":
-          file = base_server_path + 'export/spells_us.txt';
+          file = pathManager.getEmuServerPath('export/spells_us.txt');
           break;
         case "skills":
-          file = base_server_path + 'export/SkillCaps.txt';
+          file = pathManager.getEmuServerPath('export/SkillCaps.txt');
           break;
         case "basedata":
-          file = base_server_path + 'export/BaseData.txt';
+          file = pathManager.getEmuServerPath('export/BaseData.txt');
           break;
         case "dbstr":
-          file = base_server_path + 'export/dbstr_us.txt';
+          file = pathManager.getEmuServerPath('export/dbstr_us.txt');
           break;
         default:
       }

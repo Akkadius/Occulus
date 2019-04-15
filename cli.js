@@ -1,12 +1,15 @@
 /**
  * @type {commander.CommanderStatic | commander}
  */
-const program  = require('commander');
-const path     = require('path')
+const program     = require('commander');
+const path        = require('path')
+const pathManager = require("./app/core/path-manager")
 
-global.app_root = path.resolve(__dirname).split('/node_modules')[0];
-global.cli_root = app_root + '/app/commands/';
-global.server_root = path.join(app_root, '../');
+/**
+ * Path Manager
+ */
+const path_root = path.resolve(__dirname).split('/node_modules')[0];
+pathManager.initAppPaths(path_root);
 
 /**
  * CLI
@@ -22,14 +25,14 @@ program
   .option("--zones [zones]")
   .option("--with-loginserver")
   .description('Starts server launcher')
-  .action((options) => require(cli_root + 'server-launcher').serverLauncher(options));
+  .action((options) => require(pathManager.cliRoot + 'server-launcher').serverLauncher(options));
 
 /**
  * Stop Server
  */
 program
   .command('stop_server')
-  .action(() => require(cli_root + 'server-launcher').stopServer());
+  .action(() => require(pathManager.cliRoot + 'server-launcher').stopServer());
 
 /**
  * Create Model
@@ -37,7 +40,7 @@ program
 program
   .command('create_model [table]')
   .description('Create model from table')
-  .action((table) => require(cli_root + 'create-model').createModel(table));
+  .action((table) => require(pathManager.cliRoot + 'create-model').createModel(table));
 
 /**
  * Help

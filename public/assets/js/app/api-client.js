@@ -29,6 +29,7 @@ class ServerApiClient {
     const call = await this.get("/api/server/stop");
     if (call.data) {
       this.success('<i class="fe fe-power"></i> ' + call.data)
+      this.refreshPage();
     }
   }
 
@@ -39,6 +40,7 @@ class ServerApiClient {
     const call = await this.get("/api/server/start");
     if (call.data) {
       this.success('<i class="fe fe-power"></i> ' + call.data)
+      this.refreshPage();
     }
   }
 
@@ -49,6 +51,11 @@ class ServerApiClient {
     const call = await this.get("/api/server/restart");
     if (call.data) {
       this.success('<i class="fe fe-power"></i> ' + call.data)
+      this.refreshPage(500);
     }
+  }
+
+  static refreshPage(time = 100) {
+    setTimeout(function(){ window.location.reload(); }, time);
   }
 }

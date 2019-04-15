@@ -178,7 +178,11 @@ module.exports = {
    */
   restartServer : async function () {
     this.stopServer();
-    this.startServerLauncher();
+
+    let self = this;
+    setTimeout(function () {
+      self.startServerLauncher();
+    }, 300);
 
     return this;
   },

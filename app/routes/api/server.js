@@ -25,4 +25,9 @@ router.get('/restart', function (req, res, next) {
   res.send({"data": "Server has been restarted successfully!"});
 });
 
+router.get('/process_counts', async function (req, res, next) {
+  const process_counts = await serverProcessManager.getProcessCounts();
+  res.send(process_counts);
+});
+
 module.exports = router;

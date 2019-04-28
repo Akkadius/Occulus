@@ -27,6 +27,13 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 /**
+ * For Development
+ * @type {any}
+ */
+var cors = require('cors')
+app.use(cors())
+
+/**
  * Sessions
  */
 session = require('express-session')

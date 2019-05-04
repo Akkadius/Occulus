@@ -10,21 +10,22 @@ let pidusage    = require('pidusage');
 router.get('/list', async function (req, res, next) {
   const zone_list = await dataService.getZoneList();
 
+  let zone_pids = [];
+
   if (zone_list) {
-    let zone_pids = [];
     zone_list.forEach(function (zone) {
       zone_pids.push(zone.zone_os_pid);
     });
-
-    pidusage(zone_pids, function (err, stats) {
-      res.send({
-        "zone_list": zone_list,
-        "process_stats": stats
-      });
-    });
-
-    return false;
   }
+
+  pidusage(zone_pids, function (err, stats) {
+    res.send({
+      "zone_list": zone_list,
+      "process_stats": stats
+    });
+  });
+
+  return false;
 });
 
 router.get('/:port/netstats', function (req, res, next) {

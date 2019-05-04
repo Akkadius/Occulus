@@ -74,12 +74,6 @@ app.use('/zoneserver', require('./app/routes/zoneserver/netstats'));
 app.use('/download', require('./app/routes/download'));
 
 /**
- * Login
- */
-app.use('/login', require('./app/routes/auth/login'));
-app.use('/logout', require('./app/routes/auth/logout'));
-
-/**
  * API
  */
 app.use('/api/dashboard/stats', require('./app/routes/api/dashboard/stats'));
@@ -87,6 +81,7 @@ app.use('/api/world/servers', require('./app/routes/api/world/servers'));
 app.use('/api/zoneserver', require('./app/routes/api/zoneserver'));
 app.use('/api/zoneserver/netstat', require('./app/routes/api/zoneserver/netstat'));
 app.use('/api/server', require('./app/routes/api/server'));
+app.use('/api/auth', require('./app/routes/api/auth/auth'));
 
 module.exports = app;
 

@@ -36,39 +36,6 @@ app.use(cors({
 }));
 
 /**
- * Sessions
- */
-session = require('express-session')
-app.use(
-  session(
-    {
-      name: 'session',
-      secret: 'mX6s196lLJQdxJ1I7xZk',
-      resave: false,
-      saveUninitialized: false,
-
-      /**
-       * 30 days
-       *
-       * 1 minute * 60 minutes * 24 hours * 30 days
-       */
-      cookie: {
-        maxAge: 60000 * 60 * 24 * 30
-      }
-    }
-  )
-);
-
-/**
- * Print session debug
- */
-app.use(function printSession(req, res, next) {
-  console.log('req.session');
-  console.log(req.session);
-  return next();
-});
-
-/**
  * Routes
  */
 app.use('/download', require('./app/routes/download'));
@@ -76,12 +43,12 @@ app.use('/download', require('./app/routes/download'));
 /**
  * API
  */
-app.use('/api/dashboard/stats', require('./app/routes/api/dashboard/stats'));
-app.use('/api/world/servers', require('./app/routes/api/world/servers'));
-app.use('/api/zoneserver', require('./app/routes/api/zoneserver'));
-app.use('/api/zoneserver/netstat', require('./app/routes/api/zoneserver/netstat'));
-app.use('/api/server', require('./app/routes/api/server'));
-app.use('/api/auth', require('./app/routes/api/auth/auth'));
+app.use('/api/v1/dashboard/stats', require('./app/routes/api/dashboard/stats'));
+app.use('/api/v1/world/servers', require('./app/routes/api/world/servers'));
+app.use('/api/v1/zoneserver', require('./app/routes/api/zoneserver'));
+app.use('/api/v1/zoneserver/netstat', require('./app/routes/api/zoneserver/netstat'));
+app.use('/api/v1/server', require('./app/routes/api/server'));
+app.use('/api/v1/auth', require('./app/routes/api/auth/auth'));
 
 module.exports = app;
 

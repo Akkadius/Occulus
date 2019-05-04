@@ -2,10 +2,6 @@ const express     = require('express');
 const router      = express.Router();
 const authService = require('../../../../app/core/auth-service')
 
-router.get('/logout', function (req, res, next) {
-  res.send({success: "Logged out"});
-});
-
 router.post('/login', function (req, res, next) {
   const username = req.body.username;
   const password = req.body.password;

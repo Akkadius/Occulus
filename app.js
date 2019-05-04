@@ -31,7 +31,9 @@ app.use(express.static(path.join(__dirname, 'public')));
  * @type {any}
  */
 var cors = require('cors')
-app.use(cors())
+app.use(cors({
+  origin: 'http://localhost:8080'
+}));
 
 /**
  * Sessions
@@ -61,16 +63,14 @@ app.use(
  * Print session debug
  */
 app.use(function printSession(req, res, next) {
-  // console.log('req.session', req.session);
+  console.log('req.session');
+  console.log(req.session);
   return next();
 });
 
 /**
  * Routes
  */
-app.use('/', require('./app/routes/index'));
-app.use('/zoneservers', require('./app/routes/zoneservers'));
-app.use('/zoneserver', require('./app/routes/zoneserver/netstats'));
 app.use('/download', require('./app/routes/download'));
 
 /**

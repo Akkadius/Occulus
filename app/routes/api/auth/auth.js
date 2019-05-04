@@ -13,6 +13,8 @@ router.post('/login', function (req, res, next) {
   if (username === "admin" && password === "admin") {
     req.session.loggedIn = true;
     req.session.username = username;
+    req.session.save();
+
     return res.send({success: "Login success"});
   }
 

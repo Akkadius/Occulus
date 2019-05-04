@@ -18,7 +18,7 @@ router.post('/login', function (req, res, next) {
     return res.send({success: "Login success"});
   }
 
-  res.status(401).send({error: "Login incorrect!"});
+  res.status(401).send({error: "Invalid credentials!"});
 });
 
 module.exports = router;

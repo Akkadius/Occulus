@@ -2,20 +2,22 @@
  * app.js
  * @type {createApplication}
  */
-let express            = require('express');
-let cookieParser       = require('cookie-parser');
-let logger             = require('morgan');
-let app                = express();
-let fs                 = require('fs');
-let path               = require('path')
-let pathManager        = require('./app/core/path-manager')
-let eqemuConfigService = require('./app/core/eqemu-config-service')
+const express            = require('express');
+const cookieParser       = require('cookie-parser');
+const logger             = require('morgan');
+const app                = express();
+const fs                 = require('fs');
+const path               = require('path')
+const pathManager        = require('./app/core/path-manager')
+const eqemuConfigService = require('./app/core/eqemu-config-service')
+const authService        = require('./app/core/auth-service')
 
 /**
  * Init services
  */
 pathManager.init(__dirname);
 eqemuConfigService.init();
+authService.initializeKey();
 
 /**
  * Express
@@ -31,9 +33,15 @@ app.use(express.static(path.join(__dirname, 'public')));
  * @type {any}
  */
 var cors = require('cors')
-app.use(cors({
-  origin: 'http://localhost:8080'
-}));
+app.use(
+  cors(
+    {
+      origin: 'http://localhost:8080'
+    }
+  )
+);
+
+app.use(authService.handleApiRoutes());
 
 /**
  * Routes
@@ -63,7 +71,8 @@ const db        = new Sequelize(
   database.password, {
     host: database.host,
     dialect: 'mysql',
-  }
+    operatorsAliases: false
+  },
 );
 
 /**

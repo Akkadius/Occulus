@@ -61,6 +61,7 @@ app.use('/api/v1/zoneserver', require('./app/routes/api/zoneserver'));
 app.use('/api/v1/zoneserver/netstat', require('./app/routes/api/zoneserver/netstat'));
 app.use('/api/v1/server', require('./app/routes/api/server'));
 app.use('/api/v1/auth', require('./app/routes/api/auth/auth'));
+app.use('/api/v1/admin', require('./app/routes/api/admin'));
 
 module.exports = app;
 

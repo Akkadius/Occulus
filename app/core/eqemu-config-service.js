@@ -8,7 +8,7 @@ let fs          = require('fs');
 /**
  * @type {{getServerConfig(): *, init: (function(): exports), serverConfig: {}}}
  */
-module.exports  = {
+module.exports = {
   serverConfig: {},
 
   /**
@@ -27,6 +27,17 @@ module.exports  = {
    */
   getServerConfig() {
     return this.serverConfig;
+  },
+
+
+  /**
+   * @returns {module.exports.serverConfig|{}}
+   */
+  saveServerConfig(data) {
+    const config = pathManager.getEmuServerPath('eqemu_config.json');
+
+    fs.writeFileSync(config, JSON.stringify(data, null, 2), 'utf8');
+    this.serverConfig = data;
   },
 
 };

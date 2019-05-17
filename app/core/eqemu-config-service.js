@@ -29,6 +29,12 @@ module.exports = {
     return this.serverConfig;
   },
 
+  /**
+   * @returns {null}
+   */
+  getServerLongName() {
+    return (this.serverConfig.server.world.longname ? this.serverConfig.server.world.longname : null)
+  },
 
   /**
    * @returns {module.exports.serverConfig|{}}

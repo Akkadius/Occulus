@@ -40,7 +40,8 @@ app.use(
         'http://localhost:8080',
         'http://localhost:8080',
         'http://localhost:5000'
-      ]
+      ],
+      exposedHeaders: ['Content-Disposition']
     }
   )
 );
@@ -62,6 +63,7 @@ app.use('/api/v1/zoneserver/netstat', require('./app/routes/api/zoneserver/netst
 app.use('/api/v1/server', require('./app/routes/api/server'));
 app.use('/api/v1/auth', require('./app/routes/api/auth/auth'));
 app.use('/api/v1/admin', require('./app/routes/api/admin'));
+app.use('/api/v1/backup', require('./app/routes/api/backup/backup'));
 
 module.exports = app;
 

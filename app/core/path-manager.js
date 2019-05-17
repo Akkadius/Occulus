@@ -34,7 +34,7 @@ module.exports = {
    * @param requested_path
    * @returns {*}
    */
-  getEmuServerPath : function (requested_path) {
+  getEmuServerPath : function (requested_path = "") {
     return this.emuServerPath + requested_path;
   },
 
@@ -42,7 +42,7 @@ module.exports = {
    * @param requested_path
    * @returns {*}
    */
-  getCliRootPath : function (requested_path) {
+  getCliRootPath : function (requested_path = "") {
     return this.cliRoot + requested_path;
   },
 
@@ -50,7 +50,7 @@ module.exports = {
    * @param requested_path
    * @returns {*}
    */
-  getAppRootPath : function (requested_path) {
+  getAppRootPath : function (requested_path = "") {
     return this.appRoot + requested_path;
   },
 

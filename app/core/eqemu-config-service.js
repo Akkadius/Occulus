@@ -16,10 +16,19 @@ module.exports = {
    * @returns {exports}
    */
   init: function () {
+    if (Object.keys(this.serverConfig).length) {
+      return this;
+    }
+
     const config      = pathManager.getEmuServerPath('eqemu_config.json');
     this.serverConfig = JSON.parse(fs.readFileSync(config, 'utf8'));
 
     return this;
+  },
+
+  reload: function () {
+    const config      = pathManager.getEmuServerPath('eqemu_config.json');
+    this.serverConfig = JSON.parse(fs.readFileSync(config, 'utf8'));
   },
 
   /**
@@ -34,6 +43,41 @@ module.exports = {
    */
   getServerLongName() {
     return (this.serverConfig.server.world.longname ? this.serverConfig.server.world.longname : null)
+  },
+
+  /**
+   * @returns {null}
+   */
+  getDatabaseName() {
+    return (this.serverConfig.server.database.db ? this.serverConfig.server.database.db : "")
+  },
+
+  /**
+   * @returns {null}
+   */
+  getDatabaseHost() {
+    return (this.serverConfig.server.database.host ? this.serverConfig.server.database.host : "")
+  },
+
+  /**
+   * @returns {null}
+   */
+  getDatabaseUsername() {
+    return (this.serverConfig.server.database.username ? this.serverConfig.server.database.username : "")
+  },
+
+  /**
+   * @returns {null}
+   */
+  getDatabasePassword() {
+    return (this.serverConfig.server.database.password ? this.serverConfig.server.database.password : "")
+  },
+
+  /**
+   * @returns {null}
+   */
+  getDatabasePort() {
+    return (this.serverConfig.server.database.port ? this.serverConfig.server.database.port : "")
   },
 
   /**

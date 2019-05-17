@@ -43,6 +43,14 @@ program
   .action((table) => require(pathManager.cliRoot + 'create-model').createModel(table));
 
 /**
+ * Create Model
+ */
+program
+  .command('mysqldump')
+  .description('Perform a MySQL dump')
+  .action(() => require(pathManager.cliRoot + 'mysqldump').dump());
+
+/**
  * Help
  */
 if (!process.argv.slice(2).length || !/[arudl]/.test(process.argv.slice(2))) {

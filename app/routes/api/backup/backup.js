@@ -120,7 +120,6 @@ router.get('/:download', async function (req, res, next) {
       zip.end();
     });
   }
-
 });
 
 module.exports = router;

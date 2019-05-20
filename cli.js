@@ -43,7 +43,7 @@ program
   .action((table) => require(pathManager.cliRoot + 'create-model').createModel(table));
 
 /**
- * Create Model
+ * MysqlDump
  */
 program
   .command('mysqldump')
@@ -51,9 +51,17 @@ program
   .action(() => require(pathManager.cliRoot + 'mysqldump').dump());
 
 /**
+ * Websocket
+ */
+program
+  .command('ws [port]')
+  .description('Websocket testing')
+  .action((port) => require(pathManager.cliRoot + 'ws-test').test(port));
+
+/**
  * Help
  */
-if (!process.argv.slice(2).length || !/[arudl]/.test(process.argv.slice(2))) {
+if (!process.argv.slice(2).length) {
   program.outputHelp();
   process.exit();
 }

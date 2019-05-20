@@ -5,8 +5,8 @@ const pathManager        = require('../../../core/path-manager')
 const mysqldump          = require('../../../core/mysqldump-service')
 const path               = require('path')
 const fs                 = require('fs')
-const yazl               = require("yazl");
-const recursive          = require("recursive-readdir");
+const yazl               = require('yazl');
+const recursive          = require('recursive-readdir');
 const slugify            = require('slugify')
 const util               = require('util')
 const os                 = require('os')
@@ -18,41 +18,41 @@ router.get('/:download', async function (req, res, next) {
   const download       = req.params.download;
   const serverLongName = eqemuConfigService.getServerLongName()
   const now            = new Date();
-  const dateFileString = now.getFullYear() + "-" + now.getMonth() + "-" + now.getDate();
+  const dateFileString = now.getFullYear() + '-' + now.getMonth() + '-' + now.getDate();
   const archiveName    = slugify(
     util.format('(%s)-%s-%s.zip', download, dateFileString, serverLongName.toLowerCase()),
-    {remove: /[*+~()'"!:@]/g}
+    { remove : /[*+~()'"!:@]/g }
   )
 
-  let requestedDownloadPath = "";
+  let requestedDownloadPath = '';
   switch (download) {
-    case "quests":
+    case 'quests':
       requestedDownloadPath = download;
       break;
-    case "maps":
+    case 'maps':
       requestedDownloadPath = download;
       break;
-    case "lua_modules":
+    case 'lua_modules':
       requestedDownloadPath = download;
       break;
-    case "database":
+    case 'database':
       break;
-    case "full":
-      requestedDownloadPath = "./";
+    case 'full':
+      requestedDownloadPath = './';
       break;
     default:
-      res.json({error: 'Invalid download requested'})
+      res.json({ error : 'Invalid download requested' })
   }
 
-  if (download === "database") {
+  if (download === 'database') {
     const dumpFile = mysqldump.dump()
     const zip      = new yazl.ZipFile();
-    const zipFile  = path.join(os.tmpdir(), path.basename(dumpFile) + ".zip")
+    const zipFile  = path.join(os.tmpdir(), path.basename(dumpFile) + '.zip')
     zip.addFile(dumpFile, path.basename(dumpFile));
 
     zip.outputStream.pipe(
       fs.createWriteStream(zipFile)
-    ).on("close", function () {
+    ).on('close', function () {
       fs.unlinkSync(dumpFile);
 
       res.download(zipFile, path.basename(zipFile), function (err) {
@@ -63,62 +63,67 @@ router.get('/:download', async function (req, res, next) {
     zip.end();
   }
 
-  if (requestedDownloadPath !== "") {
+  if (requestedDownloadPath !== '') {
     const realPath = path.join(pathManager.getEmuServerPath(), requestedDownloadPath)
     const zipFile  = path.join(os.tmpdir(), archiveName)
     let zip        = new yazl.ZipFile();
 
-    recursive(realPath, function (err, files) {
-      files.forEach(function (file) {
-        const baseServerFilePath          = file.replace(pathManager.getEmuServerPath(), "")
-        const firstLevelFile              = baseServerFilePath.split("/")[0]
-        const ignoreBackupFirstLevelFiles = [
-          'backups',
-          'eqemu-web',
-          'eqemu-admin',
-          'db_update',
-          'updates_staged',
-          'logs',
-          'shared',
-          'export'
-        ];
+    console.log(realPath)
 
-        if (ignoreBackupFirstLevelFiles.includes(firstLevelFile)) {
-          console.debug("[backup.js] Skipping file/folder [%s]", firstLevelFile)
-          return;
-        }
+    const files = await recursive(realPath)
 
-        const baseFile = path.basename(file)
-        if (baseFile.includes(".zip")) {
-          console.debug("[backup.js] Skipping .zip file [%s]", baseFile)
-          return;
-        }
+    console.log(files)
 
-        let zipPath = file.replace(pathManager.getEmuServerPath(), "")
-        console.debug("[backup.js] Adding file [%s] to zipPath [%s]", file, zipPath)
-        zip.addFile(file, zipPath);
-      });
+    files.forEach(function (file) {
+      const baseServerFilePath          = file.replace(pathManager.getEmuServerPath(), '')
+      const firstLevelFile              = baseServerFilePath.split('/')[0]
+      const ignoreBackupFirstLevelFiles = [
+        'backups',
+        'eqemu-web',
+        'eqemu-admin',
+        'db_update',
+        'updates_staged',
+        'logs',
+        'shared',
+        'export'
+      ];
 
-      if (download === "full") {
-        const dumpFile = mysqldump.dump()
-        zip.addFile(dumpFile, path.join("database", path.basename(dumpFile)));
+      if (ignoreBackupFirstLevelFiles.includes(firstLevelFile)) {
+        console.debug('[backup.js] Skipping file/folder [%s]', firstLevelFile)
+        return;
       }
 
-      zip.outputStream.pipe(
-        fs.createWriteStream(zipFile)
-      ).on("close", function () {
-        console.debug("zip file downloaded: " + zipFile);
+      const baseFile = path.basename(file)
+      if (baseFile.includes('.zip')) {
+        console.debug('[backup.js] Skipping .zip file [%s]', baseFile)
+        return;
+      }
 
-        res.download(zipFile, path.basename(zipFile), function (err) {
-          fs.unlinkSync(zipFile);
-          if (download === "full") {
-            fs.unlinkSync(mysqldump.getBackupFullSqlFilePath());
-          }
-        });
-      });
-
-      zip.end();
+      let zipPath = file.replace(pathManager.getEmuServerPath(), '')
+      console.debug('[backup.js] Adding file [%s] to zipPath [%s]', file, zipPath)
+      zip.addFile(file, zipPath);
     });
+
+    if (download === 'full') {
+      const dumpFile = mysqldump.dump()
+      zip.addFile(dumpFile, path.join('database', path.basename(dumpFile)));
+    }
+
+    zip.outputStream.pipe(
+      fs.createWriteStream(zipFile)
+    ).on('close', function () {
+      console.debug('zip file downloaded: ' + zipFile);
+
+      res.download(zipFile, path.basename(zipFile), function (err) {
+        fs.unlinkSync(zipFile);
+        if (download === 'full') {
+          fs.unlinkSync(mysqldump.getBackupFullSqlFilePath());
+        }
+      });
+    });
+
+    zip.end();
+
   }
 });
 

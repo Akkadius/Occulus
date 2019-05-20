@@ -7,8 +7,14 @@ let router      = express.Router();
 let dataService = require('../../../core/eqemu-data-service-client.js');
 
 /* GET home page. */
-router.get('/', function (req, res, next) {
+router.get('/servers', function (req, res, next) {
   dataService.getZoneList().then(response => {
+    res.send(response);
+  });
+});
+
+router.get('/clients', function (req, res, next) {
+  dataService.getClientList().then(response => {
     res.send(response);
   });
 });

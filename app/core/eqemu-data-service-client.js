@@ -19,6 +19,15 @@ module.exports = {
   },
 
   /**
+   * @returns {Promise<*>}
+   */
+  getClientList: async function () {
+    const response = await telnetService.execWorld("api get_client_list");
+
+    return JSON.parse(response).data;
+  },
+
+  /**
    * @param port
    * @returns {Promise<*>}
    */

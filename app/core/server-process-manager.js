@@ -158,13 +158,13 @@ module.exports = {
 
     child_process.stdout.on('data', (data) => {
       if (/\[Error]|Error/i.test(data)) {
-        self.handleProcessError(process_name, args, data);
+        self.handleProcessError("cli.js", args, data);
       }
     });
 
     child_process.stderr.on('data', (data) => {
       if (/\[Error]|Error/i.test(data)) {
-        self.handleProcessError(process_name, args, data);
+        self.handleProcessError("cli.js", args, data);
       }
     });
 

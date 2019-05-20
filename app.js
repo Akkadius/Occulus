@@ -57,7 +57,7 @@ app.use('/download', require('./app/routes/download'));
  * API
  */
 app.use('/api/v1/dashboard/stats', require('./app/routes/api/dashboard/stats'));
-app.use('/api/v1/world/servers', require('./app/routes/api/world/servers'));
+app.use('/api/v1/world/', require('./app/routes/api/world/world'));
 app.use('/api/v1/zoneserver', require('./app/routes/api/zoneserver'));
 app.use('/api/v1/zoneserver/netstat', require('./app/routes/api/zoneserver/netstat'));
 app.use('/api/v1/server', require('./app/routes/api/server'));

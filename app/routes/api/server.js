@@ -15,7 +15,6 @@ router.get('/hello', function (req, res, next) {
 router.get('/websocket-authorization', async function (req, res, next) {
   const websocketAuth  = require('../../core/websocket-auth')
   const authorizedUser = await websocketAuth.checkEqemuWebsocketAuthorization()
-
   res.json(authorizedUser);
 });
 

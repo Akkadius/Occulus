@@ -47,14 +47,17 @@ module.exports = {
           hash
         )
 
-        account
+        await account
           .update(
             { password : hash },
             { where : { id : foundAccount.id } }
           )
           .then(function (user) {
-            console.debug('account updated')
-            console.debug(user)
+            console.debug('[%s] Websocket account "%s" updated to "%s"',
+              file,
+              accountName,
+              hash
+            )
           })
           .catch(function (err) {
             return { error : 'Unknown error updating entity: ' + err }

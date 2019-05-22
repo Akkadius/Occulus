@@ -63,7 +63,6 @@ module.exports = {
         });
 
         ws.onclose = function (event) {
-          // console.log(event)
           reject(event)
         }
 

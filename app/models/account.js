@@ -70,7 +70,7 @@ module.exports = function(sequelize, DataTypes) {
 			defaultValue: '0'
 		},
 		suspendeduntil: {
-			type: DataTypes.DATE,
+			type: DataTypes.TEXT,
 			allowNull: false,
 			defaultValue: '0000-00-00 00:00:00'
 		},

@@ -66,4 +66,10 @@ router.get('/process_counts', async function (req, res, next) {
   res.send(process_counts);
 });
 
+router.get('/log_categories', async function (req, res, next) {
+  res.send(
+    await models['logsys_categories'].resource.findAll( { order: [['log_category_description', 'ASC']]})
+  );
+});
+
 module.exports = router;

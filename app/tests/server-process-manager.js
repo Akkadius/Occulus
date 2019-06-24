@@ -53,7 +53,7 @@ describe('Server Process Manager', function () {
     await serverProcessManager.startServerLauncher();
     await helper.sleep(PROCESS_BOOT_TIME);
     await serverProcessManager.startStaticZone("soldungb");
-    await helper.sleep(PROCESS_BOOT_TIME);
+    await helper.sleep(PROCESS_BOOT_TIME * 2);
     const booted_zone_count = await serverProcessManager.getBootedZoneCount();
 
     assert.ok(booted_zone_count > 0);
@@ -80,6 +80,7 @@ describe('Server Process Manager', function () {
     await helper.sleep(500);
     await serverProcessManager.startServerLauncher(["--with-loginserver"]);
     await serverProcessManager.startServerLauncher(["--with-loginserver"]);
+    await helper.sleep(500);
 
     let launcher_count = 0;
     serverProcessManager.systemProcessList.forEach(function (process) {

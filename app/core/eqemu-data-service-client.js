@@ -9,19 +9,32 @@ const websocketClient = require('./websocket-client');
  * @type {{getZoneList: (function(): *)}}
  */
 module.exports = {
-  /**
-   * @returns {Promise<*>}
-   */
-  getZoneList : async function () {
-    const response = await telnetService.execWorld('api get_zone_list');
 
-    return JSON.parse(response).data;
+  /**
+   * @return {boolean}
+   */
+  isJsonString: function (str) {
+    try {
+      JSON.parse(str);
+    } catch (e) {
+      return false;
+    }
+    return true;
   },
 
   /**
    * @returns {Promise<*>}
    */
-  getClientList : async function () {
+  getZoneList: async function () {
+    const response = await telnetService.execWorld('api get_zone_list');
+
+    return (this.isJsonString(response) ? JSON.parse(response).data : []);
+  },
+
+  /**
+   * @returns {Promise<*>}
+   */
+  getClientList: async function () {
     const response = await telnetService.execWorld('api get_client_list');
 
     return JSON.parse(response).data;
@@ -31,7 +44,7 @@ module.exports = {
    * @param port
    * @returns {Promise<*>}
    */
-  getZoneNetStats : async function (port) {
+  getZoneNetStats: async function (port) {
     const response = await websocketClient.setPort(port).getZonePacketStatistics();
 
     return JSON.parse(response).data;
@@ -41,7 +54,7 @@ module.exports = {
    * @param port
    * @returns {Promise<*>}
    */
-  getZoneAttributes : async function (port) {
+  getZoneAttributes: async function (port) {
     const response = await websocketClient.setPort(port).getZoneAttributes();
 
     return JSON.parse(response).data;
@@ -51,7 +64,7 @@ module.exports = {
    * @param port
    * @returns {Promise<*>}
    */
-  getClientListDetail : async function (port) {
+  getClientListDetail: async function (port) {
     const response = await websocketClient.setPort(port).getZoneClientListDetail();
 
     return JSON.parse(response).data;
@@ -61,7 +74,7 @@ module.exports = {
    * @param port
    * @returns {Promise<*>}
    */
-  getNpcListDetail : async function (port) {
+  getNpcListDetail: async function (port) {
     const response = await websocketClient.setPort(port).getZoneNpcListDetail();
 
     return JSON.parse(response).data;
@@ -70,12 +83,12 @@ module.exports = {
   /**
    * @returns {Promise<string>}
    */
-  getWorldUptime : async function () {
+  getWorldUptime: async function () {
     const response = await telnetService.execWorld('uptime 0');
     if (!response) {
       return 0;
     }
 
     return response.replace('Worldserver Uptime: ', '').trim();
-  },
+  }
 };

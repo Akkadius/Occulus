@@ -36,7 +36,6 @@
     "nodemon": "^1.19.0",
     "path": "^0.12.7",
     "pidusage": "^2.0.17",
-    "process-list": "^1.2.3",
     "ps-list": "^6.3.0",
     "recursive-readdir": "^2.2.2",
     "sequelize": "^4.43.2",

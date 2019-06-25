@@ -8,6 +8,7 @@ const fs                = require('fs');
 const path              = require('path')
 const os                = require('os')
 const util              = require('util')
+const psList            = require('ps-list');
 
 /**
  * @type {{check: module.exports.check}}
@@ -117,7 +118,7 @@ module.exports = {
    * @returns {Promise<void>}
    */
   stopServer: async function () {
-    this.systemProcessList = await require('process-list').snapshot('pid', 'name', 'threads', 'cmdline');
+    this.systemProcessList = await psList();
     let self               = this;
 
     this.systemProcessList.forEach(function (process) {
@@ -138,9 +139,9 @@ module.exports = {
       args.push(options);
     }
 
-    let argString = "";
-    args.forEach(function(arg){
-      argString += arg + " ";
+    let argString = '';
+    args.forEach(function (arg) {
+      argString += arg + ' ';
     });
 
     /**
@@ -246,9 +247,9 @@ module.exports = {
       fs.mkdirSync(logRedirectDir);
     }
 
-    let argString = "";
-    args.forEach(function(arg){
-      argString += arg + " ";
+    let argString = '';
+    args.forEach(function (arg) {
+      argString += arg + ' ';
     });
 
     let is_windows           = process.platform === 'win32';
@@ -259,7 +260,7 @@ module.exports = {
     }
     if (is_linux) {
       start_process_string =
-        util.format('./%s %s 1> %s_$$.txt &',
+        util.format('./bin/%s %s 1> %s_$$.txt &',
           process_name,
           argString,
           path.join(logRedirectDir, process_name)
@@ -320,7 +321,9 @@ module.exports = {
    * @returns {Promise<void>}
    */
   pollProcessList: async function () {
-    this.systemProcessList = await require('process-list').snapshot('pid', 'name', 'threads', 'cmdline');
+    this.systemProcessList = await psList();
+
+    console.log(this.systemProcessList)
 
     let self = this;
     this.serverProcessNames.forEach(function (process_name) {

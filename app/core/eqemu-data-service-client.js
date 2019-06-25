@@ -1,13 +1,10 @@
 /**
  * eqemu-data-service-client.js
- * @type {{check: module.exports.check}}
+ * @type {{exec: module.exports.exec}}
  */
 let telnetService     = require('./telnet-service.js');
 const websocketClient = require('./websocket-client');
 
-/**
- * @type {{getZoneList: (function(): *)}}
- */
 module.exports = {
 
   /**

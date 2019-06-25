@@ -76,8 +76,8 @@ module.exports = {
    */
   isTokenValid : function (token) {
     try {
-      console.log('Verify \'%s\'', token)
-      console.log('AppKey \'%s\'', this.appKey)
+      // console.log('\t Verify \'%s\'', token)
+      // console.log('\t AppKey \'%s\'', this.appKey)
 
       const validation = jwt.verify(token, this.appKey);
       this.user        = validation.user;
@@ -98,7 +98,7 @@ module.exports = {
       }
 
       const requestedUrl = req.originalUrl;
-      console.log('requested url \'%s\'', requestedUrl)
+      // console.log('requested url \'%s\'', requestedUrl)
 
       let accessToken = '';
       if (req.get('authorization')) {
@@ -108,7 +108,7 @@ module.exports = {
           console.log('Authorization token is invalid')
           res.send(401, 'Authorization token is invalid');
         }
-        console.debug('[auth] access token is \'%s\'', accessToken);
+        // console.debug('[auth] access token is \'%s\'', accessToken);
       }
 
       if (requestedUrl.includes('/api/v1/auth/')) {

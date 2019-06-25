@@ -323,8 +323,6 @@ module.exports = {
   pollProcessList: async function () {
     this.systemProcessList = await psList();
 
-    console.log(this.systemProcessList)
-
     let self = this;
     this.serverProcessNames.forEach(function (process_name) {
       self.processCount[process_name] = 0;

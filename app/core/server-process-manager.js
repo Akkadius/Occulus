@@ -122,7 +122,7 @@ module.exports = {
     let self               = this;
 
     this.systemProcessList.forEach(function (process) {
-      if (self.serverProcessNames.includes(process.name) || process.cmdline.includes('server_launcher')) {
+      if (self.serverProcessNames.includes(process.name) || process.cmd.includes('server_launcher')) {
         self.killProcess(process.pid);
       }
     });
@@ -151,7 +151,7 @@ module.exports = {
     let is_launcher_booted = false;
     await this.pollProcessList();
     this.systemProcessList.forEach(function (process) {
-      if (process.cmdline.includes('server_launch')) {
+      if (process.cmd.includes('server_launch')) {
         is_launcher_booted = true;
       }
     });

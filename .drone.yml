@@ -1,7 +1,5 @@
-kind: pipeline
-name: default
-
-steps:
+pipeline:
+  build:
   - name: eqemu-admin-build
     image: akkadius/eqemu:eqemu-admin-build-latest
     environment:

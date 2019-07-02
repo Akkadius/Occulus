@@ -5,5 +5,4 @@ app-key
 .npm
 .config
 .pkg-cache
-public/
 eqemu-admin

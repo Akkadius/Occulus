@@ -73,7 +73,7 @@ app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1y', etag: fal
  * After other routes are not found
  */
 app.get('*', function (req, res, next) {
-  res.sendfile(path.join(__dirname, 'public/index.html'))
+  res.sendFile(path.join(__dirname, 'public/index.html'))
 })
 
 module.exports = app;

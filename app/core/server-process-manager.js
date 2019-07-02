@@ -176,6 +176,7 @@ module.exports = {
 
     exec(startProcessString,
       {
+        encoding: 'utf8',
         cwd: path.join(path.dirname(process.argv[0]), '../')
       },
       (error, stdout, stderr) => {

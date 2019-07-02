@@ -19,8 +19,8 @@
     ]
   },
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/Akkadius/eqemu-web-admin.git"
+    "type": "git",
+    "url": "https://github.com/Akkadius/eqemu-web-admin.git"
   },
   "dependencies": {
     "child_process": "^1.0.2",

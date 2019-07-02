@@ -1,10 +1,8 @@
 pipeline:
   run-build:
-    image: stefanotorresi/docker-compose:latest
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+    image: akkadius/eqemu:eqemu-admin-build-latest
     commands:
-      - chmod +x ./deploy/build.sh
+      - deploy/scripts/build-in-container.sh
     when:
       branch: ["master"]
       event: [push]

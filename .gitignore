@@ -6,3 +6,4 @@ app-key
 .config
 .pkg-cache
 eqemu-admin
+public/

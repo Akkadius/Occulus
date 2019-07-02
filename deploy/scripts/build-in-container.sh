@@ -6,6 +6,8 @@
 cwd=$(pwd)
 echo "cwd is $cwd"
 
+env
+
 ###################################
 # install backend npm modules
 ###################################
@@ -18,7 +20,7 @@ cd /tmp
 git clone https://github.com/Akkadius/eqemu-web-admin-client
 cd eqemu-web-admin-client
 npm install
-npm run build
+npm run build > /dev/null
 cp /tmp/eqemu-web-admin-client/dist/* $cwd/public/ -R
 
 ###################################

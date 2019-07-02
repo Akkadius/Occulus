@@ -6,4 +6,6 @@ app-key
 .config
 .pkg-cache
 eqemu-admin
+eqemu-admin-linux
+eqemu-admin-win.exe
 public/

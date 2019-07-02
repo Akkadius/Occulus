@@ -30,6 +30,4 @@ cp /tmp/eqemu-web-admin-client/dist/* $cwd/public/ -R
 ###################################
 cd $cwd
 rm -f eqemu-admin
-pkg -t node10-linux-x64 .
-
-ls -lsh
+pkg .

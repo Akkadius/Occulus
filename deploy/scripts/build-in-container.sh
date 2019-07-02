@@ -2,6 +2,8 @@
 
 cwd=$(pwd)
 
+echo "cwd is $cwd"
+
 ###################################
 # install backend npm modules
 ###################################
@@ -16,7 +18,7 @@ git clone https://github.com/Akkadius/eqemu-web-admin-client
 cd eqemu-web-admin-client
 npm install
 npm run build
-cp /tmp/eqemu-web-admin-client/dist/* ~/build/public/ -R
+cp /tmp/eqemu-web-admin-client/dist/* $cwd/public/ -R
 
 ###################################
 # package admin panel to standalone

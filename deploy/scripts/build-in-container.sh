@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
+cwd=$(pwd)
+
 ###################################
 # install backend npm modules
 ###################################
 ls -lsh
-rm -rf node_modules && npm install
+sudo rm -rf node_modules && sudo npm install
 
 ###################################
 # install and build frontend

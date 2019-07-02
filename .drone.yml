@@ -1,11 +1,14 @@
-pipeline:
-  run-build:
+kind: pipeline
+name: default
+
+steps:
+  - name: eqemu-admin-build
     image: akkadius/eqemu:eqemu-admin-build-latest
     commands:
       - sudo deploy/scripts/build-in-container.sh
     environment:
       GH_RELEASE_GITHUB_API_TOKEN:
-        from_secret: GH_RELEASE_GITHUB_API_TOKEN
+        from_secret: gh_release_github_api_token
     when:
       branch: ["master"]
       event: [push]

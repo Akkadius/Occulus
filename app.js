@@ -26,7 +26,6 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
 
 /**
  * For Development
@@ -64,6 +63,18 @@ app.use('/api/v1/server', require('./app/routes/api/server'));
 app.use('/api/v1/auth', require('./app/routes/api/auth/auth'));
 app.use('/api/v1/admin', require('./app/routes/api/admin'));
 app.use('/api/v1/backup', require('./app/routes/api/backup/backup'));
+
+/**
+ * Serve Vue SPA
+ */
+app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1y', etag: false }))
+
+/**
+ * After other routes are not found
+ */
+app.get('*', function (req, res, next) {
+  res.sendfile(path.join(__dirname, 'public/index.html'))
+})
 
 module.exports = app;
 

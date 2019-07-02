@@ -2,3 +2,8 @@
 node_modules/
 .DS_STORE
 app-key
+.npm
+.config
+.pkg-cache
+public/
+eqemu-admin

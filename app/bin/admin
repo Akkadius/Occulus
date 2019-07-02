@@ -1,0 +1,68 @@
+#!/usr/bin/env node
+
+/**
+ * @type {commander.CommanderStatic | commander}
+ */
+const program = require('commander')
+
+/**
+ * Server Launcher
+ */
+program
+  .command('server-launcher')
+  .option('--zones [zones]')
+  .option('--with-loginserver')
+  .description('Starts server launcher')
+  .action((options) => require('../commands/server-launcher').serverLauncher(options));
+
+/**
+ * Stop Server
+ */
+program
+  .command('stop-server')
+  .action(() => require('../commands/server-launcher').stopServer());
+
+/**
+ * Create Model
+ */
+program
+  .command('create_model [table]')
+  .description('Create model from table')
+  .action((table) => require('../commands/create-model').createModel(table));
+
+/**
+ * MysqlDump
+ */
+program
+  .command('mysqldump')
+  .description('Perform a MySQL dump')
+  .action(() => require('../commands/mysqldump').dump());
+
+/**
+ * Websocket
+ */
+program
+  .command('ws [port]')
+  .description('Websocket testing')
+  .action((port) => require('../commands/ws-test').test(port));
+
+/**
+ * Web
+ */
+program
+  .command('web [port]')
+  .description('Starts EQEmu Server Management Interface / API')
+  .action(() => require('./www.js'));
+
+/**
+ * Help
+ */
+if (!process.argv.slice(2).length) {
+  program.outputHelp();
+  process.exit();
+}
+
+/**
+ * Parse args
+ */
+program.parse(process.argv);

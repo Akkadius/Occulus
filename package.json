@@ -1,23 +1,26 @@
 {
   "name": "eqemu-admin",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "private": true,
-  "bin": "./bin/www",
+  "bin": "./app/bin/admin",
   "scripts": {
-    "start": "node ./app/bin/www",
+    "start": "node ./app/bin/admin web",
+    "debug": "DEBUG=eqemu-admin:*; node ./app/bin/admin web",
     "watch": "nodemon npm start --ignore public/"
   },
   "pkg": {
     "assets": [
       "app/**",
-      "bin/**",
-      "public/**",
-      "models/**"
+      "public/**"
     ],
     "targets": [
       "node10-linux-x64",
       "node10-win-x64"
     ]
+  },
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/Akkadius/eqemu-web-admin.git"
   },
   "dependencies": {
     "child_process": "^1.0.2",
@@ -25,8 +28,10 @@
     "cookie-parser": "~1.4.3",
     "cors": "^2.8.5",
     "debug": "~2.6.9",
+    "dot-object": "^1.7.1",
     "express": "~4.16.0",
     "fs": "0.0.1-security",
+    "gh-release": "^3.5.0",
     "jsonwebtoken": "^8.5.1",
     "mocha": "^6.1.4",
     "moment": "^2.24.0",

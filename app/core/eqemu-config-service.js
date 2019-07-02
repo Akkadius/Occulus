@@ -4,31 +4,46 @@
  */
 let pathManager = require('../../app/core/path-manager')
 let fs          = require('fs');
+const dot       = require('dot-object');
 
 /**
  * @type {{getServerConfig(): *, init: (function(): exports), serverConfig: {}}}
  */
 module.exports = {
-  serverConfig: {},
+  serverConfig : {},
+  serverConfigPath : '',
 
   /**
    * Initialize config
    * @returns {exports}
    */
-  init: function () {
+  init() {
     if (Object.keys(this.serverConfig).length) {
       return this;
     }
 
-    const config      = pathManager.getEmuServerPath('eqemu_config.json');
-    this.serverConfig = JSON.parse(fs.readFileSync(config, 'utf8'));
+    this.setServerConfigPath(
+      pathManager
+        .getEmuServerPath('eqemu_config.json')
+    );
+
+    this.serverConfig = JSON.parse(fs.readFileSync(this.getServerConfigPath(), 'utf8'));
+
+    console.log('Loaded [%s]', this.getServerConfigPath());
 
     return this;
   },
 
-  reload: function () {
-    const config      = pathManager.getEmuServerPath('eqemu_config.json');
-    this.serverConfig = JSON.parse(fs.readFileSync(config, 'utf8'));
+  setServerConfigPath(path) {
+    this.serverConfigPath = path;
+  },
+
+  getServerConfigPath() {
+    return this.serverConfigPath;
+  },
+
+  reload() {
+    this.serverConfig = JSON.parse(fs.readFileSync(this.getServerConfigPath(), 'utf8'));
   },
 
   /**
@@ -49,45 +64,72 @@ module.exports = {
    * @returns {null}
    */
   getDatabaseName() {
-    return (this.serverConfig.server.database.db ? this.serverConfig.server.database.db : "")
+    return (this.serverConfig.server.database.db ? this.serverConfig.server.database.db : '')
   },
 
   /**
    * @returns {null}
    */
   getDatabaseHost() {
-    return (this.serverConfig.server.database.host ? this.serverConfig.server.database.host : "")
+    return (this.serverConfig.server.database.host ? this.serverConfig.server.database.host : '')
   },
 
   /**
    * @returns {null}
    */
   getDatabaseUsername() {
-    return (this.serverConfig.server.database.username ? this.serverConfig.server.database.username : "")
+    return (this.serverConfig.server.database.username ? this.serverConfig.server.database.username : '')
   },
 
   /**
    * @returns {null}
    */
   getDatabasePassword() {
-    return (this.serverConfig.server.database.password ? this.serverConfig.server.database.password : "")
+    return (this.serverConfig.server.database.password ? this.serverConfig.server.database.password : '')
   },
 
   /**
    * @returns {null}
    */
   getDatabasePort() {
-    return (this.serverConfig.server.database.port ? this.serverConfig.server.database.port : "")
+    return (this.serverConfig.server.database.port ? this.serverConfig.server.database.port : '')
   },
 
   /**
    * @returns {module.exports.serverConfig|{}}
    */
-  saveServerConfig(data) {
-    const config = pathManager.getEmuServerPath('eqemu_config.json');
+  saveServerConfig(data = undefined) {
+    if (!data) {
+      data = this.getServerConfig()
+    }
 
-    fs.writeFileSync(config, JSON.stringify(data, null, 2), 'utf8');
+    fs.writeFileSync(
+      this.getServerConfigPath(),
+      JSON.stringify(data, null, 1),
+      'utf8'
+    );
+
     this.serverConfig = data;
   },
 
+  /**
+   * Sets config under named block
+   *
+   * @param accessor
+   * @param value
+   */
+  setAdminPanelConfig(accessor, value) {
+    dot.str('web-admin.' + accessor, value, this.getServerConfig());
+  },
+
+  /**
+   * Returns admin panel config using dot notation
+   *
+   * Example: 'application.key'
+   *
+   * @returns {null}
+   */
+  getAdminPanelConfig(accessor) {
+    return dot.pick('web-admin.' + accessor, this.getServerConfig())
+  },
 };

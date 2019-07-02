@@ -3,10 +3,10 @@
  * @type {module:fs}
  */
 
-const pathManager = require('./path-manager')
-const fs          = require('fs');
-const path        = require('path')
-const jwt         = require('jsonwebtoken');
+const jwt                = require('jsonwebtoken')
+const eqemuConfigService = require('./eqemu-config-service')
+const uuidv4             = require('uuid/v4');
+const debug              = require('debug')('eqemu-admin:auth');
 
 /**
  * @type {{check: module.exports.check}}
@@ -26,9 +26,6 @@ module.exports = {
    * @returns {*}
    */
   check : function (req, res, next) {
-
-    // authService.isTokenValid(token)
-
     if (req.session.loggedIn) {
       return next();
     } else {
@@ -37,20 +34,16 @@ module.exports = {
   },
 
   /**
-   * init key
+   * Load or set key
+   *
    * @returns {exports}
    */
   initializeKey : function () {
-    const keyFile = path.join(pathManager.appRoot, 'app-key');
-    const uuidv4  = require('uuid/v4');
-
-    if (!fs.existsSync(keyFile)) {
+    this.appKey = eqemuConfigService.getAdminPanelConfig('application.key');
+    if (!this.appKey) {
       this.appKey = uuidv4();
-      fs.writeFileSync(keyFile, this.appKey);
-      console.log('Initializing app-key \'%s\' to \'%s\'', this.appKey, keyFile)
-    } else {
-      this.appKey = fs.readFileSync(keyFile);
-      console.log('Loaded app-key \'%s\' via \'%s\'', this.appKey, keyFile)
+      eqemuConfigService.setAdminPanelConfig('application.key', this.appKey);
+      eqemuConfigService.saveServerConfig();
     }
 
     return this;
@@ -76,8 +69,8 @@ module.exports = {
    */
   isTokenValid : function (token) {
     try {
-      // console.log('\t Verify \'%s\'', token)
-      // console.log('\t AppKey \'%s\'', this.appKey)
+      debug('[auth-service] Verify [%s]', token)
+      debug('[auth-service] AppKey [%s]', this.appKey)
 
       const validation = jwt.verify(token, this.appKey);
       this.user        = validation.user;
@@ -85,7 +78,7 @@ module.exports = {
 
       return validation;
     } catch (err) {
-      console.debug('[%s][%s] Error Type: "%s: %s"', __filename, 'isTokenValid', err.name, err.message)
+      debug('[%s][%s] Error Type: "%s: %s"', __filename, 'isTokenValid', err.name, err.message)
       return false;
     }
   },
@@ -98,24 +91,23 @@ module.exports = {
       }
 
       const requestedUrl = req.originalUrl;
-      // console.log('requested url \'%s\'', requestedUrl)
+      debug('[auth-service] requested url [%s]', requestedUrl)
 
       let accessToken = '';
       if (req.get('authorization')) {
         try {
           accessToken = req.get('authorization').split('Bearer ')[1].trim();
         } catch (e) {
-          console.log('Authorization token is invalid')
+          debug('[auth-service] Authorization token is invalid')
           res.send(401, 'Authorization token is invalid');
         }
-        // console.debug('[auth] access token is \'%s\'', accessToken);
       }
 
       if (requestedUrl.includes('/api/v1/auth/')) {
-        console.debug('[auth-route] \'%s\'', requestedUrl)
+        debug('[auth-route] [%s]', requestedUrl)
         next();
       } else if (requestedUrl.includes('/api/v1/')) {
-        console.debug('[v1-route] \'%s\'', requestedUrl);
+        debug('[v1-route] [%s]', requestedUrl);
 
         if (accessToken === '') {
           res.send(401, 'Authorization token is not valid');

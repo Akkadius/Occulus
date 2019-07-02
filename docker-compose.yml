@@ -1,0 +1,16 @@
+version: '3.4'
+
+networks:
+  backend:
+    driver: bridge
+
+services:
+  eqemu-admin-build:
+    build:
+      context: deploy/containers/eqemu-admin-build
+    volumes:
+      - ./:/home/eqemu/build/
+      - ./deploy/scripts/:/home/eqemu/scripts
+    tty: true
+    networks:
+      - backend

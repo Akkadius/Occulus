@@ -52,7 +52,6 @@ module.exports = {
       await this.getBootedZoneCount();
 
       /**
-       * Single processes
        * @type {exports}
        */
       let self = this;
@@ -122,7 +121,7 @@ module.exports = {
     let self               = this;
 
     this.systemProcessList.forEach(function (process) {
-      if (self.serverProcessNames.includes(process.name) || process.cmd.includes('server_launcher')) {
+      if (self.serverProcessNames.includes(process.name) || process.cmd.includes('server-launcher')) {
         self.killProcess(process.pid);
       }
     });
@@ -148,43 +147,44 @@ module.exports = {
      * Check if launcher is booted first
      * @type {boolean}
      */
-    let is_launcher_booted = false;
+    let isLauncherBooted = false;
     await this.pollProcessList();
     this.systemProcessList.forEach(function (process) {
-      if (process.cmd.includes('server_launch')) {
-        is_launcher_booted = true;
+      if (process.cmd.includes('server-launcher')) {
+        isLauncherBooted = true;
       }
     });
 
-    if (is_launcher_booted) {
+    if (isLauncherBooted) {
       console.log('Launcher is already booted');
       return false;
     }
 
-    let start_process_string = '';
+    let startProcessString = '';
 
     // TODO: Windows
     if (process.platform === 'linux') {
-      start_process_string = util.format(
-        'node cli.js server_launcher %s &',
+      startProcessString = util.format(
+        'PKG_EXECPATH=; ./bin/%s server-launcher %s &',
+        path.basename(process.argv[0]),
         argString
       );
     }
 
-    console.log(start_process_string);
+    console.log('start string [%s]', startProcessString);
+    console.log('cwd [%s]', path.join(path.dirname(process.argv[0]), '../'));
 
-    exec(start_process_string,
+    exec(startProcessString,
       {
-        cwd: pathManager.getAppRootPath(),
-        encoding: 'utf8'
+        cwd: path.join(path.dirname(process.argv[0]), '../')
       },
       (error, stdout, stderr) => {
         if (error) {
           console.error(`exec error: ${error}`);
           return;
         }
-        // console.log(`stdout: ${stdout}`);
-        // console.log(`stderr: ${stderr}`);
+        console.log(`stdout: ${stdout}`);
+        console.log(`stderr: ${stderr}`);
       }
     );
 

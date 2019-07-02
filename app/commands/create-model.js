@@ -5,7 +5,7 @@ module.exports = {
   createModel : function (table) {
 
     if (!table) {
-      console.log("Table name must be specified");
+      console.log('Table name must be specified');
       process.exit();
     }
 
@@ -26,16 +26,16 @@ module.exports = {
       database.db,
       database.username,
       database.password, {
-        host      : database.host,
-        dialect   : 'mysql',
-        directory : "app/models/", // prevents the program from writing to disk
-        port      : '3306',
+        host : database.host,
+        dialect : 'mysql',
+        directory : 'app/models/', // prevents the program from writing to disk
+        port : '3306',
 
         additional : {
-          timestamps      : false,
+          timestamps : false,
           freezeTableName : true,
         },
-        tables     : [table]
+        tables : [table]
       }
     );
 
@@ -45,7 +45,7 @@ module.exports = {
       console.log(auto.tables); // table list
       console.log(auto.foreignKeys); // foreign key list
 
-      console.log("Model created from '%s'", table);
+      console.log('Model created from \'%s\'', table);
     });
   },
 };

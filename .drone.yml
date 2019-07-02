@@ -1,0 +1,10 @@
+pipeline:
+  run-build:
+    image: stefanotorresi/docker-compose:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    commands:
+      - chmod +x ./deploy/build.sh
+    when:
+      branch: ["master"]
+      event: [push]

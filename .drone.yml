@@ -8,7 +8,7 @@ steps:
       GH_RELEASE_GITHUB_API_TOKEN:
         from_secret: token
     commands:
-      - sudo deploy/scripts/build-in-container.sh
+      - sudo -E deploy/scripts/build-in-container.sh
     when:
       branch: ["master"]
       event: [push]

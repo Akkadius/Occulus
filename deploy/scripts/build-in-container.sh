@@ -23,6 +23,6 @@ cp /tmp/eqemu-web-admin-client/dist/* $cwd/public/ -R
 ###################################
 # package admin panel to standalone
 ###################################
-cd ~/build/
+cd $cwd
 rm eqemu-admin || true
 pkg -t node10-linux-x64 .

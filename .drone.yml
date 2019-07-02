@@ -2,7 +2,7 @@ pipeline:
   run-build:
     image: akkadius/eqemu:eqemu-admin-build-latest
     commands:
-      - deploy/scripts/build-in-container.sh
+      - sudo deploy/scripts/build-in-container.sh
     when:
       branch: ["master"]
       event: [push]

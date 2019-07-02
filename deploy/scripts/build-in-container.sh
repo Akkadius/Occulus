@@ -6,7 +6,7 @@ cwd=$(pwd)
 # install backend npm modules
 ###################################
 ls -lsh
-sudo rm -rf node_modules && sudo npm install
+rm -rf node_modules && npm install
 
 ###################################
 # install and build frontend

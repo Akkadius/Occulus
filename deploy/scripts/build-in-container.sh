@@ -3,6 +3,7 @@
 ###################################
 # install backend npm modules
 ###################################
+ls -lsh
 rm -rf node_modules && npm install
 
 ###################################

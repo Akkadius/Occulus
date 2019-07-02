@@ -3,9 +3,9 @@ pipeline:
     image: akkadius/eqemu:eqemu-admin-build-latest
     commands:
       - sudo deploy/scripts/build-in-container.sh
-    secrets:
-      - source: GH_RELEASE_GITHUB_API_TOKEN
-        target: GH_RELEASE_GITHUB_API_TOKEN
+    environment:
+      GH_RELEASE_GITHUB_API_TOKEN:
+        from_secret: GH_RELEASE_GITHUB_API_TOKEN
     when:
       branch: ["master"]
       event: [push]

@@ -4,12 +4,12 @@ name: default
 steps:
   - name: eqemu-admin-build
     image: akkadius/eqemu:eqemu-admin-build-latest
-    commands:
-      # - sudo deploy/scripts/build-in-container.sh
-      - echo ${GH_RELEASE_GITHUB_API_TOKEN}
     environment:
       GH_RELEASE_GITHUB_API_TOKEN:
         from_secret: GH_RELEASE_GITHUB_API_TOKEN
+    commands:
+      # - sudo deploy/scripts/build-in-container.sh
+      - echo ${GH_RELEASE_GITHUB_API_TOKEN}
     when:
       branch: ["master"]
       event: [push]

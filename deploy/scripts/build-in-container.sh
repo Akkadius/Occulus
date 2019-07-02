@@ -6,10 +6,6 @@
 cwd=$(pwd)
 echo "cwd is $cwd"
 
-env
-
-echo $GH_RELEASE_GITHUB_API_TOKEN
-
 ###################################
 # install backend npm modules
 ###################################

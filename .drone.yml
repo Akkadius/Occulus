@@ -11,5 +11,5 @@ steps:
       - sudo -E deploy/scripts/build-in-container.sh
       - ./node_modules/.bin/gh-release --assets=eqemu-admin-linux,eqemu-admin-win.exe -y
     when:
-      branch: ["master"]
+      branch: ["release"]
       event: [push]

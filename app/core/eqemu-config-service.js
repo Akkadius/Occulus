@@ -5,6 +5,8 @@
 let pathManager = require('../../app/core/path-manager')
 let fs          = require('fs');
 const dot       = require('dot-object');
+const debug     = require('debug')('eqemu-admin:eqemu-config-service');
+const path      = require('path')
 
 /**
  * @type {{getServerConfig(): *, init: (function(): exports), serverConfig: {}}}
@@ -23,9 +25,10 @@ module.exports = {
     }
 
     this.setServerConfigPath(
-      pathManager
-        .getEmuServerPath('eqemu_config.json')
+      path.join(pathManager.getEmuServerPath(), 'eqemu_config.json')
     );
+
+    debug('set config path to [%s]', this.getServerConfigPath());
 
     this.serverConfig = JSON.parse(fs.readFileSync(this.getServerConfigPath(), 'utf8'));
 

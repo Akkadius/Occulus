@@ -9,6 +9,7 @@ const path              = require('path')
 const os                = require('os')
 const util              = require('util')
 const psList            = require('ps-list');
+const debug             = require('debug')('eqemu-admin:process-manager');
 
 /**
  * @type {{check: module.exports.check}}
@@ -29,8 +30,6 @@ module.exports = {
    */
   init : function (options) {
     this.launchOptions = options;
-
-    console.log(this.launchOptions)
 
     let self = this;
     this.serverProcessNames.forEach(function (process_name) {
@@ -133,6 +132,7 @@ module.exports = {
    * @returns {exports}
    */
   startServerLauncher : async function (options) {
+
     let args = [];
     if (options) {
       args.push(options);
@@ -165,14 +165,17 @@ module.exports = {
     // TODO: Windows
     if (process.platform === 'linux') {
       startProcessString = util.format(
-        'PKG_EXECPATH=; ./bin/%s server-launcher %s &',
-        path.basename(process.argv[0]),
+        'PKG_EXECPATH=; %s server-launcher %s &',
+        pathManager.getEqemuAdminEntrypoint(),
         argString
       );
     }
 
-    console.log('start string [%s]', startProcessString);
-    console.log('cwd [%s]', path.join(path.dirname(process.argv[0]), '../'));
+    const command = util.format('rm -rf %s*', this.getLogRedirectDir());
+    exec(command, { cwd : pathManager.emuServerPath });
+
+    debug('start string [%s]', startProcessString);
+    debug('cwd [%s]', path.join(path.dirname(process.argv[0]), '../'));
 
     exec(startProcessString,
       {
@@ -181,11 +184,11 @@ module.exports = {
       },
       (error, stdout, stderr) => {
         if (error) {
-          console.error(`exec error: ${error}`);
+          debug(`exec error: ${error}`);
           return;
         }
-        console.log(`stdout: ${stdout}`);
-        console.log(`stderr: ${stderr}`);
+        debug(`stdout: ${stdout}`);
+        debug(`stderr: ${stderr}`);
       }
     );
 
@@ -237,17 +240,21 @@ module.exports = {
     return this.zoneBootedProcessCount;
   },
 
+  getLogRedirectDir() {
+    const logRedirectDir = path.join(os.tmpdir(), 'admin-process-logs');
+    if (!fs.existsSync(logRedirectDir)) {
+      fs.mkdirSync(logRedirectDir);
+    }
+
+    return logRedirectDir;
+  },
+
   /**
    * @param process_name
    * @param args
    * @returns {Promise<void>}
    */
   startProcess : async function (process_name, args = []) {
-    const logRedirectDir = path.join(os.tmpdir(), 'admin-process-logs');
-    if (!fs.existsSync(logRedirectDir)) {
-      fs.mkdirSync(logRedirectDir);
-    }
-
     let argString = '';
     args.forEach(function (arg) {
       argString += arg + ' ';
@@ -264,18 +271,19 @@ module.exports = {
         util.format('./bin/%s %s 1> %s_$$.txt &',
           process_name,
           argString,
-          path.join(logRedirectDir, process_name)
+          path.join(this.getLogRedirectDir(), process_name)
         );
-      const command = util.format('rm -rf %s*', path.join(logRedirectDir, process_name);
-      console.log(command);
 
-      exec(command), { cwd : pathManager.emuServerPath });
+      if (process_name !== 'zone') {
+        const command = util.format('rm -rf %s*', path.join(this.getLogRedirectDir(), process_name));
+        exec(command, { cwd : pathManager.emuServerPath });
+      }
     }
 
-    console.debug('Starting process [%s] command [%s] path [%s]',
+    debug('Starting process [%s] command [%s] path [%s]',
       process_name,
       start_process_string,
-      pathManager.emuServerPath
+      pathManager.getEmuServerPath()
     );
 
     const child = exec(

@@ -3,7 +3,11 @@
 /**
  * @type {commander.CommanderStatic | commander}
  */
-const program = require('commander')
+const program     = require('commander')
+const pathManager = require('../core/path-manager');
+const path        = require('path')
+
+pathManager.init(path.join(__dirname, '../../'));
 
 /**
  * Server Launcher

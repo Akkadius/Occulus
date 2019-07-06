@@ -2,10 +2,10 @@ const path    = require('path')
 const process = require('process')
 const fs      = require('fs');
 const util    = require('util');
+const debug   = require('debug')('eqemu-admin:path-manager');
 
 module.exports = {
   appRoot : '',
-  cliRoot : '',
   emuServerPath : '',
 
   /**
@@ -23,12 +23,19 @@ module.exports = {
       )
     }
 
-    this.cliRoot       = path.join(this.appRoot, '/app/commands/');
-    this.emuServerPath = path.join(process.cwd(), '/../');
+    this.emuServerPath = this.getEmuServerPath();
 
-    console.debug('appRoot [%s]', this.appRoot);
-    console.debug('cliRoot [%s]', this.cliRoot);
-    console.debug('emuServerPath [%s]', this.emuServerPath);
+    debug('appRoot [%s]', this.appRoot);
+    debug('emuServerPath [%s]', this.emuServerPath);
+    debug('getEqemuAdminEntrypoint [%s]', this.getEqemuAdminEntrypoint());
+    debug('process.cwd [%s]', process.cwd());
+  },
+
+  /**
+   * @returns {string}
+   */
+  getEqemuConfigName() {
+    return 'eqemu_config.json';
   },
 
   /**
@@ -36,39 +43,49 @@ module.exports = {
    * @returns {*}
    */
   getEmuServerPath : function (requested_path = '') {
-    return this.emuServerPath + requested_path;
-  },
-
-  /**
-   * @param requested_path
-   * @returns {*}
-   */
-  getCliRootPath : function (requested_path = '') {
-    return this.cliRoot + requested_path;
-  },
-
-  /**
-   * @param requested_path
-   * @returns {*}
-   */
-  getAppRootPath : function (requested_path = '') {
-    return this.appRoot + requested_path;
-  },
-
-  /**
-   * @param requested_path
-   * @returns {*}
-   */
-  checkPath : function (requested_path) {
-    if (!fs.existsSync(requested_path)) {
-      throw new Error(
-        util.format('[%s] \'%s\' does not exist!',
-          path.basename(__filename),
-          requested_path
-        )
-      )
+    if (this.isRanFromPackagedNode()) {
+      return path.join(process.argv[0], '../../', requested_path);
     }
 
-    return requested_path;
+    if (this.isRanAsStandaloneNodeProject()) {
+      const first_path = path.join(process.argv[1], '../../../../', requested_path);
+      if (fs.existsSync(path.join(first_path, this.getEqemuConfigName()))) {
+        debug('[getEmuServerPath] emu-path (1) [%s]', first_path);
+        return first_path;
+      }
+
+      const second_path = path.join(process.cwd(), '../../../../', requested_path);
+      if (fs.existsSync(path.join(second_path, this.getEqemuConfigName()))) {
+        debug('[getEmuServerPath] emu-path (2) [%s]', second_path);
+        return second_path;
+      }
+    }
+  },
+
+  /**
+   * @returns {boolean}
+   */
+  isRanFromPackagedNode() {
+    return __filename.indexOf('/snapshot/') > -1;
+  },
+
+  /**
+   * @returns {boolean}
+   */
+  isRanAsStandaloneNodeProject() {
+    return process.argv[1].indexOf('bin/admin') > -1;
+  },
+
+  /**
+   * @returns {string}
+   */
+  getEqemuAdminEntrypoint() {
+    if (this.isRanFromPackagedNode()) {
+      return process.argv[0];
+    }
+
+    if (this.isRanAsStandaloneNodeProject()) {
+      return process.argv[1];
+    }
   },
 };

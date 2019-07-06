@@ -14,20 +14,20 @@ const psList            = require('ps-list');
  * @type {{check: module.exports.check}}
  */
 module.exports = {
-  erroredStartsCount: {},
-  hasErroredHaltMessage: {},
-  erroredStartsMaxHalt: 5,
-  minZoneProcesses: 3,
-  processCount: {},
-  serverProcessNames: ['zone', 'world', 'ucs', 'queryserv', 'loginserver'],
-  systemProcessList: {},
-  launchOptions: {},
+  erroredStartsCount : {},
+  hasErroredHaltMessage : {},
+  erroredStartsMaxHalt : 5,
+  minZoneProcesses : 3,
+  processCount : {},
+  serverProcessNames : ['zone', 'world', 'ucs', 'queryserv', 'loginserver'],
+  systemProcessList : {},
+  launchOptions : {},
 
   /**
    * Launcher initialization
    * @param options
    */
-  init: function (options) {
+  init : function (options) {
     this.launchOptions = options;
 
     console.log(this.launchOptions)
@@ -44,7 +44,7 @@ module.exports = {
    * @param options
    * @returns {Promise<void>}
    */
-  start: async function (options = []) {
+  start : async function (options = []) {
     this.init(options);
 
     while (1) {
@@ -82,7 +82,7 @@ module.exports = {
    * @param process_name
    * @returns {boolean}
    */
-  doesProcessNeedToBoot: function (process_name) {
+  doesProcessNeedToBoot : function (process_name) {
     if (this.erroredStartsCount[process_name] >= this.erroredStartsMaxHalt) {
       if (!this.hasErroredHaltMessage[process_name]) {
         console.error('Process \'%s\' has tried to boot too many (%s) times... Halting attempts', process_name, this.erroredStartsMaxHalt)
@@ -109,14 +109,14 @@ module.exports = {
    * @param zone_short_name
    * @returns {Promise<void>}
    */
-  startStaticZone: async function (zone_short_name) {
+  startStaticZone : async function (zone_short_name) {
     return await this.startProcess('zone', [zone_short_name]);
   },
 
   /**
    * @returns {Promise<void>}
    */
-  stopServer: async function () {
+  stopServer : async function () {
     this.systemProcessList = await psList();
     let self               = this;
 
@@ -132,7 +132,7 @@ module.exports = {
   /**
    * @returns {exports}
    */
-  startServerLauncher: async function (options) {
+  startServerLauncher : async function (options) {
     let args = [];
     if (options) {
       args.push(options);
@@ -176,8 +176,8 @@ module.exports = {
 
     exec(startProcessString,
       {
-        encoding: 'utf8',
-        cwd: path.join(path.dirname(process.argv[0]), '../')
+        encoding : 'utf8',
+        cwd : path.join(path.dirname(process.argv[0]), '../')
       },
       (error, stdout, stderr) => {
         if (error) {
@@ -195,7 +195,7 @@ module.exports = {
   /**
    * @returns {exports}
    */
-  restartServer: async function () {
+  restartServer : async function () {
     this.stopServer();
 
     let self = this;
@@ -210,7 +210,7 @@ module.exports = {
    * @param ms
    * @returns {Promise<any>}
    */
-  sleep: function (ms) {
+  sleep : function (ms) {
     return new Promise(resolve => {
       setTimeout(resolve, ms)
     });
@@ -219,7 +219,7 @@ module.exports = {
   /**
    * @returns {Promise<number>}
    */
-  getBootedZoneCount: async function () {
+  getBootedZoneCount : async function () {
     const zone_list             = await serverDataService.getZoneList();
     this.zoneBootedProcessCount = 0;
     let self                    = this;
@@ -242,7 +242,7 @@ module.exports = {
    * @param args
    * @returns {Promise<void>}
    */
-  startProcess: async function (process_name, args = []) {
+  startProcess : async function (process_name, args = []) {
     const logRedirectDir = path.join(os.tmpdir(), 'admin-process-logs');
     if (!fs.existsSync(logRedirectDir)) {
       fs.mkdirSync(logRedirectDir);
@@ -266,6 +266,10 @@ module.exports = {
           argString,
           path.join(logRedirectDir, process_name)
         );
+      const command = util.format('rm -rf %s*', path.join(logRedirectDir, process_name);
+      console.log(command);
+
+      exec(command), { cwd : pathManager.emuServerPath });
     }
 
     console.debug('Starting process [%s] command [%s] path [%s]',
@@ -277,8 +281,8 @@ module.exports = {
     const child = exec(
       start_process_string,
       {
-        cwd: pathManager.emuServerPath,
-        encoding: 'utf8'
+        cwd : pathManager.emuServerPath,
+        encoding : 'utf8'
       }
     );
 
@@ -292,7 +296,7 @@ module.exports = {
    * @param args
    * @param data
    */
-  handleProcessError: function (process_name, args, data) {
+  handleProcessError : function (process_name, args, data) {
     console.error('[Error] Process \'%s\' via path: \'%s\', with args failed to start [%s]\n%s',
       process_name,
       pathManager.emuServerPath,
@@ -310,7 +314,7 @@ module.exports = {
   /**
    * @param process_id
    */
-  killProcess: function (process_id) {
+  killProcess : function (process_id) {
     try {
       require('child_process').execSync('kill -9 ' + process_id);
     } catch (e) {
@@ -321,7 +325,7 @@ module.exports = {
   /**
    * @returns {Promise<void>}
    */
-  pollProcessList: async function () {
+  pollProcessList : async function () {
     this.systemProcessList = await psList();
 
     let self = this;
@@ -339,15 +343,15 @@ module.exports = {
   /**
    * @returns {Promise<{world: number, ucs: number, zone: number, queryserv: number, loginserver: number}>}
    */
-  getProcessCounts: async function () {
+  getProcessCounts : async function () {
     await this.pollProcessList();
 
     return {
-      'zone': this.processCount['zone'],
-      'world': this.processCount['world'],
-      'ucs': this.processCount['ucs'],
-      'queryserv': this.processCount['queryserv'],
-      'loginserver': this.processCount['loginserver']
+      'zone' : this.processCount['zone'],
+      'world' : this.processCount['world'],
+      'ucs' : this.processCount['ucs'],
+      'queryserv' : this.processCount['queryserv'],
+      'loginserver' : this.processCount['loginserver']
     };
   }
 

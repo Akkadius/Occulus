@@ -66,8 +66,8 @@ module.exports = {
    * @returns {exports}
    */
   initializeAdminPasswordIfNotSet: function () {
-    this.appKey = eqemuConfigService.getAdminPanelConfig('application.admin.password');
-    if (!this.appKey) {
+    const adminPassword = eqemuConfigService.getAdminPanelConfig('application.admin.password');
+    if (!adminPassword) {
       eqemuConfigService.setAdminPanelConfig(
         'application.admin.password',
         this.genRandomString(30)

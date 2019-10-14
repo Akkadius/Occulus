@@ -38,11 +38,39 @@ module.exports = {
    *
    * @returns {exports}
    */
-  initializeKey : function () {
+  initializeAppKey : function () {
     this.appKey = eqemuConfigService.getAdminPanelConfig('application.key');
     if (!this.appKey) {
       this.appKey = uuidv4();
       eqemuConfigService.setAdminPanelConfig('application.key', this.appKey);
+      eqemuConfigService.saveServerConfig();
+    }
+
+    return this;
+  },
+
+  /**
+   * @param length
+   * @returns {string}
+   */
+  genRandomString: function (length) {
+    return crypto.randomBytes(Math.ceil(length / 2))
+      .toString('hex') /** convert to hexadecimal format */
+      .slice(0, length);   /** return required number of characters */
+  },
+
+  /**
+   * Load or set key
+   *
+   * @returns {exports}
+   */
+  initializeAdminPasswordIfNotSet: function () {
+    this.appKey = eqemuConfigService.getAdminPanelConfig('application.admin.password');
+    if (!this.appKey) {
+      eqemuConfigService.setAdminPanelConfig(
+        'application.admin.password',
+        this.genRandomString(30)
+      );
       eqemuConfigService.saveServerConfig();
     }
 

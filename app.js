@@ -17,7 +17,8 @@ const authService        = require('./app/core/auth-service')
  */
 pathManager.init(__dirname);
 eqemuConfigService.init();
-authService.initializeKey();
+authService.initializeAppKey();
+authService.initializeAdminPasswordIfNotSet();
 
 /**
  * Express

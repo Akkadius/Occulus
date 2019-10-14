@@ -72,6 +72,7 @@ module.exports = {
         'application.admin.password',
         this.genRandomString(30)
       );
+      
       eqemuConfigService.saveServerConfig();
     }
 

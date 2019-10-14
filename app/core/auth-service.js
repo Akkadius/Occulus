@@ -7,15 +7,16 @@ const jwt                = require('jsonwebtoken')
 const eqemuConfigService = require('./eqemu-config-service')
 const uuidv4             = require('uuid/v4');
 const debug              = require('debug')('eqemu-admin:auth');
+const crypto             = require('crypto');
 
 /**
  * @type {{check: module.exports.check}}
  */
 module.exports = {
-  appKey : '',
-  tokenExpirationTime : 60 * 60 * 24 * 7,
-  user : null,
-  userToken : null,
+  appKey: '',
+  tokenExpirationTime: 60 * 60 * 24 * 7,
+  user: null,
+  userToken: null,
 
   /**
    * check authorization
@@ -25,7 +26,7 @@ module.exports = {
    * @param next
    * @returns {*}
    */
-  check : function (req, res, next) {
+  check: function (req, res, next) {
     if (req.session.loggedIn) {
       return next();
     } else {
@@ -38,7 +39,7 @@ module.exports = {
    *
    * @returns {exports}
    */
-  initializeAppKey : function () {
+  initializeAppKey: function () {
     this.appKey = eqemuConfigService.getAdminPanelConfig('application.key');
     if (!this.appKey) {
       this.appKey = uuidv4();
@@ -81,11 +82,11 @@ module.exports = {
    * @param username
    * @returns {Buffer | string | number | PromiseLike<ArrayBuffer>}
    */
-  generateToken : function (username) {
+  generateToken: function (username) {
     return jwt.sign(
       {
-        exp : Math.floor(Date.now() / 1000) + this.tokenExpirationTime,
-        user : username
+        exp: Math.floor(Date.now() / 1000) + this.tokenExpirationTime,
+        user: username
       },
       this.appKey
     );
@@ -95,7 +96,7 @@ module.exports = {
    * @param token
    * @returns {boolean}
    */
-  isTokenValid : function (token) {
+  isTokenValid: function (token) {
     try {
       debug('[auth-service] Verify [%s]', token)
       debug('[auth-service] AppKey [%s]', this.appKey)
@@ -111,7 +112,7 @@ module.exports = {
     }
   },
 
-  handleApiRoutes : function () {
+  handleApiRoutes: function () {
     var self = this;
     return function (req, res, next) {
       if ('OPTIONS' === req.method) {

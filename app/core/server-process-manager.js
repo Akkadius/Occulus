@@ -48,7 +48,6 @@ module.exports = {
 
     while (1) {
       await this.pollProcessList();
-      await this.getBootedZoneCount();
 
       /**
        * @type {exports}
@@ -59,6 +58,8 @@ module.exports = {
           self.startProcess(process_name);
         }
       });
+
+      await this.getBootedZoneCount();
 
       /**
        * Zone

@@ -32,7 +32,7 @@ module.exports = {
 
     this.serverConfig = JSON.parse(fs.readFileSync(this.getServerConfigPath(), 'utf8'));
 
-    console.log('Loaded [%s]', this.getServerConfigPath());
+    console.log('Loaded [%s]', this.getServerConfigPath()); 
 
     return this;
   },

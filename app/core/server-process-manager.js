@@ -168,7 +168,7 @@ module.exports = {
     // TODO: Windows
     if (process.platform === 'linux') {
       startProcessString = util.format(
-        'PKG_EXECPATH=; %s server-launcher %s &',
+        'PKG_EXECPATH=; nohup %s server-launcher %s &',
         pathManager.getEqemuAdminEntrypoint(),
         argString
       );

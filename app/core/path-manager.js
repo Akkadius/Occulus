@@ -36,7 +36,7 @@ module.exports = {
    */
   getEqemuConfigName() {
     return 'eqemu_config.json';
-  },
+  }, 
 
   /**
    * @param requested_path

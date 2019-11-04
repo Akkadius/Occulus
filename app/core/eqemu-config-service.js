@@ -12,8 +12,8 @@ const path      = require('path')
  * @type {{getServerConfig(): *, init: (function(): exports), serverConfig: {}}}
  */
 module.exports = {
-  serverConfig : {},
-  serverConfigPath : '',
+  serverConfig: {},
+  serverConfigPath: '',
 
   /**
    * Initialize config
@@ -33,7 +33,7 @@ module.exports = {
     this.serverConfig = JSON.parse(fs.readFileSync(this.getServerConfigPath(), 'utf8'));
 
     console.log('Loaded [%s]', this.getServerConfigPath());
-    
+
 
     return this;
   },
@@ -135,5 +135,5 @@ module.exports = {
    */
   getAdminPanelConfig(accessor) {
     return dot.pick('web-admin.' + accessor, this.getServerConfig())
-  },
+  }
 };

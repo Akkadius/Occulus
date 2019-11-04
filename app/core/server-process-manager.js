@@ -15,20 +15,20 @@ const debug             = require('debug')('eqemu-admin:process-manager');
  * @type {{check: module.exports.check}}
  */
 module.exports = {
-  erroredStartsCount : {},
-  hasErroredHaltMessage : {},
-  erroredStartsMaxHalt : 5,
-  minZoneProcesses : 3,
-  processCount : {},
-  serverProcessNames : ['zone', 'world', 'ucs', 'queryserv', 'loginserver'],
-  systemProcessList : {},
-  launchOptions : {},
+  erroredStartsCount: {},
+  hasErroredHaltMessage: {},
+  erroredStartsMaxHalt: 5,
+  minZoneProcesses: 3,
+  processCount: {},
+  serverProcessNames: ['zone', 'world', 'ucs', 'queryserv', 'loginserver'],
+  systemProcessList: {},
+  launchOptions: {},
 
   /**
    * Launcher initialization
    * @param options
    */
-  init : function (options) {
+  init: function (options) {
     this.launchOptions = options;
 
     let self = this;
@@ -43,23 +43,23 @@ module.exports = {
    * @param options
    * @returns {Promise<void>}
    */
-  start : async function (options = []) {
+  start: async function (options = []) {
     this.init(options);
 
     while (1) {
       await this.pollProcessList();
+      await this.getBootedZoneCount();
 
       /**
        * @type {exports}
        */
       let self = this;
-      ['loginserver', 'ucs', 'world', 'queryserv'].forEach(function (process_name) {
-        if (self.doesProcessNeedToBoot(process_name)) {
+      ['loginserver', 'ucs', 'world', 'queryserv'].forEach(async function (process_name) {
+        if (self.doesProcessNeedToBoot(process_name) && !await self.isProcessRunning(process_name)) {
+          debug("starting unique process [" + process_name + "]")
           self.startProcess(process_name);
         }
       });
-
-      await this.getBootedZoneCount();
 
       /**
        * Zone
@@ -68,11 +68,11 @@ module.exports = {
         await self.startProcess('zone');
       }
 
-      console.log('Zone Processes: \'%s\'', this.processCount['zone']);
-      console.log('World Process: \'%s\'', this.processCount['world']);
-      console.log('Loginserver Process: \'%s\'', this.processCount['loginserver']);
-      console.log('UCS Process: \'%s\'', this.processCount['ucs']);
-      console.log('Booted Zone Processes: \'%s\'', this.zoneBootedProcessCount);
+      console.log('Zone Processes [%s]', this.processCount['zone']);
+      console.log('World Process [%s]', this.processCount['world']);
+      console.log('Loginserver Process [%s]', this.processCount['loginserver']);
+      console.log('UCS Process [%s]', this.processCount['ucs']);
+      console.log('Booted Zone Processes [%s]', this.zoneBootedProcessCount);
 
       await this.sleep(5000);
     }
@@ -82,10 +82,10 @@ module.exports = {
    * @param process_name
    * @returns {boolean}
    */
-  doesProcessNeedToBoot : function (process_name) {
+  doesProcessNeedToBoot: function (process_name) {
     if (this.erroredStartsCount[process_name] >= this.erroredStartsMaxHalt) {
       if (!this.hasErroredHaltMessage[process_name]) {
-        console.error('Process \'%s\' has tried to boot too many (%s) times... Halting attempts', process_name, this.erroredStartsMaxHalt)
+        console.error('Process [%s] has tried to boot too many (%s) times... Halting attempts', process_name, this.erroredStartsMaxHalt)
         this.hasErroredHaltMessage[process_name] = 1;
       }
 
@@ -102,6 +102,8 @@ module.exports = {
 
     }
 
+    debug("[doesProcessNeedToBoot] returning [%s]", this.processCount[process_name] === 0)
+
     return this.processCount[process_name] === 0;
   },
 
@@ -109,14 +111,14 @@ module.exports = {
    * @param zone_short_name
    * @returns {Promise<void>}
    */
-  startStaticZone : async function (zone_short_name) {
+  startStaticZone: async function (zone_short_name) {
     return await this.startProcess('zone', [zone_short_name]);
   },
 
   /**
    * @returns {Promise<void>}
    */
-  stopServer : async function () {
+  stopServer: async function () {
     this.systemProcessList = await psList();
     let self               = this;
 
@@ -132,7 +134,7 @@ module.exports = {
   /**
    * @returns {exports}
    */
-  startServerLauncher : async function (options) {
+  startServerLauncher: async function (options) {
 
     let args = [];
     if (options) {
@@ -173,15 +175,15 @@ module.exports = {
     }
 
     const command = util.format('rm -rf %s*', this.getLogRedirectDir());
-    exec(command, { cwd : pathManager.emuServerPath });
+    exec(command, { cwd: pathManager.emuServerPath });
 
     debug('start string [%s]', startProcessString);
     debug('cwd [%s]', path.join(path.dirname(process.argv[0]), '../'));
 
     exec(startProcessString,
       {
-        encoding : 'utf8',
-        cwd : path.join(path.dirname(process.argv[0]), '../')
+        encoding: 'utf8',
+        cwd: path.join(path.dirname(process.argv[0]), '../')
       },
       (error, stdout, stderr) => {
         if (error) {
@@ -199,7 +201,7 @@ module.exports = {
   /**
    * @returns {exports}
    */
-  restartServer : async function () {
+  restartServer: async function () {
     this.stopServer();
 
     let self = this;
@@ -214,7 +216,7 @@ module.exports = {
    * @param ms
    * @returns {Promise<any>}
    */
-  sleep : function (ms) {
+  sleep: function (ms) {
     return new Promise(resolve => {
       setTimeout(resolve, ms)
     });
@@ -223,7 +225,7 @@ module.exports = {
   /**
    * @returns {Promise<number>}
    */
-  getBootedZoneCount : async function () {
+  getBootedZoneCount: async function () {
     const zone_list             = await serverDataService.getZoneList();
     this.zoneBootedProcessCount = 0;
     let self                    = this;
@@ -255,7 +257,7 @@ module.exports = {
    * @param args
    * @returns {Promise<void>}
    */
-  startProcess : async function (process_name, args = []) {
+  startProcess: async function (process_name, args = []) {
     let argString = '';
     args.forEach(function (arg) {
       argString += arg + ' ';
@@ -269,15 +271,14 @@ module.exports = {
     }
     if (is_linux) {
       start_process_string =
-        util.format('./bin/%s %s 1> %s_$$.txt &',
+        util.format('./bin/%s %s &',
           process_name,
-          argString,
-          path.join(this.getLogRedirectDir(), process_name)
+          argString
         );
 
       if (process_name !== 'zone') {
         const command = util.format('rm -rf %s*', path.join(this.getLogRedirectDir(), process_name));
-        exec(command, { cwd : pathManager.emuServerPath });
+        exec(command, { cwd: pathManager.emuServerPath });
       }
     }
 
@@ -290,8 +291,8 @@ module.exports = {
     const child = exec(
       start_process_string,
       {
-        cwd : pathManager.emuServerPath,
-        encoding : 'utf8'
+        cwd: pathManager.emuServerPath,
+        encoding: 'utf8'
       }
     );
 
@@ -305,8 +306,8 @@ module.exports = {
    * @param args
    * @param data
    */
-  handleProcessError : function (process_name, args, data) {
-    console.error('[Error] Process \'%s\' via path: \'%s\', with args failed to start [%s]\n%s',
+  handleProcessError: function (process_name, args, data) {
+    console.error('[Error] Process [%s] via path: [%s], with args failed to start [%s]\n%s',
       process_name,
       pathManager.emuServerPath,
       args,
@@ -323,7 +324,7 @@ module.exports = {
   /**
    * @param process_id
    */
-  killProcess : function (process_id) {
+  killProcess: function (process_id) {
     try {
       require('child_process').execSync('kill -9 ' + process_id);
     } catch (e) {
@@ -334,7 +335,7 @@ module.exports = {
   /**
    * @returns {Promise<void>}
    */
-  pollProcessList : async function () {
+  pollProcessList: async function () {
     this.systemProcessList = await psList();
 
     let self = this;
@@ -352,17 +353,48 @@ module.exports = {
   /**
    * @returns {Promise<{world: number, ucs: number, zone: number, queryserv: number, loginserver: number}>}
    */
-  getProcessCounts : async function () {
+  getProcessCounts: async function () {
     await this.pollProcessList();
 
     return {
-      'zone' : this.processCount['zone'],
-      'world' : this.processCount['world'],
-      'ucs' : this.processCount['ucs'],
-      'queryserv' : this.processCount['queryserv'],
-      'loginserver' : this.processCount['loginserver']
+      'zone': this.processCount['zone'],
+      'world': this.processCount['world'],
+      'ucs': this.processCount['ucs'],
+      'queryserv': this.processCount['queryserv'],
+      'loginserver': this.processCount['loginserver']
     };
-  }
+  },
 
-}
-;
+  /**
+   * @param processName
+   * @returns {Promise<void>}
+   */
+  isProcessRunning: async function (processName) {
+    const cmd = (() => {
+      switch (process.platform) {
+        case 'win32' :
+          return `tasklist`;
+        case 'darwin' :
+          return `ps -ax | grep ${processName}`;
+        case 'linux' :
+          return `ps axco command`;
+        default:
+          return false;
+      }
+    })();
+
+
+    const stdout = require('child_process').execSync(cmd).toString();
+
+    let foundProcess = false;
+    stdout.split("\n").forEach(function(row) {
+      if (row.toLowerCase().trim() === processName.toLowerCase().trim()) {
+        foundProcess = true;
+      }
+    });
+
+    debug("[isProcessRunning] found process [%s] [%s]", processName, foundProcess)
+
+    return foundProcess;
+  }
+};

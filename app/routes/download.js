@@ -19,7 +19,7 @@ router.get('/:downloadType', function (req, res, next) {
     /**
      * Exec export binary
      */
-    exec('cd ../ && ./export_client_files ' + download_type, (error, stdout, stderr) => {
+    exec('cd ../ && ./bin/export_client_files ' + download_type, (error, stdout, stderr) => {
       if (error) {
         console.error(`exec error: ${error}`);
         return;

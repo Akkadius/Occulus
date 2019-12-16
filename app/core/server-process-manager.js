@@ -176,6 +176,8 @@ module.exports = {
 
     const command = util.format('rm -rf %s*', this.getLogRedirectDir());
     exec(command, { cwd: pathManager.emuServerPath });
+    exec("rm -rf logs/zone/*.log", { cwd: pathManager.emuServerPath });
+    exec("rm -rf logs/*.log", { cwd: pathManager.emuServerPath });
 
     debug('start string [%s]', startProcessString);
     debug('cwd [%s]', path.join(path.dirname(process.argv[0]), '../'));

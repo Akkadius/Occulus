@@ -38,7 +38,7 @@ app.use(
     {
       origin: [
         'http://localhost:8080',
-        'http://localhost:8080',
+        'http://docker:8080',
         'http://localhost:5000'
       ],
       exposedHeaders: ['Content-Disposition']

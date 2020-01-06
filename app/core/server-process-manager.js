@@ -1,15 +1,16 @@
 /**
  * server-process-manager.js
  */
-const { exec }          = require('child_process');
-const serverDataService = require('./eqemu-data-service-client.js');
-const pathManager       = require('./path-manager');
-const fs                = require('fs');
-const path              = require('path')
-const os                = require('os')
-const util              = require('util')
-const psList            = require('ps-list');
-const debug             = require('debug')('eqemu-admin:process-manager');
+const { exec, execSync } = require('child_process');
+const serverDataService  = require('./eqemu-data-service-client.js');
+const pathManager        = require('./path-manager');
+const fs                 = require('fs');
+const path               = require('path')
+const os                 = require('os')
+const util               = require('util')
+const psList             = require('ps-list');
+const debug              = require('debug')('eqemu-admin:process-manager');
+const config             = require('./eqemu-config-service')
 
 /**
  * Constants
@@ -62,41 +63,7 @@ module.exports = {
    */
   start: async function (options = []) {
     this.init(options);
-
-    /**
-     * Start watchdog
-     * @type {module.exports}
-     */
-    let self           = this;
-    this.watchDogTimer = setInterval(function () {
-
-      let processStatus = {
-        'Zone Processes': self.processCount['zone'],
-        'Booted Zone Processes': self.zoneBootedProcessCount,
-        'World Processes': self.processCount['world'],
-        'Loginserver Processes': self.processCount['loginserver'],
-        'UCS Processes': self.processCount['ucs'],
-        'Watchdog Polling Delta': self.getWatchDogPollDelta() + ' / ' + MAX_PROCESS_POLL_DELTA_SECONDS_BEFORE_KILL
-      };
-
-      console.table(processStatus);
-
-      if (self.getWatchDogPollDelta() > MAX_PROCESS_POLL_DELTA_SECONDS_BEFORE_KILL) {
-        console.log('HIT WATCHDOG THRESHOLD. TERMINATING...');
-
-        const data    = new Date() + ' watchdog killed launcher\n';
-        const logFile = pathManager.getEmuServerPath() + '/logs/launcher-watchdog-kill.log';
-
-        if (fs.existsSync(logFile)) {
-          fs.appendFileSync(logFile, data);
-        } else {
-          fs.writeFileSync(logFile, data);
-        }
-
-        process.exit()
-      }
-
-    }, WATCHDOG_TIMER);
+    this.startWatchDog();
 
     /**
      * Main launcher loop
@@ -173,9 +140,27 @@ module.exports = {
     this.systemProcessList = await psList();
     let self               = this;
 
+    debug('[stopServer] Stopping server...');
+
+    /**
+     * Kill launcher
+     */
     this.systemProcessList.forEach(function (process) {
-      if (self.serverProcessNames.includes(process.name) || process.cmd.includes('server-launcher')) {
+      if (process.cmd.includes('server-launcher')) {
         self.killProcess(process.pid);
+
+        debug('[stopServer] Killing launcher [%s] pid [%s]', process.name, process.pid);
+      }
+    });
+
+    /**
+     * Kill server processes
+     */
+    this.systemProcessList.forEach(function (process) {
+      if (self.serverProcessNames.includes(process.name)) {
+        self.killProcess(process.pid);
+
+        debug('[stopServer] Killing server process [%s] pid [%s]', process.name, process.pid);
       }
     });
 
@@ -183,10 +168,30 @@ module.exports = {
   },
 
   /**
+   * @returns {Promise<boolean>}
+   */
+  async isLauncherBooted() {
+    let isLauncherBooted = false;
+    await this.pollProcessList();
+    this.systemProcessList.forEach(function (process) {
+      if (process.cmd.includes('server-launcher')) {
+        isLauncherBooted = true;
+      }
+    });
+
+    return isLauncherBooted;
+  },
+
+  /**
    * @returns {exports}
    */
   startServerLauncher: async function (options) {
 
+    /**
+     * Parse args
+     *
+     * @type {*[]}
+     */
     let args = [];
     if (options) {
       args.push(options);
@@ -198,20 +203,15 @@ module.exports = {
     });
 
     /**
-     * Check if launcher is booted first
-     * @type {boolean}
+     * Bail out if launcher already started
      */
-    let isLauncherBooted = false;
-    await this.pollProcessList();
-    this.systemProcessList.forEach(function (process) {
-      if (process.cmd.includes('server-launcher')) {
-        isLauncherBooted = true;
-      }
-    });
-
-    if (isLauncherBooted) {
-      console.log('Launcher is already booted');
+    if (await this.isLauncherBooted()) {
+      debug('Launcher is already booted... exiting...');
       return false;
+    }
+
+    if (config.getAdminPanelConfig('launcher.runSharedMemory')) {
+      execSync("./bin/shared_memory", { cwd: pathManager.emuServerPath }).toString();
     }
 
     let startProcessString = '';
@@ -228,15 +228,20 @@ module.exports = {
 
     this.purgeServerLogs();
 
-    debug('start string [%s]', startProcessString);
-    debug('cwd [%s]', path.join(path.dirname(process.argv[0]), '../'));
+    debug('[startServerLauncher] Start string [%s]', startProcessString);
 
-    exec(startProcessString,
-      {
+    /**
+     * Start launcher
+     */
+    exec(startProcessString, { cwd: pathManager.emuServerPath });
+
+    /**
+     exec(startProcessString,
+     {
         encoding: 'utf8',
-        cwd: path.join(path.dirname(process.argv[0]), '../')
+        // cwd: path.join(path.dirname(process.argv[0]), '../')
       },
-      (error, stdout, stderr) => {
+     (error, stdout, stderr) => {
         if (error) {
           debug(`exec error: ${error}`);
           return;
@@ -244,7 +249,8 @@ module.exports = {
         debug(`stdout: ${stdout}`);
         debug(`stderr: ${stderr}`);
       }
-    );
+     );
+     **/
 
     return this;
   },
@@ -305,15 +311,15 @@ module.exports = {
       argString += arg + ' ';
     });
 
-    let is_windows           = process.platform === 'win32';
-    let is_linux             = process.platform === 'linux';
-    let start_process_string = '';
-    if (is_windows) {
-      start_process_string = process_name + '.exe';
+    let isWindows          = process.platform === 'win32';
+    let isLinux            = process.platform === 'linux';
+    let startProcessString = '';
+    if (isWindows) {
+      startProcessString = process_name + '.exe';
     }
 
-    if (is_linux) {
-      start_process_string =
+    if (isLinux) {
+      startProcessString =
         util.format('./bin/%s %s &',
           process_name,
           argString
@@ -322,21 +328,13 @@ module.exports = {
 
     debug('Starting process [%s] command [%s] path [%s]',
       process_name,
-      start_process_string,
+      startProcessString,
       pathManager.getEmuServerPath()
     );
 
-    const child = exec(
-      start_process_string,
-      {
-        cwd: pathManager.emuServerPath,
-        encoding: 'utf8'
-      }
-    );
+    exec(startProcessString, { cwd: pathManager.emuServerPath, encoding: 'utf8' });
 
     this.processCount[process_name]++;
-
-    // console.log('stdout ', child);
   },
 
   /**
@@ -421,5 +419,41 @@ module.exports = {
   purgeServerLogs() {
     exec('rm -rf logs/zone/*.log', { cwd: pathManager.emuServerPath });
     exec('rm -rf logs/*.log', { cwd: pathManager.emuServerPath });
+  },
+
+  /**
+   * Monitors server launcher for communication drift with world to be restarted
+   */
+  startWatchDog() {
+    let self           = this;
+    this.watchDogTimer = setInterval(function () {
+
+      let processStatus = {
+        'Zone Processes': self.processCount['zone'],
+        'Booted Zone Processes': self.zoneBootedProcessCount,
+        'World Processes': self.processCount['world'],
+        'Loginserver Processes': self.processCount['loginserver'],
+        'UCS Processes': self.processCount['ucs'],
+        'Watchdog Polling Delta': self.getWatchDogPollDelta() + ' / ' + MAX_PROCESS_POLL_DELTA_SECONDS_BEFORE_KILL
+      };
+
+      console.table(processStatus);
+
+      if (self.getWatchDogPollDelta() > MAX_PROCESS_POLL_DELTA_SECONDS_BEFORE_KILL) {
+        console.log('HIT WATCHDOG THRESHOLD. TERMINATING...');
+
+        const data    = new Date() + ' watchdog killed launcher\n';
+        const logFile = pathManager.getEmuServerPath() + '/logs/launcher-watchdog-kill.log';
+
+        if (fs.existsSync(logFile)) {
+          fs.appendFileSync(logFile, data);
+        } else {
+          fs.writeFileSync(logFile, data);
+        }
+
+        process.exit()
+      }
+
+    }, WATCHDOG_TIMER);
   }
 };

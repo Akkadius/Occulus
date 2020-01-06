@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.5] - 2020-1-6
+* Launcher refactoring, shared memory on bootup support
+* Update server processes on dashbaord in realtime
+* Add options to server bootup, refactor modals
+* Add keymaps
+  * p - Start Server modal
+  * r - Restart Server modal
+  * s - Stop Server modal
+
 ## [1.0.4] - 2020-1-4
 * Fix edge case in launcher stability where in the event that the launcher loses connection with world or the main launcher loop hangs, zones stop booting. This situation was rarer but a watchdog has been implemented to kill the launcher process in the event that this occurs. Requires the launcher process to be ran in a loop
 

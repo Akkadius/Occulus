@@ -32,22 +32,35 @@ module.exports = {
 
     this.serverConfig = JSON.parse(fs.readFileSync(this.getServerConfigPath(), 'utf8'));
 
-    console.log('Loaded [%s]', this.getServerConfigPath());
-
+    debug('Loaded [%s]', this.getServerConfigPath());
 
     return this;
   },
 
+  /**
+   * @param path
+   * @returns {module.exports}
+   */
   setServerConfigPath(path) {
     this.serverConfigPath = path;
+
+    return this
   },
 
+  /**
+   * @returns {string}
+   */
   getServerConfigPath() {
     return this.serverConfigPath;
   },
 
+  /**
+   * @returns {module.exports}
+   */
   reload() {
     this.serverConfig = JSON.parse(fs.readFileSync(this.getServerConfigPath(), 'utf8'));
+
+    return this;
   },
 
   /**
@@ -100,7 +113,8 @@ module.exports = {
   },
 
   /**
-   * @returns {module.exports.serverConfig|{}}
+   * @param data
+   * @returns {module.exports}
    */
   saveServerConfig(data = undefined) {
     if (!data) {
@@ -114,6 +128,8 @@ module.exports = {
     );
 
     this.serverConfig = data;
+
+    return this
   },
 
   /**
@@ -121,17 +137,21 @@ module.exports = {
    *
    * @param accessor
    * @param value
+   * @returns {module.exports}
    */
   setAdminPanelConfig(accessor, value) {
+    dot.override = true;
+
     dot.str('web-admin.' + accessor, value, this.getServerConfig());
+
+    return this
   },
 
   /**
    * Returns admin panel config using dot notation
-   *
    * Example: 'application.key'
-   *
-   * @returns {null}
+   * @param accessor
+   * @returns {*}
    */
   getAdminPanelConfig(accessor) {
     return dot.pick('web-admin.' + accessor, this.getServerConfig())

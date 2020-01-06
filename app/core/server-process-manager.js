@@ -42,6 +42,8 @@ module.exports = {
   init: function (options) {
     this.launchOptions = options;
 
+    config.init();
+
     let self = this;
     this.serverProcessNames.forEach(function (process_name) {
       self.erroredStartsCount[process_name]    = 0;
@@ -63,6 +65,24 @@ module.exports = {
    */
   start: async function (options = []) {
     this.init(options);
+
+    /**
+     * Shared memory
+     */
+    if (config.getAdminPanelConfig('launcher.runSharedMemory')) {
+      execSync("./bin/shared_memory", { cwd: pathManager.emuServerPath }).toString();
+    }
+
+    if (config.getAdminPanelConfig('launcher.runLoginserver')) {
+      debug('Running loginserver');
+      this.launchOptions.withLoginserver = true;
+    }
+
+    if (config.getAdminPanelConfig('launcher.runQueryServ')) {
+      debug('Running queryserv');
+      this.launchOptions.withQueryserv = true;
+    }
+
     this.startWatchDog();
 
     /**
@@ -118,6 +138,10 @@ module.exports = {
 
     if (process_name === 'loginserver') {
       return this.launchOptions && this.launchOptions.withLoginserver && this.processCount[process_name] === 0;
+    }
+
+    if (process_name === 'queryserv') {
+      return this.launchOptions && this.launchOptions.withQueryserv && this.processCount[process_name] === 0;
     }
 
     debug('[doesProcessNeedToBoot] returning [%s]', this.processCount[process_name] === 0)
@@ -208,10 +232,6 @@ module.exports = {
     if (await this.isLauncherBooted()) {
       debug('Launcher is already booted... exiting...');
       return false;
-    }
-
-    if (config.getAdminPanelConfig('launcher.runSharedMemory')) {
-      execSync("./bin/shared_memory", { cwd: pathManager.emuServerPath }).toString();
     }
 
     let startProcessString = '';

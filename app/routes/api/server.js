@@ -57,9 +57,14 @@ router.get('/start', function (req, res, next) {
   res.send({ 'data': 'Server has been started successfully!' });
 });
 
-router.get('/restart', function (req, res, next) {
-  serverProcessManager.restartServer();
-  res.send({ 'data': 'Server has been restarted successfully!' });
+router.post('/restart/cancel', function (req, res, next) {
+  serverProcessManager.cancelRestart(req.body);
+  res.send({ 'data': 'Server restart cancelled' });
+});
+
+router.post('/restart', function (req, res, next) {
+  serverProcessManager.restartServer(req.body);
+  res.send({ 'data': 'Server restart starting' });
 });
 
 router.get('/launcher/config', function (req, res, next) {

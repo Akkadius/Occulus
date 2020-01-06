@@ -16,4 +16,11 @@ module.exports = {
   stopServer: function (options) {
     require('../core/server-process-manager').stopServer(options);
   },
+
+  /**
+   * @param options
+   */
+  restartServer: function (options) {
+    require('../core/server-process-manager').restartServer(options);
+  },
 };

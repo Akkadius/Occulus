@@ -33,6 +33,7 @@ module.exports = {
   systemProcessList: {},
   launchOptions: {},
   watchDogTimer: null,
+  cancelTimedRestart: false,
   lastProcessPollTime: Math.floor(new Date() / 1000),
 
   /**
@@ -70,7 +71,7 @@ module.exports = {
      * Shared memory
      */
     if (config.getAdminPanelConfig('launcher.runSharedMemory')) {
-      execSync("./bin/shared_memory", { cwd: pathManager.emuServerPath }).toString();
+      execSync('./bin/shared_memory', { cwd: pathManager.emuServerPath }).toString();
     }
 
     if (config.getAdminPanelConfig('launcher.runLoginserver')) {
@@ -276,9 +277,64 @@ module.exports = {
   },
 
   /**
+   * @param options
+   */
+  async cancelRestart(options = []) {
+    if (options.cancel) {
+      this.cancelTimedRestart = true;
+      await serverDataService.messageWorld("[SERVER MESSAGE] Server restart cancelled")
+    }
+  },
+
+  /**
    * @returns {exports}
    */
-  restartServer: async function () {
+  restartServer: async function (options = []) {
+
+    /**
+     * Delayed restart
+     */
+    if (options.timer && options.timer > 0) {
+
+      const startTime     = Math.floor(new Date() / 1000);
+      const endTime       = startTime + parseInt(options.timer);
+      let rebootTime      = false;
+      let lastWarningTime = Math.floor(new Date() / 1000) - 1000;
+
+      while (!rebootTime) {
+        const minutesRemaining = (endTime - Math.floor(new Date() / 1000)) / 60;
+        const unixTimeNow      = Math.floor(new Date() / 1000);
+
+        if ((lastWarningTime + 30) <= unixTimeNow) {
+          lastWarningTime = unixTimeNow;
+
+          const worldMessage = util.format(
+            '[SERVER MESSAGE] The world will be coming down for a reboot in [%s] minute(s), please log out before this time...',
+            Number((minutesRemaining).toFixed(2))
+          );
+
+          await serverDataService.messageWorld(worldMessage)
+
+          debug('Sending world message | %s', worldMessage)
+        }
+
+        if (unixTimeNow > endTime) {
+          rebootTime = true;
+        }
+
+        if (this.cancelTimedRestart) {
+          break;
+        }
+
+        await this.sleep(1000);
+      }
+    }
+
+    if (this.cancelTimedRestart) {
+      debug('Reboot cancelled');
+      return false;
+    }
+
     this.stopServer();
 
     let self = this;

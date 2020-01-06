@@ -27,6 +27,14 @@ program
   .action(() => require('../commands/server-launcher').stopServer());
 
 /**
+ * Timed Restart
+ */
+program
+  .command('restart-server')
+  .option('--timer [seconds]')
+  .action((options) => require('../commands/server-launcher').restartServer(options));
+
+/**
  * Create Model
  */
 program

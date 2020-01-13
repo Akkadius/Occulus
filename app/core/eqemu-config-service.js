@@ -153,7 +153,18 @@ module.exports = {
    * @param accessor
    * @returns {*}
    */
-  getAdminPanelConfig(accessor) {
-    return dot.pick('web-admin.' + accessor, this.getServerConfig())
+  getAdminPanelConfig(accessor, defaultValue = "") {
+
+    const accessorKey = 'web-admin.' + accessor;
+    const configVar   = dot.pick(accessorKey, this.getServerConfig());
+
+    debug("[getAdminPanelConfig] config [%s] = [%s] default [%s]", accessor, configVar, defaultValue);
+
+    if (!configVar && defaultValue !== "") {
+      this.setAdminPanelConfig(accessor, defaultValue);
+      this.saveServerConfig();
+    }
+
+    return (configVar ? configVar : defaultValue)
   }
 };

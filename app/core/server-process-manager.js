@@ -45,6 +45,8 @@ module.exports = {
 
     config.init();
 
+    this.minZoneProcesses = config.getAdminPanelConfig('launcher.minZoneProcesses', 3);
+
     let self = this;
     this.serverProcessNames.forEach(function (process_name) {
       self.erroredStartsCount[process_name]    = 0;
@@ -70,16 +72,16 @@ module.exports = {
     /**
      * Shared memory
      */
-    if (config.getAdminPanelConfig('launcher.runSharedMemory')) {
+    if (config.getAdminPanelConfig('launcher.runSharedMemory', true)) {
       execSync('./bin/shared_memory', { cwd: pathManager.emuServerPath }).toString();
     }
 
-    if (config.getAdminPanelConfig('launcher.runLoginserver')) {
+    if (config.getAdminPanelConfig('launcher.runLoginserver', false)) {
       debug('Running loginserver');
       this.launchOptions.withLoginserver = true;
     }
 
-    if (config.getAdminPanelConfig('launcher.runQueryServ')) {
+    if (config.getAdminPanelConfig('launcher.runQueryServ', false)) {
       debug('Running queryserv');
       this.launchOptions.withQueryserv = true;
     }

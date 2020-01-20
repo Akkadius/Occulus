@@ -126,10 +126,6 @@ module.exports = {
    * @returns {module.exports}
    */
   saveServerConfig(data = undefined) {
-    if (!data) {
-      data = this.getFreshServerConfig()
-    }
-
     debug('[saveServerConfig] writing config')
 
     fs.writeFileSync(

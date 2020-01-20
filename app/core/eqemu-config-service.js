@@ -69,6 +69,8 @@ module.exports = {
   getFreshServerConfig() {
     this.serverConfig = JSON.parse(fs.readFileSync(this.getServerConfigPath(), 'utf8'));
 
+    debug("[getFreshServerConfig] fetching");
+
     return this.serverConfig;
   },
 
@@ -127,7 +129,7 @@ module.exports = {
    */
   saveServerConfig(data = undefined) {
     if (!data) {
-      data = this.getFreshServerConfig()
+      data = this.getServerConfig()
     }
 
     debug('[saveServerConfig] writing config')
@@ -172,8 +174,10 @@ module.exports = {
     debug("[getAdminPanelConfig] config [%s] = [%s] default [%s]", accessor, configVar, defaultValue);
 
     if (typeof configVar === "undefined" && defaultValue !== "") {
+      debug("[getAdminPanelConfig] writing default value for [%s] default [%s]", accessor, defaultValue);
+
       this.setAdminPanelConfig(accessor, defaultValue);
-      this.saveServerConfig();
+      this.saveServerConfig(this.serverConfig);
     }
 
     return (configVar ? configVar : defaultValue)

@@ -1,5 +1,10 @@
 #!/usr/bin/env node
 
+if (process.platform === "win32") {
+  console.log("web service is not currently supported on windows");
+  process.exit(1);
+}
+
 /**
  * Module dependencies.
  */
@@ -66,6 +71,8 @@ function onError(error) {
   }
 }
 
+
+
 /**
  * Event listener for HTTP server "listening" event.
  */
@@ -75,5 +82,5 @@ function onListening() {
     ? 'pipe ' + addr
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
-  console.log('Listening on ' + bind);
+  console.log('[www] Listening on ' + bind);
 }

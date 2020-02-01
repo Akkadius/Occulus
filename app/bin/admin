@@ -38,7 +38,7 @@ program
  * Create Model
  */
 program
-  .command('create_model [table]')
+  .command('create-model [table]')
   .description('Create model from table')
   .action((table) => require('../commands/create-model').createModel(table));
 
@@ -57,6 +57,14 @@ program
   .command('ws [port]')
   .description('Websocket testing')
   .action((port) => require('../commands/ws-test').test(port));
+
+/**
+ * Hot Reload Listener
+ */
+program
+  .command('hot-reload-listener')
+  .description('Starts EQEmulator hot reload listener service')
+  .action(() => require('../commands/hot-reload-listener').startListener());
 
 /**
  * Web

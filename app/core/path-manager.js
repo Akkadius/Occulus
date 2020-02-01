@@ -36,7 +36,7 @@ module.exports = {
    */
   getEqemuConfigName() {
     return 'eqemu_config.json';
-  }, 
+  },
 
   /**
    * @param requested_path
@@ -60,6 +60,27 @@ module.exports = {
         return second_path;
       }
     }
+  },
+
+  /**
+   * @returns {string}
+   */
+  getEmuQuestsPath: function () {
+    return path.join(this.getEmuServerPath(), 'quests');
+  },
+
+  /**
+   * @returns {string}
+   */
+  getEmuLuaModulesPath: function () {
+    return path.join(this.getEmuServerPath(), 'lua_modules');
+  },
+
+  /**
+   * @returns {string}
+   */
+  getEmuPluginsPath: function () {
+    return path.join(this.getEmuServerPath(), 'plugins');
   },
 
   /**

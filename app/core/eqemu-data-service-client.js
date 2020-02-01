@@ -95,4 +95,12 @@ module.exports = {
   messageWorld: async function (message) {
     telnetService.execWorld('emote world 15 ' + message);
   },
+
+  /**
+   *
+   * @param zoneShortName
+   */
+  hotReloadZoneQuests: async function(zoneShortName) {
+    return telnetService.execWorld('reloadzonequests ' + zoneShortName);
+  }
 };

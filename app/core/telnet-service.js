@@ -31,6 +31,7 @@ module.exports = {
      */
     const ping = await tcpping({ address: '127.0.0.1', port: 9000, timeout: 500, attempts: 1 });
     if (!ping.avg) {
+      console.warn("[telnet-service] [%s] world-server is unavailable...", command);
       return false;
     }
 
@@ -125,5 +126,5 @@ module.exports = {
       console.log(error);
     }
 
-  }
+  },
 };

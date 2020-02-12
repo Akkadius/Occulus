@@ -1,12 +1,12 @@
 {
   "name": "eqemu-admin",
-  "version": "1.0.1",
+  "version": "1.0.8",
   "private": true,
   "bin": "./app/bin/admin",
   "scripts": {
     "start": "node ./app/bin/admin web",
     "debug": "DEBUG=eqemu-admin:*; node ./app/bin/admin web",
-    "watch": "nodemon npm start --ignore public/"
+    "watch": "nodemon --ignore public/ --exec node ./app/bin/admin web"
   },
   "pkg": {
     "assets": [
@@ -38,7 +38,7 @@
     "morgan": "~1.9.0",
     "mysql": "^2.17.1",
     "mysql2": "^1.6.5",
-    "nodemon": "^1.19.0",
+    "node-watch": "^0.6.3",
     "path": "^0.12.7",
     "pidusage": "^2.0.17",
     "ps-list": "^6.3.0",
@@ -52,5 +52,6 @@
     "uuid": "^3.3.2",
     "ws": "^7.0.0",
     "yazl": "^2.5.1"
-  }
+  },
+  "devDependencies": {}
 }

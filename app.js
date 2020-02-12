@@ -11,6 +11,8 @@ const path               = require('path')
 const pathManager        = require('./app/core/path-manager')
 const eqemuConfigService = require('./app/core/eqemu-config-service')
 const authService        = require('./app/core/auth-service')
+const database           = require('./app/core/database')
+const hotReloadService   = require('./app/core/hot-reload-service')
 
 /**
  * Init services
@@ -25,7 +27,7 @@ authService.initializeAdminPasswordIfNotSet();
  */
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({extended: false}));
+app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 /**
@@ -38,7 +40,7 @@ app.use(
     {
       origin: [
         'http://localhost:8080',
-        'http://localhost:8080',
+        'http://docker:8080',
         'http://localhost:5000'
       ],
       exposedHeaders: ['Content-Disposition']
@@ -80,45 +82,14 @@ app.get('*', function (req, res, next) {
 module.exports = app;
 
 /**
- * Load Database
+ * Database
  */
-const database  = eqemuConfigService.getServerConfig().server.database;
-const Sequelize = require('sequelize');
-const db        = new Sequelize(
-  database.db,
-  database.username,
-  database.password, {
-    host: database.host,
-    dialect: 'mysql',
-    operatorsAliases: false
-  },
-);
+database.init()
 
 /**
- * Connect to DB
+ * Hot Reload Service
  */
-db.authenticate()
-  .then(() => {
-      console.log('MySQL Connection has been established successfully.');
-    }
-  )
-  .catch(err => {
-      console.error('Unable to connect to the database:', err);
-    }
-  );
-
-/**
- * Dynamically load models
- * @type {{}}
- */
-models = {};
-fs.readdirSync(pathManager.appRoot + '/app/models/').forEach(function (filename) {
-  var model          = {};
-  model.path         = path.join(pathManager.appRoot, '/app/models/', filename)
-  model.name         = filename.replace(/\.[^/.]+$/, "");
-  model.resource     = db.import(model.path);
-  models[model.name] = model;
-});
+hotReloadService.startListener();
 
 /**
  * NetStat Listeners

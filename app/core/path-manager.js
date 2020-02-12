@@ -5,13 +5,13 @@ const util    = require('util');
 const debug   = require('debug')('eqemu-admin:path-manager');
 
 module.exports = {
-  appRoot : '',
-  emuServerPath : '',
+  appRoot: '',
+  emuServerPath: '',
 
   /**
    * @param app_root
    */
-  init : function (app_root) {
+  init: function (app_root) {
     this.appRoot = app_root;
 
     if (!fs.existsSync(app_root + '/node_modules')) {
@@ -42,7 +42,7 @@ module.exports = {
    * @param requested_path
    * @returns {*}
    */
-  getEmuServerPath : function (requested_path = '') {
+  getEmuServerPath: function (requested_path = '') {
     if (this.isRanFromPackagedNode()) {
       return path.join(process.argv[0], '../../', requested_path);
     }
@@ -60,6 +60,27 @@ module.exports = {
         return second_path;
       }
     }
+  },
+
+  /**
+   * @returns {string}
+   */
+  getEmuQuestsPath: function () {
+    return path.join(this.getEmuServerPath(), 'quests');
+  },
+
+  /**
+   * @returns {string}
+   */
+  getEmuLuaModulesPath: function () {
+    return path.join(this.getEmuServerPath(), 'lua_modules');
+  },
+
+  /**
+   * @returns {string}
+   */
+  getEmuPluginsPath: function () {
+    return path.join(this.getEmuServerPath(), 'plugins');
   },
 
   /**
@@ -87,5 +108,5 @@ module.exports = {
     if (this.isRanAsStandaloneNodeProject()) {
       return process.argv[1];
     }
-  },
+  }
 };

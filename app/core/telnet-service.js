@@ -29,8 +29,9 @@ module.exports = {
      * TCP ping first, respond with error
      * @type {any | void}
      */
-    const ping = await tcpping({address: '127.0.0.1', port: 9000, timeout: 500, attempts: 1});
+    const ping = await tcpping({ address: '127.0.0.1', port: 9000, timeout: 500, attempts: 1 });
     if (!ping.avg) {
+      console.warn("[telnet-service] [%s] world-server is unavailable...", command);
       return false;
     }
 
@@ -46,7 +47,7 @@ module.exports = {
         shellPrompt: '>',
         timeout: 1000,
         execTimeout: 1000,
-        maxBufferLength: '10M',
+        maxBufferLength: '10M'
       }
     );
 
@@ -58,7 +59,7 @@ module.exports = {
       }
     );
 
-    worldConnection.send("quit", {
+    worldConnection.send('quit', {
         waitfor: 'Connection closed by foreign host$',
         maxBufferLength: '10M'
       }
@@ -66,7 +67,7 @@ module.exports = {
 
     worldConnection.destroy();
 
-    return worldResponse.replace("\n\r>", "").trim();
+    return worldResponse.replace('\n\r>', '').trim();
   },
 
   /**
@@ -99,7 +100,7 @@ module.exports = {
           shellPrompt: '>',
           timeout: 1000,
           execTimeout: 1000,
-          maxBufferLength: '10M',
+          maxBufferLength: '10M'
         }
       );
 
@@ -111,7 +112,7 @@ module.exports = {
         }
       );
 
-      zoneConnection[port].send("quit", {
+      zoneConnection[port].send('quit', {
           waitfor: 'Connection closed by foreign host$',
           maxBufferLength: '10M'
         }
@@ -119,7 +120,7 @@ module.exports = {
 
       zoneConnection[port].destroy();
 
-      return zoneResponse.replace("\n\r>", "").trim();
+      return zoneResponse.replace('\n\r>', '').trim();
 
     } catch (error) {
       console.log(error);

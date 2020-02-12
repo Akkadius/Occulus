@@ -12,8 +12,8 @@ const path      = require('path')
  * @type {{getServerConfig(): *, init: (function(): exports), serverConfig: {}}}
  */
 module.exports = {
-  serverConfig : {},
-  serverConfigPath : '',
+  serverConfig: {},
+  serverConfigPath: '',
 
   /**
    * Initialize config
@@ -32,21 +32,46 @@ module.exports = {
 
     this.serverConfig = JSON.parse(fs.readFileSync(this.getServerConfigPath(), 'utf8'));
 
-    console.log('Loaded [%s]', this.getServerConfigPath());
+    debug('Loaded [%s]', this.getServerConfigPath());
 
     return this;
   },
 
+  /**
+   * @param path
+   * @returns {module.exports}
+   */
   setServerConfigPath(path) {
     this.serverConfigPath = path;
+
+    return this
   },
 
+  /**
+   * @returns {string}
+   */
   getServerConfigPath() {
     return this.serverConfigPath;
   },
 
+  /**
+   * @returns {module.exports}
+   */
   reload() {
     this.serverConfig = JSON.parse(fs.readFileSync(this.getServerConfigPath(), 'utf8'));
+
+    return this;
+  },
+
+  /**
+   * @returns {module.exports.serverConfig|{}}
+   */
+  getFreshServerConfig() {
+    this.serverConfig = JSON.parse(fs.readFileSync(this.getServerConfigPath(), 'utf8'));
+
+    debug("[getFreshServerConfig] fetching");
+
+    return this.serverConfig;
   },
 
   /**
@@ -99,12 +124,15 @@ module.exports = {
   },
 
   /**
-   * @returns {module.exports.serverConfig|{}}
+   * @param data
+   * @returns {module.exports}
    */
   saveServerConfig(data = undefined) {
     if (!data) {
       data = this.getServerConfig()
     }
+
+    debug('[saveServerConfig] writing config')
 
     fs.writeFileSync(
       this.getServerConfigPath(),
@@ -113,6 +141,8 @@ module.exports = {
     );
 
     this.serverConfig = data;
+
+    return this
   },
 
   /**
@@ -120,19 +150,36 @@ module.exports = {
    *
    * @param accessor
    * @param value
+   * @returns {module.exports}
    */
   setAdminPanelConfig(accessor, value) {
+    dot.override = true;
+
     dot.str('web-admin.' + accessor, value, this.getServerConfig());
+
+    return this
   },
 
   /**
    * Returns admin panel config using dot notation
-   *
    * Example: 'application.key'
-   *
-   * @returns {null}
+   * @param accessor
+   * @returns {*}
    */
-  getAdminPanelConfig(accessor) {
-    return dot.pick('web-admin.' + accessor, this.getServerConfig())
-  },
+  getAdminPanelConfig(accessor, defaultValue = "") {
+
+    const accessorKey = 'web-admin.' + accessor;
+    const configVar   = dot.pick(accessorKey, this.getServerConfig());
+
+    debug("[getAdminPanelConfig] config [%s] = [%s] default [%s]", accessor, configVar, defaultValue);
+
+    if (typeof configVar === "undefined" && defaultValue !== "") {
+      debug("[getAdminPanelConfig] writing default value for [%s] default [%s]", accessor, defaultValue);
+
+      this.setAdminPanelConfig(accessor, defaultValue);
+      this.saveServerConfig(this.serverConfig);
+    }
+
+    return (configVar ? configVar : defaultValue)
+  }
 };

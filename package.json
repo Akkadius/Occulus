@@ -23,6 +23,7 @@
     "url": "https://github.com/Akkadius/eqemu-web-admin.git"
   },
   "dependencies": {
+    "chalk": "^3.0.0",
     "child_process": "^1.0.2",
     "commander": "^2.20.0",
     "cookie-parser": "~1.4.3",

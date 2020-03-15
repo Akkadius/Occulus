@@ -63,16 +63,36 @@ module.exports = {
   },
 
   /**
+   * @returns {boolean}
+   */
+  isEqemuServerOnline() {
+    let isServerOnline = false
+    let self = this
+    this.serverProcessNames.forEach(function (processName) {
+      if (self.processCount[processName] > 0) {
+        isServerOnline = true
+      }
+    });
+
+    return isServerOnline
+  },
+
+  /**
    * @param options
    * @returns {Promise<void>}
    */
   start: async function (options = []) {
     this.init(options);
 
+    await this.pollProcessList();
+
+    debug('server is [%s]', (this.isEqemuServerOnline() ? "online" : "offline"))
+
     /**
      * Shared memory
      */
-    if (config.getAdminPanelConfig('launcher.runSharedMemory', true)) {
+    if (config.getAdminPanelConfig('launcher.runSharedMemory', true) && !this.isEqemuServerOnline()) {
+      debug("Running shared memory");
       execSync('./bin/shared_memory', { cwd: pathManager.emuServerPath }).toString();
     }
 

@@ -39,22 +39,22 @@ module.exports = {
   },
 
   /**
-   * @param requested_path
+   * @param requestedPath
    * @returns {*}
    */
-  getEmuServerPath: function (requested_path = '') {
+  getEmuServerPath: function (requestedPath = '') {
     if (this.isRanFromPackagedNode()) {
-      return path.join(process.argv[0], '../../', requested_path);
+      return path.join(process.argv[0], '../../', requestedPath);
     }
 
     if (this.isRanAsStandaloneNodeProject()) {
-      const first_path = path.join(process.argv[1], '../../../../', requested_path);
+      const first_path = path.join(process.argv[1], '../../../../', requestedPath);
       if (fs.existsSync(path.join(first_path, this.getEqemuConfigName()))) {
         debug('[getEmuServerPath] emu-path (1) [%s]', first_path);
         return first_path;
       }
 
-      const second_path = path.join(process.cwd(), '../../../../', requested_path);
+      const second_path = path.join(process.cwd(), '../../../../', requestedPath);
       if (fs.existsSync(path.join(second_path, this.getEqemuConfigName()))) {
         debug('[getEmuServerPath] emu-path (2) [%s]', second_path);
         return second_path;

@@ -6,20 +6,37 @@ const express     = require('express');
 const router      = express.Router();
 const { exec }    = require('child_process');
 const pathManager = require('../core/path-manager');
+const fs          = require('fs')
+const path        = require('path');
 
-/* GET home page. */
+
 router.get('/:downloadType', function (req, res, next) {
   if (req.params.downloadType) {
 
     /**
      * Request params
      */
-    const download_type = req.params.downloadType;
+    const downloadType = req.params.downloadType;
+    const emuPath      = pathManager.getEmuServerPath();
+    const exportPath   = path.join(emuPath, 'export')
+
+    if (!fs.existsSync(exportPath)) {
+      fs.mkdirSync(exportPath)
+    }
+
+    const stats                = fs.statSync(path.join(emuPath, 'export/spells_us.txt'));
+    const modifiedTimeUnix     = stats.mtimeMs / 1000;
+    const unixNow              = Math.floor(Date.now() / 1000)
+    const secondsSinceModified = unixNow - modifiedTimeUnix
+    let command                = 'cd ../ && ./bin/export_client_files ' + downloadType;
+    if (secondsSinceModified < 60) {
+      command = 'echo "noop"';
+    }
 
     /**
      * Exec export binary
      */
-    exec('cd ../ && ./bin/export_client_files ' + download_type, (error, stdout, stderr) => {
+    exec(command, (error, stdout, stderr) => {
       if (error) {
         console.error(`exec error: ${error}`);
         return;
@@ -28,19 +45,19 @@ router.get('/:downloadType', function (req, res, next) {
       /**
        * @type {string}
        */
-      let file = "";
-      switch (download_type) {
-        case "spells":
-          file = pathManager.getEmuServerPath('export/spells_us.txt');
+      let file = '';
+      switch (downloadType) {
+        case 'spells':
+          file = path.join(emuPath, 'export/spells_us.txt');
           break;
-        case "skills":
-          file = pathManager.getEmuServerPath('export/SkillCaps.txt');
+        case 'skills':
+          file = path.join(emuPath, 'export/SkillCaps.txt');
           break;
-        case "basedata":
-          file = pathManager.getEmuServerPath('export/BaseData.txt');
+        case 'basedata':
+          file = path.join(emuPath, 'export/BaseData.txt');
           break;
-        case "dbstr":
-          file = pathManager.getEmuServerPath('export/dbstr_us.txt');
+        case 'dbstr':
+          file = path.join(emuPath, 'export/dbstr_us.txt');
           break;
         default:
       }
@@ -48,28 +65,24 @@ router.get('/:downloadType', function (req, res, next) {
       /**
        * Get base file name
        */
-      var path           = require('path');
-      var base_file_name = path.basename(file).replace(".txt", "");
-      var fs             = require('fs');
-      var yazl           = require("yazl");
-      var zipfile        = new yazl.ZipFile();
+      const base_file_name = path.basename(file).replace('.txt', '');
+      const fs             = require('fs');
+      const yazl           = require('yazl');
+      const zipfile        = new yazl.ZipFile();
 
-      zipfile.addFile(file, base_file_name + ".txt");
-
-      console.log("zipping file: " + file);
-
+      zipfile.addFile(file, base_file_name + '.txt');
       zipfile.outputStream.pipe(
-        fs.createWriteStream(base_file_name + ".zip")
-      ).on("close", function () {
-        console.log("zip file downloaded: " + base_file_name + ".zip");
-        res.download(base_file_name + ".zip");
+        fs.createWriteStream(base_file_name + '.zip')
+      ).on('close', function () {
+        console.log('zip file downloaded: ' + base_file_name + '.zip');
+        res.download(base_file_name + '.zip');
 
         /**
          * Cleanup after 10s because the download callback doesn't work
          */
         setTimeout(function () {
-          if (fs.existsSync(base_file_name + ".zip")) {
-            fs.unlinkSync(base_file_name + ".zip");
+          if (fs.existsSync(base_file_name + '.zip')) {
+            fs.unlinkSync(base_file_name + '.zip');
           }
         }, 10000);
       });

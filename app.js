@@ -71,7 +71,7 @@ app.use('/api/v1/backup', require('./app/routes/api/backup/backup'));
 /**
  * Serve Vue SPA
  */
-app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1y', etag: false }))
+app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1y', etag: true, lastModified: true }))
 
 /**
  * After other routes are not found

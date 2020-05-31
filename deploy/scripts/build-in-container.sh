@@ -19,7 +19,7 @@ rm -rf node_modules && npm install
 cd ./frontend
 npm install
 npm run build
-cp ./dist/* $cwd/public/ -R
+cp $cwd/frontend/dist/* $cwd/public/ -R
 cat $cwd/public/index.html
 ls -lsh $cwd
 

@@ -1,28 +1,31 @@
 <template>
-  <div class="card">
+  <div>
+    <div class="row justify-content-between align-items-center mb-5 mt-5">
 
-    <div class="card-header">
-      <h4 class="card-header-title">Message of the Day</h4>
-    </div>
+      <div class="col-12 col-md-9 col-xl-7">
+        <h2 class="mb-2">
+          Message of the Day
+        </h2>
+        <p class="text-muted mb-md-0">
+          Message of the day is what your players see when they first log in
+        </p>
+      </div>
 
-    <div class="card-body">
-
-      <app-loader :is-loading="!loaded"></app-loader>
-
-      <!-- Row -->
-      <div class="row">
-        <div class="col-lg-12">
-          <div class="form-group">
-            <textarea class="form-control" rows="7" v-model="motd"></textarea>
-          </div>
-        </div>
+      <div class="col-12 col-md-auto">
+        <button type="submit" class="btn btn-primary ml-auto" @click="submit()">
+          <i class="fe fe-save"></i>
+          Save
+        </button>
       </div>
     </div>
 
-    <!-- Bottom Buttons -->
-    <div class="card-footer text-right">
-      <div class="d-flex">
-        <button type="submit" class="btn btn-primary ml-auto" @click="submit()">Save</button>
+    <hr class="my-5">
+
+    <div class="row justify-content-between align-items-center">
+      <div class="col-lg-12">
+        <div class="form-group">
+          <textarea class="form-control" rows="7" v-model="motd"></textarea>
+        </div>
       </div>
     </div>
 
@@ -46,10 +49,10 @@
     },
     methods: {
       submit: async function () {
-        const result = await EqemuAdminClient.postServerMotd({motd: this.motd})
+        const result = await EqemuAdminClient.postServerMotd({ motd: this.motd })
 
         if (result.success) {
-          this.$toast.info(result.success, 'Saved', {position: 'bottomRight'})
+          this.$toast.info(result.success, 'Saved', { position: 'bottomRight' })
         }
       }
     }

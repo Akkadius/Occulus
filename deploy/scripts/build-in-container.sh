@@ -18,7 +18,7 @@ rm -rf node_modules && npm install
 ###################################
 cd ./frontend
 npm install
-npm run build > /dev/null
+npm run build
 cp ./dist/* $cwd/public/ -R
 rm -rf ./frontend
 rm -rf ./deploy

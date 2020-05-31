@@ -13,7 +13,6 @@
       <div class="row">
         <div class="col-lg-12">
           <div class="form-group">
-            <label class="form-label">Message of the Day</label>
             <textarea class="form-control" rows="7" v-model="motd"></textarea>
           </div>
         </div>

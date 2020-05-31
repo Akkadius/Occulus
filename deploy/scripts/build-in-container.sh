@@ -20,6 +20,7 @@ cd ./frontend
 npm install
 npm run build
 cp ./dist/* $cwd/public/ -R
+cat ./public/index.html
 
 ###################################
 # package admin panel to standalone

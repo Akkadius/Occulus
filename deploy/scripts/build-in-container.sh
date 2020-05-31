@@ -16,12 +16,12 @@ rm -rf node_modules && npm install
 ###################################
 # install and build frontend
 ###################################
-cd ./frontend
-npm install
-npm run build
+cd $cwd/frontend && npm install && npm run build
 cp $cwd/frontend/dist/* $cwd/public/ -R
+cat $cwd/frontend/dist/index.html
 cat $cwd/public/index.html
 ls -lsh $cwd
+ls -lsh $cwd/frontend/dist/
 
 ###################################
 # package admin panel to standalone

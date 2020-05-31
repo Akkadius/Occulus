@@ -7,7 +7,7 @@
           Zone Server Settings
         </h2>
         <p class="text-muted mb-md-0">
-          Configure zone server properties...
+          Configure zone server properties
         </p>
       </div>
 

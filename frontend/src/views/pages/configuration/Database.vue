@@ -8,7 +8,7 @@
             Database Connection Properties
           </h2>
           <p class="text-muted mb-md-0">
-            Configure the server's different types of MySQL database connections...
+            Configure the server's different types of MySQL database connections
           </p>
         </div>
 

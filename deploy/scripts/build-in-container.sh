@@ -14,12 +14,12 @@ rm -rf node_modules && npm install
 ###################################
 # install and build frontend
 ###################################
-cd /tmp
-git clone https://github.com/Akkadius/eqemu-web-admin-client
-cd eqemu-web-admin-client
+cd ./frontend
 npm install
 npm run build > /dev/null
-cp /tmp/eqemu-web-admin-client/dist/* $cwd/public/ -R
+cp ./dist/* $cwd/public/ -R
+rm -rf ./frontend
+rm -rf ./deploy
 
 ###################################
 # package admin panel to standalone

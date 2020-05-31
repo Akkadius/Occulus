@@ -1,0 +1,4 @@
+/* TablePlus: Modals with double X's */
+.close:before {
+    content: none;
+}

@@ -21,7 +21,6 @@ npm install
 npm run build
 cp ./dist/* $cwd/public/ -R
 rm -rf ./frontend
-rm -rf ./deploy
 
 ###################################
 # package admin panel to standalone

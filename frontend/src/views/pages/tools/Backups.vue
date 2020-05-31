@@ -7,13 +7,19 @@
 
     <div class="card-body">
       <!-- Row -->
+
+      <b-alert show variant="primary">
+        <i class="fe fe-info"></i>
+        One time manual server backups
+      </b-alert>
+
       <div class="row">
         <div class="col-lg-12">
           <table class="table card-table table-vcenter">
             <tbody>
             <tr v-for="(backupType, index) in simpleDownloadTypes" :key="index">
               <td>
-                <button type="button" class="btn btn-primary btn-block"
+                <button type="button" class="btn btn-white mb-2"
                         style="width:100%"
                         @click="downloadBackup(backupType)"
                         v-bind:class="{ 'btn-loading': downloadStatus[backupType] }">
@@ -37,7 +43,7 @@
             </tr>
             <tr>
               <td>
-                <button type="button" class="btn btn-primary btn-block"
+                <button type="button" class="btn btn-white mb-2"
                         style="width:100%"
                         @click="downloadBackup('full')"
                         v-bind:class="{ 'btn-loading': downloadStatus['full'] }">

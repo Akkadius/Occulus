@@ -10,22 +10,24 @@
       <div class="row">
         <div class="col-lg-12">
 
-          <small>
+          <b-alert show variant="primary">
+            <i class="fe fe-info"></i>
             All links below can be used publicly for download without login
-          </small>
+          </b-alert>
 
           <table class="table card-table table-vcenter mt-5">
             <tbody>
             <tr>
               <td class="text-right">
-                <a :href="backendBaseUrl + '/download/spells'" target="spells_download" class="btn btn-primary btn-block"><i
+                <a :href="backendBaseUrl + '/download/spells'" target="spells_download"
+                   class="btn btn-white mb-2"><i
                   class="fe fe-download mr-2"></i>spells_us.txt</a>
               </td>
               <td class="td-center">Generates and zips a spells file for use with an EverQuest client</td>
             </tr>
             <tr>
               <td class="text-right">
-                <a :href="backendBaseUrl + '/download/dbstr'" target="dbstr_download" class="btn btn-primary btn-block"><i
+                <a :href="backendBaseUrl + '/download/dbstr'" target="dbstr_download" class="btn btn-white mb-2"><i
                   class="fe fe-download mr-2"></i>dbstr_us.txt</a>
               </td>
               <td class="td-center">Generates and zips a strings file for use with an EverQuest client
@@ -33,14 +35,15 @@
             </tr>
             <tr>
               <td class="text-right">
-                <a :href="backendBaseUrl + '/download/skills'" target="skills_download" class="btn btn-primary btn-block"><i
+                <a :href="backendBaseUrl + '/download/skills'" target="skills_download"
+                   class="btn btn-white mb-2"><i
                   class="fe fe-download mr-2"></i>SkillCaps.txt</a>
               </td>
               <td class="td-center">Generates and zips a skills file for use with an EverQuest client</td>
             </tr>
             <tr>
               <td class="text-right">
-                <a :href="backendBaseUrl + '/download/basedata'" target="base_data"  class="btn btn-primary btn-block"><i
+                <a :href="backendBaseUrl + '/download/basedata'" target="base_data" class="btn btn-white mb-2"><i
                   class="fe fe-download mr-2"></i>BaseData.txt</a>
               </td>
               <td class="td-center">Generates and zips a base data file for use with an EverQuest client

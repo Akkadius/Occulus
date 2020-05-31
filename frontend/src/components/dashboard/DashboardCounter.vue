@@ -1,14 +1,27 @@
 <template>
-  <div class="col-6 col-sm-4 col-lg-2">
-    <div class="card" style="height:120px">
-      <div class="card-body p-3 text-center">
-        <div class="text-right text-red">
-          &nbsp;
+  <div class="col-6 col-lg-3 col-xl">
+    <div class="card">
+      <div class="card-body">
+        <div class="row align-items-center">
+          <div class="col">
+
+            <h6 class="text-uppercase text-muted mb-2">
+              {{ name }}
+            </h6>
+
+            <span class="h2 mb-0">{{ counter }}</span>
+
+          </div>
+          <div class="col-auto">
+
+            <!-- Icon -->
+            <span :class="['h2', 'fe', 'fe-' + icon, 'text-muted', 'mb-0']"></span>
+
+          </div>
         </div>
-        <div class="h1 m-0 accounts" :style="style">{{ counter }}</div>
-        <div class="text-muted mb-4">{{ name }}</div>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -27,6 +40,10 @@
       },
       counter: {
         default: 0,
+        required: true
+      },
+      icon: {
+        default: 'clock',
         required: true
       },
       counterFontSize: {

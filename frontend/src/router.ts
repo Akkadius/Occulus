@@ -10,6 +10,9 @@ export default new Router({
   routes: [
     {
       path: '/',
+      meta: {
+        title: 'EQEmu Admin Panel'
+      },
       component: () => import('./views/dashboard/Layout.vue'),
       children: [
         {

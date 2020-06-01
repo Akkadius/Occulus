@@ -64,7 +64,7 @@
           </div>
 
         </b-tab>
-        <b-tab title="QueryServer" active>
+        <b-tab title="QueryServer" >
 
           <div class="form-row">
             <div class="form-group col-md-4">

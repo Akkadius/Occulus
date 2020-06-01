@@ -27,6 +27,8 @@ import './assets/fonts/feather/feather.min.css'
 
 Vue.use(VueIziToast)
 
+import './assets/css/global.css'
+
 /**
  * App loader
  */

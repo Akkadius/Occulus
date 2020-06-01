@@ -1,74 +1,133 @@
 <template>
-  <div class="page">
-    <div class="page-single">
-      <div class="container">
-        <div class="row">
-          <div class="col col-login mx-auto">
+  <div class="d-flex align-items-center bg-auth border-top border-top-2 border-primary">
 
-            <form class="card login-form" action="" method="post">
-              <div class="card-body p-6">
-                <div class="card-title">Login</div>
+    <!-- CONTENT
+    ================================================== -->
+    <div class="container-fluid">
+      <div class="row align-items-center justify-content-center">
+        <div class="col-12 col-md-5 col-lg-6 col-xl-4 px-lg-6 my-5">
 
-                <!-- Username -->
-                <div class="form-group">
+          <!-- Heading -->
+          <h1 class="display-4 text-center mb-6 menuetto-header">
+            Occulus
+            <span style="display:block; font-size: 38px">EverQuest Emulator Admin Panel</span>
+          </h1>
 
-                  <label class="form-label">
-                    Username
-                  </label>
+          <div class="form-group">
 
-                  <input
-                    type="text"
-                    class="form-control"
-                    name="username"
-                    aria-describedby="username"
-                    placeholder="Enter username"
-                    @keydown="$event.keyCode === 13 ? login() : false"
-                    v-model="username">
-                </div>
+            <label class="form-label">
+              Username
+            </label>
 
-                <!-- Password -->
-                <div class="form-group">
-
-                  <label class="form-label">
-                    Password
-                  </label>
-
-                  <input type="password"
-                         class="form-control"
-                         name="password"
-                         v-model="password"
-                         @keydown="$event.keyCode === 13 ? login() : false"
-                         placeholder="Password">
-                </div>
-
-                <div class="form-footer">
-                  <button type="button" class="btn btn-primary btn-block" @click="login()">
-                    Sign in
-                  </button>
-                </div>
-
-                <app-loader :is-loading="!loaded"></app-loader>
-
-                <div class="alert alert-danger mt-5"
-                     role="alert"
-                     v-show="errorMessage && loaded">
-                  {{ errorMessage }}
-                </div>
-              </div>
-            </form>
+            <input
+              type="text"
+              class="form-control"
+              name="username"
+              aria-describedby="username"
+              placeholder="Enter username"
+              @keydown="$event.keyCode === 13 ? login() : false"
+              v-model="username">
           </div>
+
+          <!-- Password -->
+          <div class="form-group">
+
+            <label class="form-label">
+              Password
+            </label>
+
+            <input type="password"
+                   class="form-control"
+                   name="password"
+                   v-model="password"
+                   @keydown="$event.keyCode === 13 ? login() : false"
+                   placeholder="Password">
+          </div>
+
+          <div class="form-footer">
+            <button
+              type="button"
+              class="btn btn-primary btn-block"
+              @click="login()">
+              Sign in
+            </button>
+          </div>
+
+          <app-loader :is-loading="!loaded"></app-loader>
+
+          <div class="alert alert-danger mt-5"
+               role="alert"
+               v-show="errorMessage && loaded">
+            {{ errorMessage }}
+          </div>
+
         </div>
-      </div>
+        <div class="col-12 col-md-7 col-lg-6 col-xl-8 d-none d-lg-block">
+          <!-- Image -->
+          <div class="bg-cover vh-100 mt-n1 mr-n3"
+               :style="{ backgroundImage: 'url(' + require('@/assets/img/covers/gate-side.png') + ')'}">
+
+            <div class="c" v-for="index in 150"></div>
+
+          </div>
+
+        </div>
+      </div> <!-- / .row -->
     </div>
   </div>
 </template>
 
+<style lang="scss">
+
+  @function posOrNeg() {
+    @return random() * 2 - 1;
+  }
+
+
+  $total: 200;
+  $size: 30;
+
+  .c {
+    position: absolute;
+    width: $size+px;
+    height: $size+px;
+    margin-top: -$size/2+px;
+    margin-left: -$size/2+px;
+    transform: translate3d(50vw, 50vh, -1000px);
+    border-radius: 50%;
+    border-width: 0;
+    opacity: .7;
+  }
+
+  @for $i from 1 through $total {
+    $color: hsl(($i * .1)+210, 60%, 61%);
+
+    .c:nth-child(#{$i}) {
+      animation: anim#{$i} 6.0s infinite alternate;
+      animation-delay: $i * -1s;
+      background: $color;
+      background: radial-gradient(circle at top left, lighten($color, 10%), $color);
+      box-shadow: 0 0 25px 3px lighten($color, 5%);
+      border: 1px solid $color;
+    }
+    @keyframes anim#{$i}{
+      80% {
+        opacity: .1;
+      }
+      100% {
+        transform: translate3d(random(100)+vw, random(100)+vh, 0);
+        opacity: 1;
+      }
+    }
+  }
+</style>
+
 <script>
-  import { EqemuAdminClient } from '@/app/core/eqemu-admin-client'
+  import {EqemuAdminClient} from '@/app/core/eqemu-admin-client'
 
   export default {
     name: 'Login.vue',
-    data () {
+    data() {
       return {
         username: '',
         password: '',

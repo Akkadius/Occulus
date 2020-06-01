@@ -27,7 +27,6 @@
     <app-loader :is-loading="!loaded"></app-loader>
 
     <div class="row row-cards" v-if="loaded">
-
       <dashboard-counter name="Accounts" icon="user" :counter="this.kFormatter(stats.accounts)"></dashboard-counter>
       <dashboard-counter name="Characters"icon="user" :counter="this.kFormatter(stats.characters)"></dashboard-counter>
       <dashboard-counter name="Guilds" icon="shield" :counter="this.kFormatter(stats.guilds)"></dashboard-counter>
@@ -36,11 +35,7 @@
     <div class="row row-cards" v-if="loaded">
       <dashboard-counter name="Items" icon="award" :counter="this.kFormatter(stats.items)"></dashboard-counter>
       <dashboard-counter name="NPCs" icon="gitlab" :counter="this.kFormatter(stats.npcs)"></dashboard-counter>
-      <dashboard-counter
-        name="Server Uptime"
-        :counter="stats.uptime"
-        counter-font-size="1.3rem"></dashboard-counter>
-
+      <dashboard-counter name="Server Uptime" :counter="stats.uptime"></dashboard-counter>
     </div>
 
     <div class="row row-cards" v-if="loaded">

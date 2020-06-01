@@ -96,7 +96,7 @@
     transform: translate3d(50vw, 50vh, -1000px);
     border-radius: 50%;
     border-width: 0;
-    opacity: .7;
+    opacity: .1;
   }
 
   @for $i from 1 through $total {
@@ -108,15 +108,15 @@
       background: $color;
       background: radial-gradient(circle at top left, lighten($color, 10%), $color);
       box-shadow: 0 0 25px 3px lighten($color, 5%);
-      border: 1px solid $color;
+      border: 0 solid $color;
     }
     @keyframes anim#{$i}{
       80% {
-        opacity: .1;
+        opacity: .8;
       }
       100% {
         transform: translate3d(random(100)+vw, random(100)+vh, 0);
-        opacity: 1;
+        opacity: .1;
       }
     }
   }

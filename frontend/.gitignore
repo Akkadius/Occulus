@@ -23,3 +23,6 @@ yarn-error.log*
 *.sw?
 
 ._*
+
+
+!public

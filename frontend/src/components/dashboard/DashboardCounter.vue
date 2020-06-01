@@ -1,5 +1,5 @@
 <template>
-  <div class="col-6 col-lg-3 col-xl">
+  <div class="col-12 col-lg-4">
     <div class="card">
       <div class="card-body">
         <div class="row align-items-center">
@@ -44,7 +44,7 @@
       },
       icon: {
         default: 'clock',
-        required: true
+        required: false
       },
       counterFontSize: {
         type: String,

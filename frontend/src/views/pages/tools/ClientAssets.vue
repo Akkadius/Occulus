@@ -27,7 +27,7 @@
             </tr>
             <tr>
               <td class="text-right">
-                <a :href="backendBaseUrl + '/download/dbstr'" target="dbstr_download" class="btn btn-white mb-2"><i
+                <a :href="backendBaseUrl + '/download/dbstring'" target="dbstr_download" class="btn btn-white mb-2"><i
                   class="fe fe-download mr-2"></i>dbstr_us.txt</a>
               </td>
               <td class="td-center">Generates and zips a strings file for use with an EverQuest client

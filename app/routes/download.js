@@ -60,10 +60,15 @@ router.get('/:downloadType', function (req, res, next) {
         case 'basedata':
           file = path.join(emuPath, 'export/BaseData.txt');
           break;
-        case 'dbstr':
+        case 'dbstring':
           file = path.join(emuPath, 'export/dbstr_us.txt');
           break;
         default:
+      }
+
+      if (!fs.existsSync(file)) {
+        res.send("File does not exist");
+        return;
       }
 
       /**

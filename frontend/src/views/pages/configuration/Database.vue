@@ -64,7 +64,7 @@
           </div>
 
         </b-tab>
-        <b-tab title="Game (Content Database)" active>
+        <b-tab title="Game (Content Database)">
           <b-alert show variant="primary">
             <i class="fe fe-info"></i>
             This connection is optional and is described in more detail

@@ -24,7 +24,7 @@ router.get('/:downloadType', function (req, res, next) {
       fs.mkdirSync(exportPath)
     }
 
-    let command = 'cd ../ && ./bin/export_client_files ' + downloadType;
+    let command      = 'cd ../ && ./bin/export_client_files ' + downloadType;
     const spellsFile = path.join(emuPath, 'export/spells_us.txt');
     if (fs.existsSync(spellsFile)) {
       const stats                = fs.statSync(spellsFile);
@@ -65,9 +65,10 @@ router.get('/:downloadType', function (req, res, next) {
           break;
         default:
       }
-
+      
+      const fs = require('fs');
       if (!fs.existsSync(file)) {
-        res.send("File does not exist");
+        res.send('File does not exist');
         return;
       }
 
@@ -75,7 +76,6 @@ router.get('/:downloadType', function (req, res, next) {
        * Get base file name
        */
       const base_file_name = path.basename(file).replace('.txt', '');
-      const fs             = require('fs');
       const yazl           = require('yazl');
       const zipfile        = new yazl.ZipFile();
 

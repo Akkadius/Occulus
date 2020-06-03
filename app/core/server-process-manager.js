@@ -27,7 +27,6 @@ module.exports = {
   erroredStartsCount: {},
   hasErroredHaltMessage: {},
   erroredStartsMaxHalt: 5,
-  minZoneProcesses: 3,
   processCount: {},
   serverProcessNames: ['zone', 'world', 'ucs', 'queryserv', 'loginserver'],
   systemProcessList: {},
@@ -44,8 +43,6 @@ module.exports = {
     this.launchOptions = options;
 
     config.init();
-
-    this.minZoneProcesses = config.getAdminPanelConfig('launcher.minZoneProcesses', 3);
 
     let self = this;
     this.serverProcessNames.forEach(function (process_name) {
@@ -154,7 +151,7 @@ module.exports = {
     }
 
     if (process_name === 'zone' &&
-      this.processCount[process_name] < (this.zoneBootedProcessCount + this.minZoneProcesses)) {
+      this.processCount[process_name] < (this.zoneBootedProcessCount + config.getAdminPanelConfig('launcher.minZoneProcesses', 3))) {
 
       return true;
     }

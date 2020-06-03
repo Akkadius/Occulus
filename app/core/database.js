@@ -7,10 +7,12 @@ const pathManager        = require('./path-manager')
 const eqemuConfigService = require('./eqemu-config-service')
 const Sequelize          = require('sequelize')
 const path               = require('path')
+const util               = require('util')
 
 module.exports = {
 
   connection: null,
+  contentConnection: null,
 
   /**
    * @return {boolean}
@@ -20,43 +22,72 @@ module.exports = {
       return false;
     }
 
-    const database  = eqemuConfigService.getServerConfig().server.database;
-    this.connection = new Sequelize(
+    const serverConfig = eqemuConfigService.getServerConfig().server;
+
+    this.connection = await this.connect(serverConfig.database);
+
+    if (eqemuConfigService.getServerConfig().server.content_database) {
+      this.contentConnection = await this.connect(serverConfig.content_database, 'content');
+    } else {
+      this.contentConnection = this.connection;
+    }
+  },
+
+  /**
+   * @param eqemuDatabaseConfig
+   * @param connectionType
+   * @returns {Promise<void>}
+   */
+  async connect(eqemuDatabaseConfig, connectionType = 'default') {
+
+    const database   = eqemuDatabaseConfig;
+    const connection = new Sequelize(
       database.db,
       database.username,
       database.password, {
         host: database.host,
+        port: database.port,
         dialect: 'mysql',
-        logging: false,
-        operatorsAliases: false
+        logging: false
       }
     );
 
     /**
      * Connect to DB
      */
-    this.connection.authenticate()
-      .then(() => {
-          console.log('[database] MySQL Connection has been established successfully');
+    const connectionProperties = util.format(
+      'Host [%s:%s] Database [%s] User [%s]',
+      database.host,
+      database.port,
+      database.db,
+      database.username
+    )
 
-          /**
-           * Load models
-           * @type {{}}
-           */
-          global.models = {};
-          let self = this;
-          fs.readdirSync(pathManager.appRoot + '/app/models/').forEach(function (filename) {
-            var model                 = {};
-            model.path                = path.join(pathManager.appRoot, '/app/models/', filename)
-            model.name                = filename.replace(/\.[^/.]+$/, '');
-            model.resource            = self.connection.import(model.path);
-            global.models[model.name] = model;
-          });
-        }
-      )
-      .catch(err => {
-          console.error('Unable to connect to the database:', err);
-        }
-      );
+    try {
+      await connection.authenticate();
+      console.log('[database] MySQL Connected (%s) | %s', connectionType, connectionProperties);
+    } catch (error) {
+      console.error('Unable to connect to the database:', error);
+    }
+
+    return connection;
+  },
+
+  /**
+   * @param connection
+   * @param tableName
+   * @returns {Promise<*>}
+   */
+  async tableRowCount(connection, tableName) {
+    return (await
+        connection.query(
+          util.format(
+            'select count(*) as count from %s',
+            tableName
+          ),
+          { type: 'SELECT' }
+        )
+    )[0].count;
   }
-};
+}
+

@@ -35,14 +35,6 @@ program
   .action((options) => require('../commands/server-launcher').restartServer(options));
 
 /**
- * Create Model
- */
-program
-  .command('create-model [table]')
-  .description('Create model from table')
-  .action((table) => require('../commands/create-model').createModel(table));
-
-/**
  * MysqlDump
  */
 program

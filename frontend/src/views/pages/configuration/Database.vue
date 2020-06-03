@@ -44,7 +44,7 @@
           <div class="form-row">
             <div class="form-group col-md-6">
               <label class="form-label">Database Username</label>
-              <input type="text" class="form-control" v-model="serverConfig.server.qsdatabase.username"/>
+              <input type="text" class="form-control" v-model="serverConfig.server.database.username"/>
             </div>
 
             <div class="form-group col-md-6">
@@ -52,7 +52,7 @@
 
               <div class="input-group">
                 <input :type="passwordFieldType" class="form-control"
-                       v-model="serverConfig.server.qsdatabase.password"/>
+                       v-model="serverConfig.server.database.password"/>
                 <span class="input-group-append">
                   <button class="btn btn-primary" type="button" @click="switchPasswordVisibility()"><i
                     class="fa fa-eye"></i>
@@ -64,7 +64,55 @@
           </div>
 
         </b-tab>
-        <b-tab title="QueryServer" >
+        <b-tab title="Game (Content Database)" active>
+          <b-alert show variant="primary">
+            <i class="fe fe-info"></i>
+            This connection is optional and is described in more detail
+            <a href="https://eqemu.gitbook.io/server/categories/database/multi-tenancy"
+               target="multi-tenancy-doc"
+               style="color:white">(here)</a>; leave blank to use default connction
+          </b-alert>
+          <div class="form-row">
+            <div class="form-group col-md-4">
+              <label class="form-label">Database Name</label>
+              <input type="text" class="form-control" v-model="serverConfig.server.content_database.db"/>
+            </div>
+
+            <div class="form-group col-md-4">
+              <label class="form-label">Database Host</label>
+              <input type="text" class="form-control" v-model="serverConfig.server.content_database.host"/>
+            </div>
+
+            <div class="form-group col-md-4">
+              <label class="form-label">Database Port</label>
+              <input type="text" class="form-control" v-model="serverConfig.server.content_database.port"/>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label class="form-label">Database Username</label>
+              <input type="text" class="form-control" v-model="serverConfig.server.content_database.username"/>
+            </div>
+
+            <div class="form-group col-md-6">
+              <label class="form-label">Database Password</label>
+
+              <div class="input-group">
+                <input :type="passwordFieldType" class="form-control"
+                       v-model="serverConfig.server.content_database.password"/>
+                <span class="input-group-append">
+                  <button class="btn btn-primary" type="button" @click="switchPasswordVisibility()"><i
+                    class="fa fa-eye"></i>
+                      Show / Hide
+                  </button>
+                </span>
+              </div>
+            </div>
+          </div>
+
+        </b-tab>
+        <b-tab title="QueryServer">
 
           <div class="form-row">
             <div class="form-group col-md-4">

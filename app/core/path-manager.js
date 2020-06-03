@@ -14,6 +14,8 @@ module.exports = {
   init: function (app_root) {
     this.appRoot = app_root;
 
+    global.use = name => require(app_root + `${name}`);
+
     if (!fs.existsSync(app_root + '/node_modules')) {
       throw new Error(
         util.format('[%s] [%s] is not a valid application root!',

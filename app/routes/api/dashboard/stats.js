@@ -1,8 +1,8 @@
 let express            = require('express');
 let router             = express.Router();
-let dataService        = require('../../../core/eqemu-data-service-client.js');
-let eqemuConfigService = require('../../../core/eqemu-config-service')
-let database           = require('../../../core/database')
+let dataService        = use('/app/core/eqemu-data-service-client.js');
+let eqemuConfigService = use('/app/core/eqemu-config-service')
+let database           = use('/app/core/database')
 
 /* GET home page. */
 router.get('/', async function (req, res, next) {

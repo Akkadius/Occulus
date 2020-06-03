@@ -6,8 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.0.2]
 * Remove models from code; use repositories and raw queries underneath
-* Updated sequelize
-* 
+* Updated Sequelize to 5.21.11
+* Added content database connection to back-end database module
+* Added content database connection to front-end
+* Updated dashboard stats to point to content database
+* Updated hot-reload listener to point to content database
 
 ## [2.0.1]
 * UI fixes

@@ -1,7 +1,7 @@
 const express            = require('express');
 const router             = express.Router();
-const authService        = require('../../../../app/core/auth-service')
-const eqemuConfigService = require('../../../../app/core/eqemu-config-service')
+const authService        = use('/app/core/auth-service')
+const eqemuConfigService = use('/app/core/eqemu-config-service')
 
 router.post('/login', function (req, res, next) {
   const username       = req.body.username;

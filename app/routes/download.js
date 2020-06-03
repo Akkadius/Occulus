@@ -24,13 +24,16 @@ router.get('/:downloadType', function (req, res, next) {
       fs.mkdirSync(exportPath)
     }
 
-    const stats                = fs.statSync(path.join(emuPath, 'export/spells_us.txt'));
-    const modifiedTimeUnix     = stats.mtimeMs / 1000;
-    const unixNow              = Math.floor(Date.now() / 1000)
-    const secondsSinceModified = unixNow - modifiedTimeUnix
-    let command                = 'cd ../ && ./bin/export_client_files ' + downloadType;
-    if (secondsSinceModified < 60) {
-      command = 'echo "noop"';
+    let command = 'cd ../ && ./bin/export_client_files ' + downloadType;
+    if (fs.existsSync(exportPath)) {
+      const stats                = fs.statSync(path.join(emuPath, 'export/spells_us.txt'));
+      const modifiedTimeUnix     = stats.mtimeMs / 1000;
+      const unixNow              = Math.floor(Date.now() / 1000)
+      const secondsSinceModified = unixNow - modifiedTimeUnix
+
+      if (secondsSinceModified < 60) {
+        command = 'echo "noop"';
+      }
     }
 
     /**

@@ -25,8 +25,9 @@ router.get('/:downloadType', function (req, res, next) {
     }
 
     let command = 'cd ../ && ./bin/export_client_files ' + downloadType;
-    if (fs.existsSync(exportPath)) {
-      const stats                = fs.statSync(path.join(emuPath, 'export/spells_us.txt'));
+    const spellsFile = path.join(emuPath, 'export/spells_us.txt');
+    if (fs.existsSync(spellsFile)) {
+      const stats                = fs.statSync(spellsFile);
       const modifiedTimeUnix     = stats.mtimeMs / 1000;
       const unixNow              = Math.floor(Date.now() / 1000)
       const secondsSinceModified = unixNow - modifiedTimeUnix

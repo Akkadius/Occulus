@@ -13,7 +13,7 @@
     "bootstrap": "^4.3.1",
     "bootstrap-vue": "^2.0.0-rc.19",
     "core-js": "^2.6.5",
-    "jquery": "^3.2.1",
+    "jquery": "^3.5.0",
     "vue": "^2.6.10",
     "vue-class-component": "^7.0.2",
     "vue-izitoast": "^1.1.2",

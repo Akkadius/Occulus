@@ -3,7 +3,7 @@ name: default
 
 steps:
   - name: eqemu-admin-build
-    image: akkadius/eqemu:eqemu-admin-build-latest
+    image: akkadius/eqemu:eqemu-admin-build-5-31-2020
     environment:
       GH_RELEASE_GITHUB_API_TOKEN:
         from_secret: token

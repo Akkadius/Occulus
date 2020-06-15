@@ -7,6 +7,9 @@ let fs          = require('fs');
 const dot       = require('dot-object');
 const debug     = require('debug')('eqemu-admin:eqemu-config-service');
 const path      = require('path')
+const watch     = require('node-watch');
+const chalk     = require('chalk');
+const util      = require('util');
 
 /**
  * @type {{getServerConfig(): *, init: (function(): exports), serverConfig: {}}}
@@ -31,6 +34,11 @@ module.exports = {
     debug('set config path to [%s]', this.getServerConfigPath());
 
     this.serverConfig = JSON.parse(fs.readFileSync(this.getServerConfigPath(), 'utf8'));
+
+    watch(this.getServerConfigPath(),  (evt, file) => {
+      console.log(chalk`{green [{bold EQEmuConfig}] File change detected, reloading... }`)
+      this.serverConfig = JSON.parse(fs.readFileSync(this.getServerConfigPath(), 'utf8'));
+    });
 
     debug('Loaded [%s]', this.getServerConfigPath());
 
@@ -69,7 +77,7 @@ module.exports = {
   getFreshServerConfig() {
     this.serverConfig = JSON.parse(fs.readFileSync(this.getServerConfigPath(), 'utf8'));
 
-    debug("[getFreshServerConfig] fetching");
+    debug('[getFreshServerConfig] fetching');
 
     return this.serverConfig;
   },
@@ -166,15 +174,15 @@ module.exports = {
    * @param accessor
    * @returns {*}
    */
-  getAdminPanelConfig(accessor, defaultValue = "") {
+  getAdminPanelConfig(accessor, defaultValue = '') {
 
     const accessorKey = 'web-admin.' + accessor;
     const configVar   = dot.pick(accessorKey, this.getServerConfig());
 
-    debug("[getAdminPanelConfig] config [%s] = [%s] default [%s]", accessor, configVar, defaultValue);
+    debug('[getAdminPanelConfig] config [%s] = [%s] default [%s]', accessor, configVar, defaultValue);
 
-    if (typeof configVar === "undefined" && defaultValue !== "") {
-      debug("[getAdminPanelConfig] writing default value for [%s] default [%s]", accessor, defaultValue);
+    if (typeof configVar === 'undefined' && defaultValue !== '') {
+      debug('[getAdminPanelConfig] writing default value for [%s] default [%s]', accessor, defaultValue);
 
       this.setAdminPanelConfig(accessor, defaultValue);
       this.saveServerConfig(this.serverConfig);

@@ -4,6 +4,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.4]
+* Fix for database editing
+
+## [2.0.3]
+* Fix for asset downloading
+
+## [2.0.2]
+* Remove models from code; use repositories and raw queries underneath
+* Updated Sequelize to 5.21.11
+* Added content database connection to back-end database module
+* Added content database connection to front-end
+* Updated dashboard stats to point to content database
+* Updated hot-reload listener to point to content database
+
+## [2.0.1]
+* UI fixes
+
+## [2.0.0]
+* Rename project as Occulus
+
+## [1.1.3]
+* Move FE into BE project
+
+## [1.1.0] 
+* UI overhaul / cleanup
+* Fix client asset downloading on the backend
+
+## [1.0.9] - 2020-3-15
+* Fixing issue where when watchdog triggers and launcher is restarted while server is still online that we do not run shared memory again which has a chance to introduce overflow issues with data that is contained in shared memory
+
 ## [1.0.8] - 2020-2-1
 * Add CLI service [hot-reload-listener]
 

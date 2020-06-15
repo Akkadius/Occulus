@@ -27,7 +27,6 @@ module.exports = {
   erroredStartsCount: {},
   hasErroredHaltMessage: {},
   erroredStartsMaxHalt: 5,
-  minZoneProcesses: 3,
   processCount: {},
   serverProcessNames: ['zone', 'world', 'ucs', 'queryserv', 'loginserver'],
   systemProcessList: {},
@@ -45,8 +44,6 @@ module.exports = {
 
     config.init();
 
-    this.minZoneProcesses = config.getAdminPanelConfig('launcher.minZoneProcesses', 3);
-
     let self = this;
     this.serverProcessNames.forEach(function (process_name) {
       self.erroredStartsCount[process_name]    = 0;
@@ -63,16 +60,36 @@ module.exports = {
   },
 
   /**
+   * @returns {boolean}
+   */
+  isEqemuServerOnline() {
+    let isServerOnline = false
+    let self = this
+    this.serverProcessNames.forEach(function (processName) {
+      if (self.processCount[processName] > 0) {
+        isServerOnline = true
+      }
+    });
+
+    return isServerOnline
+  },
+
+  /**
    * @param options
    * @returns {Promise<void>}
    */
   start: async function (options = []) {
     this.init(options);
 
+    await this.pollProcessList();
+
+    debug('server is [%s]', (this.isEqemuServerOnline() ? "online" : "offline"))
+
     /**
      * Shared memory
      */
-    if (config.getAdminPanelConfig('launcher.runSharedMemory', true)) {
+    if (config.getAdminPanelConfig('launcher.runSharedMemory', true) && !this.isEqemuServerOnline()) {
+      debug("Running shared memory");
       execSync('./bin/shared_memory', { cwd: pathManager.emuServerPath }).toString();
     }
 
@@ -134,7 +151,7 @@ module.exports = {
     }
 
     if (process_name === 'zone' &&
-      this.processCount[process_name] < (this.zoneBootedProcessCount + this.minZoneProcesses)) {
+      this.processCount[process_name] < (this.zoneBootedProcessCount + config.getAdminPanelConfig('launcher.minZoneProcesses', 3))) {
 
       return true;
     }

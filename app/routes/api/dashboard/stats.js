@@ -1,23 +1,25 @@
 let express            = require('express');
 let router             = express.Router();
-let dataService        = require('../../../core/eqemu-data-service-client.js');
-let eqemuConfigService = require('../../../core/eqemu-config-service')
+let dataService        = use('/app/core/eqemu-data-service-client.js');
+let eqemuConfigService = use('/app/core/eqemu-config-service')
+let database           = use('/app/core/database')
 
 /* GET home page. */
 router.get('/', async function (req, res, next) {
-  let dashboard_stats        = {};
-  const eqemu_config         = eqemuConfigService.getServerConfig();
-  dashboard_stats.long_name  = eqemu_config.server.world.longname;
-  dashboard_stats.shortname  = eqemu_config.server.world.shortname;
-  dashboard_stats.zone_count = 0;
-  dashboard_stats.accounts   = await models['account'].resource.count();
-  dashboard_stats.characters = await models['character_data'].resource.count();
-  dashboard_stats.items      = await models['items'].resource.count();
-  dashboard_stats.guilds     = await models['guilds'].resource.count();
-  dashboard_stats.npcs       = await models['npc_types'].resource.count();
-  dashboard_stats.uptime     = await dataService.getWorldUptime();
 
-  res.send(dashboard_stats);
+  const eqemu_config = eqemuConfigService.getServerConfig();
+  let stats          = {};
+  stats.long_name    = eqemu_config.server.world.longname;
+  stats.shortname    = eqemu_config.server.world.shortname;
+  stats.zone_count   = 0;
+  stats.accounts     = await database.tableRowCount(database.connection, 'account');
+  stats.characters   = await database.tableRowCount(database.connection, 'character_data');
+  stats.guilds       = await database.tableRowCount(database.connection, 'guilds');
+  stats.items        = await database.tableRowCount(database.contentConnection, 'items');
+  stats.npcs         = await database.tableRowCount(database.contentConnection, 'npc_types');
+  stats.uptime       = await dataService.getWorldUptime();
+
+  res.send(stats);
 });
 
 module.exports = router;

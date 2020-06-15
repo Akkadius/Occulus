@@ -6,13 +6,12 @@ const express            = require('express');
 const cookieParser       = require('cookie-parser');
 const logger             = require('morgan');
 const app                = express();
-const fs                 = require('fs');
-const path               = require('path')
-const pathManager        = require('./app/core/path-manager')
-const eqemuConfigService = require('./app/core/eqemu-config-service')
-const authService        = require('./app/core/auth-service')
-const database           = require('./app/core/database')
-const hotReloadService   = require('./app/core/hot-reload-service')
+const path               = require('path');
+const pathManager        = require('./app/core/path-manager');
+const eqemuConfigService = require('./app/core/eqemu-config-service');
+const authService        = require('./app/core/auth-service');
+const database           = require('./app/core/database');
+const hotReloadService   = require('./app/core/hot-reload-service');
 
 /**
  * Init services
@@ -40,6 +39,7 @@ app.use(
     {
       origin: [
         'http://localhost:8080',
+        'http://192.168.98.200:8080',
         'http://docker:8080',
         'http://localhost:5000'
       ],
@@ -70,21 +70,23 @@ app.use('/api/v1/backup', require('./app/routes/api/backup/backup'));
 /**
  * Serve Vue SPA
  */
-app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1y', etag: false }))
+app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1y', etag: true, lastModified: true }));
 
 /**
  * After other routes are not found
  */
 app.get('*', function (req, res, next) {
   res.sendFile(path.join(__dirname, 'public/index.html'))
-})
+});
 
 module.exports = app;
 
 /**
  * Database
  */
-database.init()
+async () => {
+  database.init();
+};
 
 /**
  * Hot Reload Service

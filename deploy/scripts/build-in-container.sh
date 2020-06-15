@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -x #echo on
+
 ###################################
 # cwd
 ###################################
@@ -14,12 +16,8 @@ rm -rf node_modules && npm install
 ###################################
 # install and build frontend
 ###################################
-cd /tmp
-git clone https://github.com/Akkadius/eqemu-web-admin-client
-cd eqemu-web-admin-client
-npm install
-npm run build > /dev/null
-cp /tmp/eqemu-web-admin-client/dist/* $cwd/public/ -R
+cd $cwd/frontend && npm install && npm run build
+cp $cwd/frontend/dist/* $cwd/public/ -R
 
 ###################################
 # package admin panel to standalone

@@ -172,6 +172,17 @@
     },
     async created() {
       this.serverConfig = await EqemuAdminClient.getServerConfig()
+
+      if (!this.serverConfig.server.content_database) {
+        this.serverConfig.server.content_database = {
+          db: "",
+          host: "",
+          port: "",
+          username: "",
+          password: "",
+        }
+      }
+
       this.loaded       = true
     },
     methods: {

@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.5]
+* Add new endpoints
+  * POST /v1/api/git/update/quests
+  * POST /v1/api/git/update/maps
+  * POST /v1/api/code/git/update
+  * POST /v1/api/code/build
+  * GET /v1/api/code/build/status
+  * POST /v1/api/code/git/branch/:branch
+  * GET /v1/api/code/git/branches
+
 ## [2.0.4]
 * Fix for database editing
 

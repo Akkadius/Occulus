@@ -65,7 +65,7 @@ router.get('/:downloadType', function (req, res, next) {
           break;
         default:
       }
-      
+
       const fs = require('fs');
       if (!fs.existsSync(file)) {
         res.send('File does not exist');

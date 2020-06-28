@@ -113,23 +113,19 @@ const TEMP_BUILD_OUTPUT_PATH = '/tmp/build-output';
 
 router.post('/code/build', async function (req, res, next) {
   const codePath = config.getAdminPanelConfig('serverCodePath', '/home/eqemu/code/')
+  const buildCores = parseInt(require('os').cpus().length / 2).toString();
   const command  = util.format(
-    'cd %s && make -j4 > %s &',
+    'cd %s && make -j%s > %s &',
     path.join(codePath, 'build'),
+    buildCores,
     TEMP_BUILD_OUTPUT_PATH
-  )
+  );
 
-  let result
+  require('child_process')
+    .exec(command, function (err, stdout) {
+    });
 
-  try {
-    result = require('child_process')
-      .execSync(command)
-      .toString();
-  } catch (err) {
-    result = err.toString()
-  }
-
-  res.json({ message: 'Build job submitted' });
+  res.json({ message: 'Build job submitted', buildCores: buildCores });
 });
 
 router.get('/code/build/status', async function (req, res, next) {
@@ -184,9 +180,9 @@ router.get('/code/git/branches', async function (req, res, next) {
   const command  = util.format(
     'cd %s && git fetch origin && git branch -a',
     codePath
-  )
+  );
 
-  let result
+  let result;
 
   try {
     result = require('child_process')
@@ -196,12 +192,16 @@ router.get('/code/git/branches', async function (req, res, next) {
     result = err.toString()
   }
 
+  result = result.split('\n').filter(function (line) {
+    return line.indexOf('->') === -1;
+  }).join('\n');
+
   result = result
     .trim()
     .replace(/^ +/gm, '')
-    .replace(/remotes\/origin\//g, "")
-    .replace(/\* /g, "")
-    .split("\n")
+    .replace(/remotes\/origin\//g, '')
+    .replace(/\* /g, '')
+    .split('\n');
 
   res.json({ branches: result });
 });

@@ -112,9 +112,9 @@ router.post('/code/git/update', async function (req, res, next) {
 const TEMP_BUILD_OUTPUT_PATH = '/tmp/build-output';
 
 router.post('/code/build', async function (req, res, next) {
-  const codePath = config.getAdminPanelConfig('serverCodePath', '/home/eqemu/code/')
+  const codePath   = config.getAdminPanelConfig('serverCodePath', '/home/eqemu/code/')
   const buildCores = parseInt(require('os').cpus().length / 2).toString();
-  const command  = util.format(
+  const command    = util.format(
     'cd %s && make -j%s > %s &',
     path.join(codePath, 'build'),
     buildCores,
@@ -126,6 +126,14 @@ router.post('/code/build', async function (req, res, next) {
     });
 
   res.json({ message: 'Build job submitted', buildCores: buildCores });
+});
+
+router.post('/code/build/cancel', async function (req, res, next) {
+  require('child_process')
+    .exec('pkill -9 make', function (err, stdout) {
+    });
+
+  res.json({ message: 'Build job killed', buildCores: buildCores });
 });
 
 router.get('/code/build/status', async function (req, res, next) {

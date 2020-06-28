@@ -133,7 +133,7 @@ router.post('/code/build/cancel', async function (req, res, next) {
     .exec('pkill -9 make', function (err, stdout) {
     });
 
-  res.json({ message: 'Build job killed', buildCores: buildCores });
+  res.json({ message: 'Build job killed' });
 });
 
 router.get('/code/build/status', async function (req, res, next) {

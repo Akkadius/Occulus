@@ -4,6 +4,7 @@
  */
 let telnetService     = require('./telnet-service.js');
 const websocketClient = require('./websocket-client');
+const pathManager     = use('/app/core/path-manager');
 
 module.exports = {
 
@@ -100,7 +101,25 @@ module.exports = {
    *
    * @param zoneShortName
    */
-  hotReloadZoneQuests: async function(zoneShortName) {
+  hotReloadZoneQuests: async function (zoneShortName) {
     return telnetService.execWorld('reloadzonequests ' + zoneShortName);
+  },
+
+  /**
+   *
+   * @param zoneShortName
+   */
+  getDatabaseSchema: async function (zoneShortName) {
+    let result
+
+    try {
+      result = require('child_process')
+        .execSync('./bin/world database:schema', { cwd: pathManager.emuServerPath })
+        .toString();
+    } catch (e) {
+      result = e.output.toString().replace(",{", "{").replace("\n,", "\n");
+    }
+
+    return JSON.parse(result);
   }
 };

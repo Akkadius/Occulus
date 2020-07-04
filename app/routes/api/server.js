@@ -4,10 +4,13 @@
  */
 const express              = require('express');
 const router               = express.Router();
-const serverProcessManager = require('../../core/server-process-manager')
-const config               = require('../../core/eqemu-config-service')
-const os                   = require('os')
+const serverProcessManager = require('../../core/server-process-manager');
+const config               = require('../../core/eqemu-config-service');
+const os                   = require('os');
 const si                   = require('systeminformation');
+let database               = use('/app/core/database');
+let dataService            = use('/app/core/eqemu-data-service-client.js');
+
 
 router.get('/hello', function (req, res, next) {
   res.send({ 'data': 'hello' });
@@ -88,6 +91,31 @@ router.get('/log_categories', async function (req, res, next) {
   res.send(
     await models['logsys_categories'].resource.findAll({ order: [['log_category_description', 'ASC']] })
   );
+});
+
+router.get('/meta', async function (req, res, next) {
+  const ruleValues       = use('/app/repositories/ruleValuesRepository')
+  const currentExpansion = (await ruleValues.getCurrentExpansion());
+
+  const eqemu_config      = config.getServerConfig();
+  let stats               = {};
+  stats.long_name         = eqemu_config.server.world.longname;
+  stats.short_name        = eqemu_config.server.world.shortname;
+  stats.accounts          = await database.tableRowCount(database.connection, 'account');
+  stats.characters        = await database.tableRowCount(database.connection, 'character_data');
+  stats.guilds            = await database.tableRowCount(database.connection, 'guilds');
+  stats.items             = await database.tableRowCount(database.contentConnection, 'items');
+  stats.npcs              = await database.tableRowCount(database.contentConnection, 'npc_types');
+  stats.zone_count        = (await dataService.getZoneList()).length;
+  stats.current_expansion = (currentExpansion) ? currentExpansion : 0;
+  stats.process_counts    = await serverProcessManager.getProcessCounts();
+  stats.uptime            = await dataService.getWorldUptime();
+
+  res.json(stats);
+});
+
+router.get('/schema', async function (req, res, next) {
+  res.json((await dataService.getDatabaseSchema()));
 });
 
 module.exports = router;

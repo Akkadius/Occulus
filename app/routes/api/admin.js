@@ -9,6 +9,7 @@ const util                 = require('util')
 const path                 = require('path')
 const fs                   = require('fs')
 const config               = use('/app/core/eqemu-config-service')
+const recursive            = require('recursive-readdir');
 
 router.get('/config', function (req, res, next) {
   res.send(eqemuConfigService.getServerConfig());
@@ -212,6 +213,26 @@ router.get('/code/git/branches', async function (req, res, next) {
     .split('\n');
 
   res.json({ branches: result });
+});
+
+router.get('/logs/list', async function (req, res, next) {
+  const files = await recursive(path.join(pathManager.getEmuServerPath(), 'logs/'));
+
+  res.json({ files: files });
+});
+
+router.get('/logs/view/:file', async function (req, res, next) {
+  let response  = {};
+  const logPath = path.join(pathManager.getEmuServerPath(), 'logs/');
+  if (req.params.file.includes(logPath)) {
+    const file = fs.readFileSync(req.params.file, 'utf8');
+    response   = { fileContents: file };
+  }
+  else {
+    response = { error: "Invalid path!" };
+  }
+
+  res.json(response);
 });
 
 module.exports = router;

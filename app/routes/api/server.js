@@ -96,22 +96,25 @@ router.get('/log_categories', async function (req, res, next) {
 router.get('/meta', async function (req, res, next) {
   const ruleValues       = use('/app/repositories/ruleValuesRepository')
   const currentExpansion = (await ruleValues.getCurrentExpansion());
+  const playersOnline    = (await dataService.getClientList());
 
-  const eqemu_config      = config.getServerConfig();
-  let stats               = {};
-  stats.long_name         = eqemu_config.server.world.longname;
-  stats.short_name        = eqemu_config.server.world.shortname;
-  stats.accounts          = await database.tableRowCount(database.connection, 'account');
-  stats.characters        = await database.tableRowCount(database.connection, 'character_data');
-  stats.guilds            = await database.tableRowCount(database.connection, 'guilds');
-  stats.items             = await database.tableRowCount(database.contentConnection, 'items');
-  stats.npcs              = await database.tableRowCount(database.contentConnection, 'npc_types');
-  stats.zone_count        = (await dataService.getZoneList()).length;
-  stats.current_expansion = (currentExpansion) ? currentExpansion : 0;
-  stats.process_counts    = await serverProcessManager.getProcessCounts();
-  stats.uptime            = await dataService.getWorldUptime();
+  const eqemu_config     = config.getServerConfig();
+  let meta               = {};
+  meta.long_name         = eqemu_config.server.world.longname;
+  meta.short_name        = eqemu_config.server.world.shortname;
+  meta.stats             = {};
+  meta.stats.accounts    = await database.tableRowCount(database.connection, 'account');
+  meta.stats.characters  = await database.tableRowCount(database.connection, 'character_data');
+  meta.stats.guilds      = await database.tableRowCount(database.connection, 'guilds');
+  meta.stats.items       = await database.tableRowCount(database.contentConnection, 'items');
+  meta.stats.npcs        = await database.tableRowCount(database.contentConnection, 'npc_types');
+  meta.zone_count        = (await dataService.getZoneList()).length;
+  meta.players_online    = (playersOnline) ? playersOnline.length : 0;
+  meta.current_expansion = (currentExpansion) ? currentExpansion : 0;
+  meta.process_counts    = await serverProcessManager.getProcessCounts();
+  meta.uptime            = await dataService.getWorldUptime();
 
-  res.json(stats);
+  res.json(meta);
 });
 
 router.get('/schema', async function (req, res, next) {

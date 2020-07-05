@@ -23,10 +23,10 @@ module.exports = {
     }
 
     const serverConfig = eqemuConfigService.getServerConfig().server;
+    this.connection    = await this.connect(serverConfig.database);
 
-    this.connection = await this.connect(serverConfig.database);
-
-    if (eqemuConfigService.getServerConfig().server.content_database) {
+    if (eqemuConfigService.getServerConfig().server.content_database
+      && eqemuConfigService.getServerConfig().server.content_database.host.trim() !== "") {
       this.contentConnection = await this.connect(serverConfig.content_database, 'content');
     } else {
       this.contentConnection = this.connection;
@@ -62,6 +62,8 @@ module.exports = {
       database.db,
       database.username
     )
+
+    console.log('[database] MySQL Attempting to connect (%s) | %s', connectionType, connectionProperties);
 
     try {
       await connection.authenticate();

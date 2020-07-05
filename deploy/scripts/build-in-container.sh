@@ -24,4 +24,4 @@ cp $cwd/frontend/dist/* $cwd/public/ -R
 ###################################
 cd $cwd
 rm -f eqemu-admin
-pkg --debug .
+pkg .

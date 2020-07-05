@@ -89,7 +89,7 @@ module.exports = {
    * @returns {boolean}
    */
   isRanFromPackagedNode() {
-    return __filename.indexOf('/snapshot/') > -1;
+    return __filename.indexOf('/snapshot/') > -1 || __filename.indexOf('C:\\snapshot\\') > -1;
   },
 
   /**

@@ -6,8 +6,7 @@ networks:
 
 services:
   eqemu-admin-build:
-    build:
-      context: deploy/containers/eqemu-admin-build
+    image: akkadius/eqemu-admin-build-pipeline:latest
     volumes:
       - ./:/home/eqemu/build/
       - ./deploy/scripts/:/home/eqemu/scripts

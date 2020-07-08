@@ -96,7 +96,7 @@ module.exports = {
    * @returns {boolean}
    */
   isRanAsStandaloneNodeProject() {
-    return process.argv[1].indexOf('bin/admin') > -1;
+    return process.argv[1].indexOf('bin/admin') > -1 || process.argv[1].indexOf('bin\\admin') > -1;
   },
 
   /**

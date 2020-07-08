@@ -19,7 +19,7 @@
           </tr>
 
           <!-- Disk -->
-          <tr>
+          <tr v-if="Object.keys(sysinfo.disk).length > 0">
             <td style="vertical-align: middle">Disk</td>
             <td class="text-right" style="font-size: 10px !important">
               {{ bytesToGbytes(diskUsageBytes) }} /

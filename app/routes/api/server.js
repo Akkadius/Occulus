@@ -22,26 +22,50 @@ router.get('/websocket-authorization', async function (req, res, next) {
   res.json(authorizedUser);
 });
 
+let lastCachedTime = 0;
+let lastCpuInfo = {};
+
+async function getCpuInfo() {
+  const currentTime = Math.floor(new Date() / 1000);
+
+  cpuInfo = lastCpuInfo;
+  if (currentTime - 30 > lastCachedTime || Object.keys(lastCpuInfo).length === 0) {
+    cpuInfo = {
+      info: await si.cpu(),
+      speed: await si.cpuCurrentspeed()
+    };
+    lastCpuInfo = cpuInfo;
+    lastCachedTime = currentTime;
+  }
+
+  cpuInfo.load = await si.currentLoad();
+
+  return cpuInfo;
+}
+
 router.get('/sysinfo', async function (req, res, next) {
+  const osMeta = use('/app/core/operating-system');
+  let disk     = {};
+
+  if (osMeta.isLinux()) {
+    disk = {
+      'io': await si.disksIO(),
+      'fs': {
+        'size': await si.fsSize(),
+        'stats': await si.fsStats()
+      }
+    };
+  }
+
   res.send(
     {
       'hostname': os.hostname(),
       'uptime': os.uptime(),
-      'cpu': {
-        info: await si.cpu(),
-        speed: await si.cpuCurrentspeed(),
-        load: await si.currentLoad()
-      },
+      'cpu': await getCpuInfo(),
       'mem': await si.mem(),
       'system': await si.system(),
       'os': await si.osInfo(),
-      'disk': {
-        'io': await si.disksIO(),
-        'fs': {
-          'size': await si.fsSize(),
-          'stats': await si.fsStats()
-        }
-      },
+      'disk': disk,
       'network': {
         'interfaces': await si.networkInterfaces(),
         'stats': await si.networkStats()

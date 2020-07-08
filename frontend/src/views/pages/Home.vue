@@ -73,6 +73,7 @@
   import DashboardProcessCounts from '@/components/dashboard/DashboardProcessCounts.vue'
   import ServerProcessButtonComponent from '@/components/ServerProcessButtonComponent'
   import Timer from '@/app/core/timer'
+  import process from 'process'
 
   export default {
     components: {
@@ -111,11 +112,14 @@
         clearInterval(Timer.timer['sys-info'])
       }
 
+      const sysInfoTimer = navigator.appVersion.indexOf("Win") ? 2500 : 1000;
+      this.loadSysInfo();
       Timer.timer['sys-info'] = setInterval(function () {
         if (!document.hidden) {
           self.loadSysInfo()
         }
-      }, 1000)
+      }, sysInfoTimer)
+
     },
     computed: {
       cpuLoadDisplay: function () {

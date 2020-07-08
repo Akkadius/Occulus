@@ -167,6 +167,8 @@ module.exports = {
 
     dot.str('web-admin.' + accessor, value, this.getServerConfig());
 
+    this.saveServerConfig(this.serverConfig);
+
     return this
   },
 
@@ -187,7 +189,6 @@ module.exports = {
       debug('[getAdminPanelConfig] writing default value for [%s] default [%s]', accessor, defaultValue);
 
       this.setAdminPanelConfig(accessor, defaultValue);
-      this.saveServerConfig(this.serverConfig);
     }
 
     return (configVar ? configVar : defaultValue)

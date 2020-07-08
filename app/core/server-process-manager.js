@@ -216,6 +216,8 @@ module.exports = {
       }
     });
 
+    config.setAdminPanelConfig('launcher.isRunning', false)
+
     return this;
   },
 
@@ -245,6 +247,13 @@ module.exports = {
     debug('isLauncherBooted [%s]', isLauncherBooted);
 
     return isLauncherBooted;
+  },
+
+  checkIfLauncherNeedsToBeRevived: async function() {
+    const isLauncherRunning = config.getAdminPanelConfig('launcher.isRunning') ;
+    if (isLauncherRunning) {
+      this.startServerLauncher();
+    }
   },
 
   /**
@@ -278,14 +287,20 @@ module.exports = {
     let startProcessString = '';
 
     // TODO: Windows
+
+    /**
+     * PKG_EXECPATH needs to be blank due to https://github.com/vercel/pkg/issues/376
+     */
     if (process.platform === 'linux') {
       startProcessString = util.format(
         // 'while true; do nohup PKG_EXECPATH=; %s server-launcher %s 1>/dev/null 2>/dev/null && sleep 1 ; done &',
-        'while true; do cd %s; nohup %s server-launcher %s >> launcher.log && sleep 1 ; done &',
-        pathManager.emuServerPath,
+        'export PKG_EXECPATH=; export DEBUG=eqemu-admin:*; %s server-launcher %s &',
         pathManager.getEqemuAdminEntrypoint(),
         argString
       );
+
+      config.setAdminPanelConfig('launcher.isRunning', true);
+      console.log("[Process Manager] Starting server launcher...");
     }
 
     this.purgeServerLogs();
@@ -300,13 +315,9 @@ module.exports = {
         cwd: pathManager.emuServerPath,
         encoding: 'utf8',
         shell: '/bin/bash',
-        detached: true,
-        env: Object.assign(process.env, {
-          PKG_EXECPATH: '',
-          DEBUG: 'eqemu-admin:*',
-        })
+        detached: true
       }
-    );
+    ).on('error', function( err ){ console.log(err)});
 
     return this;
   },

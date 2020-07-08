@@ -189,7 +189,7 @@ module.exports = {
    * @returns {Promise<void>}
    */
   stopServer: async function () {
-    this.init(options);
+    this.init([]);
 
     this.systemProcessList = await psList();
     let self               = this;

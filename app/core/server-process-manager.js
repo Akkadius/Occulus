@@ -275,7 +275,8 @@ module.exports = {
     // TODO: Windows
     if (process.platform === 'linux') {
       startProcessString = util.format(
-        'while true; do nohup PKG_EXECPATH=; %s server-launcher %s 1>/dev/null 2>/dev/null && sleep 1 ; done &',
+        // 'while true; do nohup PKG_EXECPATH=; %s server-launcher %s 1>/dev/null 2>/dev/null && sleep 1 ; done &',
+        'while true; do nohup PKG_EXECPATH=; %s server-launcher %s >> launcher.log && sleep 1 ; done &',
         pathManager.getEqemuAdminEntrypoint(),
         argString
       );

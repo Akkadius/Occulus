@@ -232,7 +232,12 @@ module.exports = {
        * 2) Make sure it isn't this process
        * 3) Make sure it's not a while loop that is keeping it alive
        */
-      if (process.cmd.includes('server-launcher') && process.pid !== systemProc.pid && !process.cmd.includes('while')) {
+      if (
+        process.cmd.includes('server-launcher') &&
+        process.cmd.includes('admin') &&
+        process.pid !== systemProc.pid &&
+        !process.cmd.includes('while')
+      ) {
         isLauncherBooted = true;
       }
     });
@@ -276,7 +281,7 @@ module.exports = {
     if (process.platform === 'linux') {
       startProcessString = util.format(
         // 'while true; do nohup PKG_EXECPATH=; %s server-launcher %s 1>/dev/null 2>/dev/null && sleep 1 ; done &',
-        'while true; do nohup PKG_EXECPATH=; %s server-launcher %s >> launcher.log && sleep 1 ; done &',
+        'while true; do nohup PKG_EXECPATH=; DEBUG=eqemu-admin:* %s server-launcher %s >> launcher.log && sleep 1 ; done &',
         pathManager.getEqemuAdminEntrypoint(),
         argString
       );

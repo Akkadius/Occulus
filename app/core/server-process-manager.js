@@ -301,10 +301,10 @@ module.exports = {
         encoding: 'utf8',
         shell: '/bin/bash',
         detached: true,
-        env: {
+        env: Object.assign(process.env, {
           PKG_EXECPATH: '',
           DEBUG: 'eqemu-admin:*',
-        }
+        })
       }
     );
 

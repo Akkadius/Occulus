@@ -281,7 +281,7 @@ module.exports = {
     if (process.platform === 'linux') {
       startProcessString = util.format(
         // 'while true; do nohup PKG_EXECPATH=; %s server-launcher %s 1>/dev/null 2>/dev/null && sleep 1 ; done &',
-        'while true; do cd %s; nohup PKG_EXECPATH= DEBUG=eqemu-admin:* %s server-launcher %s >> launcher.log && sleep 1 ; done &',
+        'while true; do cd %s; nohup %s server-launcher %s >> launcher.log && sleep 1 ; done &',
         pathManager.emuServerPath,
         pathManager.getEqemuAdminEntrypoint(),
         argString
@@ -300,7 +300,11 @@ module.exports = {
         cwd: pathManager.emuServerPath,
         encoding: 'utf8',
         shell: '/bin/bash',
-        detached: true
+        detached: true,
+        env: {
+          PKG_EXECPATH: '',
+          DEBUG: 'eqemu-admin:*',
+        }
       }
     );
 

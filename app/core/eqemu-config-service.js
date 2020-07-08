@@ -27,7 +27,6 @@ module.exports = {
       return this;
     }
 
-    debug('attempting config path to [%s]', this.getServerConfigPath());
     debug('attempting config path to [%s]', path.join(pathManager.getEmuServerPath(), 'eqemu_config.json'));
 
     this.setServerConfigPath(

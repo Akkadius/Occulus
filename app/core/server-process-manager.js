@@ -11,6 +11,7 @@ const util               = require('util')
 const psList             = require('ps-list');
 const debug              = require('debug')('eqemu-admin:process-manager');
 const config             = require('./eqemu-config-service')
+const systemProc         = require('process')
 
 /**
  * Constants
@@ -64,12 +65,14 @@ module.exports = {
    */
   isEqemuServerOnline() {
     let isServerOnline = false
-    let self = this
+    let self           = this
     this.serverProcessNames.forEach(function (processName) {
       if (self.processCount[processName] > 0) {
         isServerOnline = true
       }
     });
+
+    debug('isEqemuServerOnline [%s]', isServerOnline)
 
     return isServerOnline
   },
@@ -83,13 +86,18 @@ module.exports = {
 
     await this.pollProcessList();
 
-    debug('server is [%s]', (this.isEqemuServerOnline() ? "online" : "offline"))
+    if (await this.isLauncherBooted()) {
+      debug('Launcher is already booted... exiting...');
+      process.exit();
+    }
+
+    debug('server is [%s]', (this.isEqemuServerOnline() ? 'online' : 'offline'))
 
     /**
      * Shared memory
      */
     if (config.getAdminPanelConfig('launcher.runSharedMemory', true) && !this.isEqemuServerOnline()) {
-      debug("Running shared memory");
+      debug('Running shared memory');
       execSync('./bin/shared_memory', { cwd: pathManager.emuServerPath }).toString();
     }
 
@@ -164,7 +172,7 @@ module.exports = {
       return this.launchOptions && this.launchOptions.withQueryserv && this.processCount[process_name] === 0;
     }
 
-    debug('[doesProcessNeedToBoot] returning [%s]', this.processCount[process_name] === 0)
+    debug('[doesProcessNeedToBoot] [%s] returning [%s]', process_name, this.processCount[process_name] === 0)
 
     return this.processCount[process_name] === 0;
   },
@@ -218,10 +226,18 @@ module.exports = {
     let isLauncherBooted = false;
     await this.pollProcessList();
     this.systemProcessList.forEach(function (process) {
-      if (process.cmd.includes('server-launcher')) {
+
+      /**
+       * 1) Make sure we're looking for a command running the launcher
+       * 2) Make sure it isn't this process
+       * 3) Make sure it's not a while loop that is keeping it alive
+       */
+      if (process.cmd.includes('server-launcher') && process.pid !== systemProc.pid && !process.cmd.includes('while')) {
         isLauncherBooted = true;
       }
     });
+
+    debug('isLauncherBooted [%s]', isLauncherBooted);
 
     return isLauncherBooted;
   },
@@ -259,8 +275,7 @@ module.exports = {
     // TODO: Windows
     if (process.platform === 'linux') {
       startProcessString = util.format(
-        'while : ; do PKG_EXECPATH=; nohup %s server-launcher %s && sleep 1 ; done &',
-        //'PKG_EXECPATH=; nohup %s server-launcher %s &',
+        'while true; do nohup PKG_EXECPATH=; %s server-launcher %s 1>/dev/null 2>/dev/null && sleep 1 ; done &',
         pathManager.getEqemuAdminEntrypoint(),
         argString
       );
@@ -273,24 +288,14 @@ module.exports = {
     /**
      * Start launcher
      */
-    exec(startProcessString, { cwd: pathManager.emuServerPath });
-
-    /**
-     exec(startProcessString,
-     {
+    require('child_process').spawn(startProcessString,
+      {
+        cwd: pathManager.emuServerPath,
         encoding: 'utf8',
-        // cwd: path.join(path.dirname(process.argv[0]), '../')
-      },
-     (error, stdout, stderr) => {
-        if (error) {
-          debug(`exec error: ${error}`);
-          return;
-        }
-        debug(`stdout: ${stdout}`);
-        debug(`stderr: ${stderr}`);
+        shell: '/bin/bash',
+        detached: true
       }
-     );
-     **/
+    );
 
     return this;
   },
@@ -301,7 +306,7 @@ module.exports = {
   async cancelRestart(options = []) {
     if (options.cancel) {
       this.cancelTimedRestart = true;
-      await serverDataService.messageWorld("[SERVER MESSAGE] Server restart cancelled")
+      await serverDataService.messageWorld('[SERVER MESSAGE] Server restart cancelled')
     }
   },
 
@@ -415,7 +420,7 @@ module.exports = {
 
     if (isLinux) {
       startProcessString =
-        util.format('./bin/%s %s &',
+        util.format('nohup ./bin/%s %s 1>/dev/null 2>/dev/null &',
           process_name,
           argString
         );
@@ -427,7 +432,14 @@ module.exports = {
       pathManager.getEmuServerPath()
     );
 
-    exec(startProcessString, { cwd: pathManager.emuServerPath, encoding: 'utf8' });
+    require('child_process').spawn(startProcessString,
+      {
+        cwd: pathManager.emuServerPath,
+        encoding: 'utf8',
+        shell: '/bin/bash',
+        detached: true
+      }
+    );
 
     this.processCount[process_name]++;
   },

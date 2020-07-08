@@ -189,6 +189,8 @@ module.exports = {
    * @returns {Promise<void>}
    */
   stopServer: async function () {
+    this.init(options);
+
     this.systemProcessList = await psList();
     let self               = this;
 
@@ -336,6 +338,7 @@ module.exports = {
    * @returns {exports}
    */
   restartServer: async function (options = []) {
+    this.init(options);
 
     /**
      * Delayed restart

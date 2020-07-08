@@ -14,7 +14,8 @@
       "public/**"
     ],
     "targets": [
-      "node12-linux-x64"
+      "node12-linux-x64",
+      "node12-win-x64"
     ]
   },
   "repository": {

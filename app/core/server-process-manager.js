@@ -39,11 +39,12 @@ module.exports = {
   /**
    * Launcher initialization
    * @param options
+   * @param skipConfigWatch
    */
-  init: function (options) {
+  init: function (options, skipConfigWatch = false) {
     this.launchOptions = options;
 
-    config.init();
+    config.init(skipConfigWatch);
 
     let self = this;
     this.serverProcessNames.forEach(function (process_name) {
@@ -82,7 +83,7 @@ module.exports = {
    * @returns {Promise<void>}
    */
   start: async function (options = []) {
-    this.init(options);
+    this.init(options, true);
 
     await this.pollProcessList();
 
@@ -112,6 +113,8 @@ module.exports = {
     }
 
     this.startWatchDog();
+
+    config.setAdminPanelConfig('launcher.isRunning', true);
 
     /**
      * Main launcher loop
@@ -189,7 +192,7 @@ module.exports = {
    * @returns {Promise<void>}
    */
   stopServer: async function () {
-    this.init([]);
+    this.init([], true);
 
     this.systemProcessList = await psList();
     let self               = this;
@@ -338,7 +341,7 @@ module.exports = {
    * @returns {exports}
    */
   restartServer: async function (options = []) {
-    this.init(options);
+    this.init(options, true);
 
     /**
      * Delayed restart

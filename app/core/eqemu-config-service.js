@@ -22,7 +22,7 @@ module.exports = {
    * Initialize config
    * @returns {exports}
    */
-  init() {
+  init(skipWatch = false) {
     if (Object.keys(this.serverConfig).length) {
       return this;
     }
@@ -37,10 +37,12 @@ module.exports = {
 
     this.serverConfig = JSON.parse(fs.readFileSync(this.getServerConfigPath(), 'utf8'));
 
-    watch(this.getServerConfigPath(),  (evt, file) => {
-      console.log(chalk`{green [{bold EQEmuConfig}] File change detected, reloading... }`)
-      this.serverConfig = JSON.parse(fs.readFileSync(this.getServerConfigPath(), 'utf8'));
-    });
+    if (!skipWatch) {
+      watch(this.getServerConfigPath(), (evt, file) => {
+        console.log(chalk`{green [{bold EQEmuConfig}] File change detected, reloading... }`)
+        this.serverConfig = JSON.parse(fs.readFileSync(this.getServerConfigPath(), 'utf8'));
+      });
+    }
 
     debug('Loaded [%s]', this.getServerConfigPath());
 

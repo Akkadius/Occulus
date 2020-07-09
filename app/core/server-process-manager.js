@@ -351,7 +351,7 @@ module.exports = {
     if (os.isWindows()) {
       if (pathManager.isRanFromPackagedNode()) {
         startProcessString = util.format(
-          'set PKG_EXECPATH= && start /b node %s server-launcher %s',
+          'set PKG_EXECPATH= && start /b %s server-launcher %s',
           pathManager.getEqemuAdminEntrypoint(),
           argString
         );

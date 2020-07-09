@@ -91,6 +91,7 @@ module.exports = {
 
     if (await this.isLauncherBooted()) {
       debug('Launcher is already booted... exiting...');
+      console.log('Launcher is already booted... exiting...');
       process.exit();
     }
 
@@ -99,9 +100,17 @@ module.exports = {
     /**
      * Shared memory
      */
-    if (config.getAdminPanelConfig('launcher.runSharedMemory', true) && !this.isEqemuServerOnline()) {
+    if (config.getAdminPanelConfig('launcher.runSharedMemory') && !this.isEqemuServerOnline()) {
       debug('Running shared memory');
-      execSync('./bin/shared_memory', {cwd: pathManager.emuServerPath}).toString();
+
+      if (os.isLinux()) {
+        execSync('./bin/shared_memory', {cwd: pathManager.emuServerPath}).toString();
+      }
+
+      if (os.isWindows()) {
+        execSync('bin\\shared_memory', {cwd: pathManager.emuServerPath}).toString();
+      }
+
     }
 
     if (config.getAdminPanelConfig('launcher.runLoginserver', false)) {
@@ -196,7 +205,7 @@ module.exports = {
   stopServer: async function () {
     this.init([], true);
 
-    this.pollProcessList();
+    await this.pollProcessList();
     let self = this;
 
     debug('[stopServer] Stopping server...');
@@ -246,7 +255,7 @@ module.exports = {
         if (
           proc.cmd.includes('server-launcher') &&
           proc.cmd.includes('admin') &&
-          proc.pid !== systemProc.pid &&
+          parseInt(proc.pid) !== parseInt(systemProc.pid) &&
           !proc.cmd.includes('while')
         ) {
           isLauncherBooted = true;
@@ -257,16 +266,14 @@ module.exports = {
 
 
         if (
-          proc.cmd.includes('eqemu-server-launcher') &&
-          proc.pid !== systemProc.pid
+          proc.cmd.includes('server-launcher') &&
+          parseInt(proc.pid) !== parseInt(systemProc.pid)
         ) {
-          console.log(proc);
 
-          console.log("Current system proc [%s]", systemProc.pid);
-          console.log("process.pid [%s]", proc.pid);
-          console.log("process.cmd.includes('eqemu-server-launcher') [%s]", proc.cmd.includes('eqemu-server-launcher'));
-
-          console.log("Is booted?");
+          debug("Launcher is already booted");
+          debug(proc);
+          debug("Current system proc [%s]", systemProc.pid);
+          debug("process.pid [%s]", proc.pid);
 
           isLauncherBooted = true;
         }
@@ -315,12 +322,10 @@ module.exports = {
 
     let startProcessString = '';
 
-    // TODO: Windows
-
     /**
      * PKG_EXECPATH needs to be blank due to https://github.com/vercel/pkg/issues/376
      */
-    if (process.platform === 'linux') {
+    if (os.isLinux()) {
       startProcessString = util.format(
         // 'while true; do nohup PKG_EXECPATH=; %s server-launcher %s 1>/dev/null 2>/dev/null && sleep 1 ; done &',
         'export PKG_EXECPATH=; export DEBUG=eqemu-admin:*; %s server-launcher %s &',
@@ -330,25 +335,43 @@ module.exports = {
 
       config.setAdminPanelConfig('launcher.isRunning', true);
       console.log("[Process Manager] Starting server launcher...");
+
+      require('child_process').spawn(startProcessString,
+        {
+          cwd: pathManager.emuServerPath,
+          encoding: 'utf8',
+          shell: '/bin/bash',
+          detached: true
+        }
+      ).on('error', function (err) {
+        console.log(err);
+      });
+    }
+
+    if (os.isWindows()) {
+      if (pathManager.isRanFromPackagedNode()) {
+        startProcessString = util.format(
+          'set PKG_EXECPATH= && start /b node %s server-launcher %s',
+          pathManager.getEqemuAdminEntrypoint(),
+          argString
+        );
+      } else if (pathManager.isRanAsStandaloneNodeProject()) {
+        startProcessString = util.format(
+          'set PKG_EXECPATH= && start /b node %s server-launcher %s',
+          pathManager.getEqemuAdminEntrypoint(),
+          argString
+        );
+      }
+
+      require('child_process').exec(startProcessString);
+
+      config.setAdminPanelConfig('launcher.isRunning', true);
+      console.log("[Process Manager] Starting server launcher...");
     }
 
     this.purgeServerLogs();
 
     debug('[startServerLauncher] Start string [%s]', startProcessString);
-
-    /**
-     * Start launcher
-     */
-    require('child_process').spawn(startProcessString,
-      {
-        cwd: pathManager.emuServerPath,
-        encoding: 'utf8',
-        shell: '/bin/bash',
-        detached: true
-      }
-    ).on('error', function (err) {
-      console.log(err);
-    });
 
     return this;
   },
@@ -465,34 +488,44 @@ module.exports = {
       argString += arg + ' ';
     });
 
-    let isWindows          = process.platform === 'win32';
-    let isLinux            = process.platform === 'linux';
     let startProcessString = '';
-    if (isWindows) {
-      startProcessString = process_name + '.exe';
+    if (os.isWindows()) {
+      startProcessString =
+        util.format('bin\\%s',
+          process_name + '.exe'
+        );
+
+      require('child_process').spawn(startProcessString,
+        {
+          cwd: pathManager.emuServerPath,
+          detached: true,
+          stdio: 'ignore',
+          windowsHide: false
+        }
+      );
     }
 
-    if (isLinux) {
+    if (os.isLinux()) {
       startProcessString =
         util.format('nohup ./bin/%s %s 1>/dev/null 2>/dev/null &',
           process_name,
           argString
         );
+
+      require('child_process').spawn(startProcessString,
+        {
+          cwd: pathManager.emuServerPath,
+          encoding: 'utf8',
+          shell: '/bin/bash',
+          detached: true
+        }
+      );
     }
 
     debug('Starting process [%s] command [%s] path [%s]',
       process_name,
       startProcessString,
       pathManager.getEmuServerPath()
-    );
-
-    require('child_process').spawn(startProcessString,
-      {
-        cwd: pathManager.emuServerPath,
-        encoding: 'utf8',
-        shell: '/bin/bash',
-        detached: true
-      }
     );
 
     this.processCount[process_name]++;
@@ -503,7 +536,12 @@ module.exports = {
    */
   killProcess: function (process_id) {
     try {
-      require('child_process').execSync('kill -9 ' + process_id);
+      if (os.isLinux()) {
+        require('child_process').execSync('kill -9 ' + process_id);
+      }
+      if (os.isWindows()) {
+        require('child_process').execSync(util.format('TASKKILL /PID %s /F', process_id));
+      }
     } catch (e) {
       console.log(e);
     }
@@ -520,21 +558,11 @@ module.exports = {
       self.processCount[process_name] = 0;
     });
 
-    if (os.isLinux()) {
-      this.systemProcessList.forEach(function (process) {
-        if (self.serverProcessNames.includes(process.name)) {
-          self.processCount[process.name]++;
-        }
-      });
-    }
-
-    if (os.isWindows()) {
-      this.systemProcessList.forEach((process) => {
-        if (self.serverProcessNames.includes(process.processName)) {
-          self.processCount[process.processName]++;
-        }
-      });
-    }
+    this.systemProcessList.forEach(function (process) {
+      if (self.serverProcessNames.includes(process.name)) {
+        self.processCount[process.name]++;
+      }
+    });
   },
 
   async getProcessList() {
@@ -557,14 +585,14 @@ module.exports = {
             const processId         = splitRow[splitLength - 1].trim();
             const simpleProcessName = splitRow[splitLength - 2].replace('.exe', '').trim();
             const commandLine       = row
-              .replace("," + processId, '')
-              .replace("," + simpleProcessName, '')
+              .replace("," + splitRow[splitLength - 1].trim(), '')
+              .replace("," + splitRow[splitLength - 2].trim(), '')
               .split(",")[1].trim()
             ;
 
             processList.push(
               {
-                "processName": simpleProcessName,
+                "name": simpleProcessName,
                 "pid": processId,
                 "cmd": commandLine
               }
@@ -573,12 +601,6 @@ module.exports = {
         }
       });
     }
-
-    processList.forEach((proc) => {
-      if (proc.processName.includes("zone")) {
-        console.log(proc);
-      }
-    })
 
     return processList;
 

@@ -59,55 +59,61 @@ module.exports = {
      * Lua Modules
      */
     watch(pathManager.getEmuLuaModulesPath(), { recursive: true }, function (evt, file) {
-      const changedFile = path.dirname(file).split(path.sep).pop() + '/' + path.basename(file);
+      if (evt === 'update') {
+        const changedFile = path.dirname(file).split(path.sep).pop() + '/' + path.basename(file);
 
-      self.message(util.format(
-        chalk`[{bold lua_modules}] Reloading [{bold All Zones}] File [{bold %s}]`,
-        changedFile
-      ));
-      serverDataService.hotReloadZoneQuests('all');
+        self.message(util.format(
+          chalk`[{bold lua_modules}] Reloading [{bold All Zones}] File [{bold %s}]`,
+          changedFile
+        ));
+        serverDataService.hotReloadZoneQuests('all');
+      }
     });
 
     /**
      * Plugins
      */
     watch(pathManager.getEmuPluginsPath(), { recursive: true }, function (evt, file) {
-      const changedFile = path.dirname(file).split(path.sep).pop() + '/' + path.basename(file);
+      if (evt === 'update') {
+        const changedFile = path.dirname(file).split(path.sep).pop() + '/' + path.basename(file);
 
-      self.message(util.format(
-        chalk`[{bold plugins}] Reloading [{bold All Zones}] File [{bold %s}]`,
-        changedFile
-      ));
+        self.message(util.format(
+          chalk`[{bold plugins}] Reloading [{bold All Zones}] File [{bold %s}]`,
+          changedFile
+        ));
 
-      serverDataService.hotReloadZoneQuests('all');
+        serverDataService.hotReloadZoneQuests('all');
+      }
     });
 
     /**
      * Quests
      */
     watch(pathManager.getEmuQuestsPath(), { recursive: true }, function (evt, file) {
-      const changedFile = path.dirname(file).split(path.sep).pop() + '/' + path.basename(file);
-      const changedZone = path.dirname(file).split(path.sep).pop();
+      if (evt === 'update') {
+        const changedFile = path.dirname(file).split(path.sep).pop() + '/' + path.basename(file);
+        const changedZone = path.dirname(file).split(path.sep).pop();
 
-      const changedData = util.format(
-        chalk`File [{bold %s}]`,
-        changedFile
-      );
+        const changedData = util.format(
+          chalk`File [{bold %s}]`,
+          changedFile
+        );
 
-      /**
-       * Zone
-       */
-      if (self.doesZoneExist(changedZone)) {
-        self.message(util.format(chalk`[{bold zone}] Reloading [{bold %s}] %s`, changedZone, changedData));
-        serverDataService.hotReloadZoneQuests(changedZone);
-      }
+        /**
+         * Zone
+         */
+        if (self.doesZoneExist(changedZone)) {
+          self.message(util.format(chalk`[{bold zone}] Reloading [{bold %s}] %s`, changedZone, changedData));
+          serverDataService.hotReloadZoneQuests(changedZone);
+        }
 
-      /**
-       * Global
-       */
-      if (changedZone === 'global') {
-        self.message(util.format(chalk`[{bold global}] Reloading [{bold %s}] %s`, 'All Zones', changedData));
-        serverDataService.hotReloadZoneQuests('all');
+        /**
+         * Global
+         */
+        if (changedZone === 'global') {
+          self.message(util.format(chalk`[{bold global}] Reloading [{bold %s}] %s`, 'All Zones', changedData));
+          serverDataService.hotReloadZoneQuests('all');
+        }
       }
     });
 

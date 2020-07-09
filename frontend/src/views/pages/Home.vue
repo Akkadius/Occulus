@@ -73,7 +73,6 @@
   import DashboardProcessCounts from '@/components/dashboard/DashboardProcessCounts.vue'
   import ServerProcessButtonComponent from '@/components/ServerProcessButtonComponent'
   import Timer from '@/app/core/timer'
-  import process from 'process'
 
   export default {
     components: {

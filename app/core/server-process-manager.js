@@ -1,17 +1,17 @@
 /**
  * server-process-manager.js
  */
-const { exec, execSync } = require('child_process');
-const serverDataService  = require('./eqemu-data-service-client.js');
-const pathManager        = require('./path-manager');
-const fs                 = require('fs');
-const path               = require('path')
-const os                 = require('os')
-const util               = require('util')
-const psList             = require('ps-list');
-const debug              = require('debug')('eqemu-admin:process-manager');
-const config             = require('./eqemu-config-service')
-const systemProc         = require('process')
+const {exec, execSync}  = require('child_process');
+const serverDataService = require('./eqemu-data-service-client.js');
+const pathManager       = require('./path-manager');
+const fs                = require('fs');
+const path              = require('path');
+const util              = require('util');
+const psList            = require('ps-list');
+const debug             = require('debug')('eqemu-admin:process-manager');
+const config            = require('./eqemu-config-service');
+const systemProc        = require('process');
+const os                = use('/app/core/operating-system');
 
 /**
  * Constants
@@ -44,6 +44,8 @@ module.exports = {
   init: function (options, skipConfigWatch = false) {
     this.launchOptions = options;
 
+    process.title = "eqemu-server-launcher";
+
     config.init(skipConfigWatch);
 
     let self = this;
@@ -58,24 +60,24 @@ module.exports = {
    * @returns {number}
    */
   getWatchDogPollDelta() {
-    return (Math.floor(new Date() / 1000) - this.lastProcessPollTime)
+    return (Math.floor(new Date() / 1000) - this.lastProcessPollTime);
   },
 
   /**
    * @returns {boolean}
    */
   isEqemuServerOnline() {
-    let isServerOnline = false
-    let self           = this
+    let isServerOnline = false;
+    let self           = this;
     this.serverProcessNames.forEach(function (processName) {
       if (self.processCount[processName] > 0) {
-        isServerOnline = true
+        isServerOnline = true;
       }
     });
 
-    debug('isEqemuServerOnline [%s]', isServerOnline)
+    debug('isEqemuServerOnline [%s]', isServerOnline);
 
-    return isServerOnline
+    return isServerOnline;
   },
 
   /**
@@ -89,17 +91,26 @@ module.exports = {
 
     if (await this.isLauncherBooted()) {
       debug('Launcher is already booted... exiting...');
+      console.log('Launcher is already booted... exiting...');
       process.exit();
     }
 
-    debug('server is [%s]', (this.isEqemuServerOnline() ? 'online' : 'offline'))
+    debug('server is [%s]', (this.isEqemuServerOnline() ? 'online' : 'offline'));
 
     /**
      * Shared memory
      */
-    if (config.getAdminPanelConfig('launcher.runSharedMemory', true) && !this.isEqemuServerOnline()) {
+    if (config.getAdminPanelConfig('launcher.runSharedMemory') && !this.isEqemuServerOnline()) {
       debug('Running shared memory');
-      execSync('./bin/shared_memory', { cwd: pathManager.emuServerPath }).toString();
+
+      if (os.isLinux()) {
+        execSync('./bin/shared_memory', {cwd: pathManager.emuServerPath}).toString();
+      }
+
+      if (os.isWindows()) {
+        execSync('bin\\shared_memory', {cwd: pathManager.emuServerPath}).toString();
+      }
+
     }
 
     if (config.getAdminPanelConfig('launcher.runLoginserver', false)) {
@@ -129,7 +140,7 @@ module.exports = {
       let self = this;
       for (const process_name of ['loginserver', 'ucs', 'world', 'queryserv']) {
         if (self.doesProcessNeedToBoot(process_name) && !await self.isProcessRunning(process_name)) {
-          debug('starting unique process [' + process_name + ']')
+          debug('starting unique process [' + process_name + ']');
           self.startProcess(process_name);
         }
       }
@@ -154,7 +165,7 @@ module.exports = {
   doesProcessNeedToBoot: function (process_name) {
     if (this.erroredStartsCount[process_name] >= this.erroredStartsMaxHalt) {
       if (!this.hasErroredHaltMessage[process_name]) {
-        console.error('Process [%s] has tried to boot too many (%s) times... Halting attempts', process_name, this.erroredStartsMaxHalt)
+        console.error('Process [%s] has tried to boot too many (%s) times... Halting attempts', process_name, this.erroredStartsMaxHalt);
         this.hasErroredHaltMessage[process_name] = 1;
       }
 
@@ -175,7 +186,7 @@ module.exports = {
       return this.launchOptions && this.launchOptions.withQueryserv && this.processCount[process_name] === 0;
     }
 
-    debug('[doesProcessNeedToBoot] [%s] returning [%s]', process_name, this.processCount[process_name] === 0)
+    debug('[doesProcessNeedToBoot] [%s] returning [%s]', process_name, this.processCount[process_name] === 0);
 
     return this.processCount[process_name] === 0;
   },
@@ -194,8 +205,8 @@ module.exports = {
   stopServer: async function () {
     this.init([], true);
 
-    this.systemProcessList = await psList();
-    let self               = this;
+    await this.pollProcessList();
+    let self = this;
 
     debug('[stopServer] Stopping server...');
 
@@ -221,7 +232,7 @@ module.exports = {
       }
     });
 
-    config.setAdminPanelConfig('launcher.isRunning', false)
+    config.setAdminPanelConfig('launcher.isRunning', false);
 
     return this;
   },
@@ -232,20 +243,40 @@ module.exports = {
   async isLauncherBooted() {
     let isLauncherBooted = false;
     await this.pollProcessList();
-    this.systemProcessList.forEach(function (process) {
+    this.systemProcessList.forEach(function (proc) {
 
-      /**
-       * 1) Make sure we're looking for a command running the launcher
-       * 2) Make sure it isn't this process
-       * 3) Make sure it's not a while loop that is keeping it alive
-       */
-      if (
-        process.cmd.includes('server-launcher') &&
-        process.cmd.includes('admin') &&
-        process.pid !== systemProc.pid &&
-        !process.cmd.includes('while')
-      ) {
-        isLauncherBooted = true;
+      if (os.isLinux()) {
+
+        /**
+         * 1) Make sure we're looking for a command running the launcher
+         * 2) Make sure it isn't this process
+         * 3) Make sure it's not a while loop that is keeping it alive
+         */
+        if (
+          proc.cmd.includes('server-launcher') &&
+          proc.cmd.includes('admin') &&
+          parseInt(proc.pid) !== parseInt(systemProc.pid) &&
+          !proc.cmd.includes('while')
+        ) {
+          isLauncherBooted = true;
+        }
+      }
+
+      if (os.isWindows()) {
+
+
+        if (
+          proc.cmd.includes('server-launcher') &&
+          parseInt(proc.pid) !== parseInt(systemProc.pid)
+        ) {
+
+          debug("Launcher is already booted");
+          debug(proc);
+          debug("Current system proc [%s]", systemProc.pid);
+          debug("process.pid [%s]", proc.pid);
+
+          isLauncherBooted = true;
+        }
       }
     });
 
@@ -254,8 +285,8 @@ module.exports = {
     return isLauncherBooted;
   },
 
-  checkIfLauncherNeedsToBeRevived: async function() {
-    const isLauncherRunning = config.getAdminPanelConfig('launcher.isRunning') ;
+  checkIfLauncherNeedsToBeRevived: async function () {
+    const isLauncherRunning = config.getAdminPanelConfig('launcher.isRunning');
     if (isLauncherRunning) {
       this.startServerLauncher();
     }
@@ -291,12 +322,10 @@ module.exports = {
 
     let startProcessString = '';
 
-    // TODO: Windows
-
     /**
      * PKG_EXECPATH needs to be blank due to https://github.com/vercel/pkg/issues/376
      */
-    if (process.platform === 'linux') {
+    if (os.isLinux()) {
       startProcessString = util.format(
         // 'while true; do nohup PKG_EXECPATH=; %s server-launcher %s 1>/dev/null 2>/dev/null && sleep 1 ; done &',
         'export PKG_EXECPATH=; export DEBUG=eqemu-admin:*; %s server-launcher %s &',
@@ -306,23 +335,43 @@ module.exports = {
 
       config.setAdminPanelConfig('launcher.isRunning', true);
       console.log("[Process Manager] Starting server launcher...");
+
+      require('child_process').spawn(startProcessString,
+        {
+          cwd: pathManager.emuServerPath,
+          encoding: 'utf8',
+          shell: '/bin/bash',
+          detached: true
+        }
+      ).on('error', function (err) {
+        console.log(err);
+      });
+    }
+
+    if (os.isWindows()) {
+      if (pathManager.isRanFromPackagedNode()) {
+        startProcessString = util.format(
+          'set PKG_EXECPATH= && start /b %s server-launcher %s',
+          pathManager.getEqemuAdminEntrypoint(),
+          argString
+        );
+      } else if (pathManager.isRanAsStandaloneNodeProject()) {
+        startProcessString = util.format(
+          'set PKG_EXECPATH= && start /b node %s server-launcher %s',
+          pathManager.getEqemuAdminEntrypoint(),
+          argString
+        );
+      }
+
+      require('child_process').exec(startProcessString);
+
+      config.setAdminPanelConfig('launcher.isRunning', true);
+      console.log("[Process Manager] Starting server launcher...");
     }
 
     this.purgeServerLogs();
 
     debug('[startServerLauncher] Start string [%s]', startProcessString);
-
-    /**
-     * Start launcher
-     */
-    require('child_process').spawn(startProcessString,
-      {
-        cwd: pathManager.emuServerPath,
-        encoding: 'utf8',
-        shell: '/bin/bash',
-        detached: true
-      }
-    ).on('error', function( err ){ console.log(err)});
 
     return this;
   },
@@ -333,7 +382,7 @@ module.exports = {
   async cancelRestart(options = []) {
     if (options.cancel) {
       this.cancelTimedRestart = true;
-      await serverDataService.messageWorld('[SERVER MESSAGE] Server restart cancelled')
+      await serverDataService.messageWorld('[SERVER MESSAGE] Server restart cancelled');
     }
   },
 
@@ -365,9 +414,9 @@ module.exports = {
             Number((minutesRemaining).toFixed(2))
           );
 
-          await serverDataService.messageWorld(worldMessage)
+          await serverDataService.messageWorld(worldMessage);
 
-          debug('Sending world message | %s', worldMessage)
+          debug('Sending world message | %s', worldMessage);
         }
 
         if (unixTimeNow > endTime) {
@@ -403,7 +452,7 @@ module.exports = {
    */
   sleep: function (ms) {
     return new Promise(resolve => {
-      setTimeout(resolve, ms)
+      setTimeout(resolve, ms);
     });
   },
 
@@ -439,34 +488,44 @@ module.exports = {
       argString += arg + ' ';
     });
 
-    let isWindows          = process.platform === 'win32';
-    let isLinux            = process.platform === 'linux';
     let startProcessString = '';
-    if (isWindows) {
-      startProcessString = process_name + '.exe';
+    if (os.isWindows()) {
+      startProcessString =
+        util.format('bin\\%s',
+          process_name + '.exe'
+        );
+
+      require('child_process').spawn(startProcessString,
+        {
+          cwd: pathManager.emuServerPath,
+          detached: true,
+          stdio: 'ignore',
+          windowsHide: false
+        }
+      );
     }
 
-    if (isLinux) {
+    if (os.isLinux()) {
       startProcessString =
         util.format('nohup ./bin/%s %s 1>/dev/null 2>/dev/null &',
           process_name,
           argString
         );
+
+      require('child_process').spawn(startProcessString,
+        {
+          cwd: pathManager.emuServerPath,
+          encoding: 'utf8',
+          shell: '/bin/bash',
+          detached: true
+        }
+      );
     }
 
     debug('Starting process [%s] command [%s] path [%s]',
       process_name,
       startProcessString,
       pathManager.getEmuServerPath()
-    );
-
-    require('child_process').spawn(startProcessString,
-      {
-        cwd: pathManager.emuServerPath,
-        encoding: 'utf8',
-        shell: '/bin/bash',
-        detached: true
-      }
     );
 
     this.processCount[process_name]++;
@@ -477,7 +536,12 @@ module.exports = {
    */
   killProcess: function (process_id) {
     try {
-      require('child_process').execSync('kill -9 ' + process_id);
+      if (os.isLinux()) {
+        require('child_process').execSync('kill -9 ' + process_id);
+      }
+      if (os.isWindows()) {
+        require('child_process').execSync(util.format('TASKKILL /PID %s /F', process_id));
+      }
     } catch (e) {
       console.log(e);
     }
@@ -487,7 +551,7 @@ module.exports = {
    * @returns {Promise<void>}
    */
   pollProcessList: async function () {
-    this.systemProcessList = await psList();
+    this.systemProcessList = await this.getProcessList();
 
     let self = this;
     this.serverProcessNames.forEach(function (process_name) {
@@ -499,6 +563,47 @@ module.exports = {
         self.processCount[process.name]++;
       }
     });
+  },
+
+  async getProcessList() {
+    let processList = [];
+
+    if (os.isLinux()) {
+      processList = await psList();
+    }
+
+    if (os.isWindows()) {
+      const stdout = require('child_process')
+        .execSync("WMIC path win32_process get Description,Commandline,Processid /format:csv")
+        .toString();
+
+      stdout.split('\n').forEach((row) => {
+        if (row.includes(",") && !row.includes("Description,ProcessId")) {
+          if (row.split(",").length > 2) {
+            const splitRow          = row.split(",");
+            const splitLength       = splitRow.length;
+            const processId         = splitRow[splitLength - 1].trim();
+            const simpleProcessName = splitRow[splitLength - 2].replace('.exe', '').trim();
+            const commandLine       = row
+              .replace("," + splitRow[splitLength - 1].trim(), '')
+              .replace("," + splitRow[splitLength - 2].trim(), '')
+              .split(",")[1].trim()
+            ;
+
+            processList.push(
+              {
+                "name": simpleProcessName,
+                "pid": processId,
+                "cmd": commandLine
+              }
+            );
+          }
+        }
+      });
+    }
+
+    return processList;
+
   },
 
   /**
@@ -543,7 +648,7 @@ module.exports = {
       }
     });
 
-    debug('[isProcessRunning] found process [%s] [%s]', processName, foundProcess)
+    debug('[isProcessRunning] found process [%s] [%s]', processName, foundProcess);
 
     return foundProcess;
   },
@@ -552,8 +657,8 @@ module.exports = {
    * Purges server logs
    */
   purgeServerLogs() {
-    exec('rm -rf logs/zone/*.log', { cwd: pathManager.emuServerPath });
-    exec('rm -rf logs/*.log', { cwd: pathManager.emuServerPath });
+    exec('rm -rf logs/zone/*.log', {cwd: pathManager.emuServerPath});
+    exec('rm -rf logs/*.log', {cwd: pathManager.emuServerPath});
   },
 
   /**
@@ -586,7 +691,7 @@ module.exports = {
           fs.writeFileSync(logFile, data);
         }
 
-        process.exit()
+        process.exit();
       }
 
     }, WATCHDOG_TIMER);

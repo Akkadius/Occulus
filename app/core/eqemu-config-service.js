@@ -2,11 +2,11 @@
  * eqemu-config-service.js
  * @type {any}
  */
-let pathManager = require('../../app/core/path-manager')
+let pathManager = require('../../app/core/path-manager');
 let fs          = require('fs');
 const dot       = require('dot-object');
 const debug     = require('debug')('eqemu-admin:eqemu-config-service');
-const path      = require('path')
+const path      = require('path');
 const watch     = require('node-watch');
 const chalk     = require('chalk');
 const util      = require('util');
@@ -39,7 +39,7 @@ module.exports = {
 
     if (!skipWatch) {
       watch(this.getServerConfigPath(), (evt, file) => {
-        console.log(chalk`{green [{bold EQEmuConfig}] File change detected, reloading... }`)
+        console.log(chalk`{green [{bold EQEmuConfig}] File change detected, reloading... }`);
         this.serverConfig = JSON.parse(fs.readFileSync(this.getServerConfigPath(), 'utf8'));
       });
     }
@@ -56,7 +56,7 @@ module.exports = {
   setServerConfigPath(path) {
     this.serverConfigPath = path;
 
-    return this
+    return this;
   },
 
   /**
@@ -97,42 +97,42 @@ module.exports = {
    * @returns {null}
    */
   getServerLongName() {
-    return (this.serverConfig.server.world.longname ? this.serverConfig.server.world.longname : null)
+    return (this.serverConfig.server.world.longname ? this.serverConfig.server.world.longname : null);
   },
 
   /**
    * @returns {null}
    */
   getDatabaseName() {
-    return (this.serverConfig.server.database.db ? this.serverConfig.server.database.db : '')
+    return (this.serverConfig.server.database.db ? this.serverConfig.server.database.db : '');
   },
 
   /**
    * @returns {null}
    */
   getDatabaseHost() {
-    return (this.serverConfig.server.database.host ? this.serverConfig.server.database.host : '')
+    return (this.serverConfig.server.database.host ? this.serverConfig.server.database.host : '');
   },
 
   /**
    * @returns {null}
    */
   getDatabaseUsername() {
-    return (this.serverConfig.server.database.username ? this.serverConfig.server.database.username : '')
+    return (this.serverConfig.server.database.username ? this.serverConfig.server.database.username : '');
   },
 
   /**
    * @returns {null}
    */
   getDatabasePassword() {
-    return (this.serverConfig.server.database.password ? this.serverConfig.server.database.password : '')
+    return (this.serverConfig.server.database.password ? this.serverConfig.server.database.password : '');
   },
 
   /**
    * @returns {null}
    */
   getDatabasePort() {
-    return (this.serverConfig.server.database.port ? this.serverConfig.server.database.port : '')
+    return (this.serverConfig.server.database.port ? this.serverConfig.server.database.port : '');
   },
 
   /**
@@ -141,10 +141,10 @@ module.exports = {
    */
   saveServerConfig(data = undefined) {
     if (!data) {
-      data = this.getServerConfig()
+      data = this.getServerConfig();
     }
 
-    debug('[saveServerConfig] writing config')
+    debug('[saveServerConfig] writing config');
 
     fs.writeFileSync(
       this.getServerConfigPath(),
@@ -154,7 +154,7 @@ module.exports = {
 
     this.serverConfig = data;
 
-    return this
+    return this;
   },
 
   /**
@@ -171,7 +171,7 @@ module.exports = {
 
     this.saveServerConfig(this.serverConfig);
 
-    return this
+    return this;
   },
 
   /**
@@ -193,6 +193,6 @@ module.exports = {
       this.setAdminPanelConfig(accessor, defaultValue);
     }
 
-    return (configVar ? configVar : defaultValue)
+    return (configVar ? configVar : defaultValue);
   }
 };

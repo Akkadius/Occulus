@@ -1,10 +1,5 @@
 #!/usr/bin/env node
 
-if (process.platform === "win32") {
-  console.log("web service is not currently supported on windows");
-  process.exit(1);
-}
-
 /**
  * Module dependencies.
  */

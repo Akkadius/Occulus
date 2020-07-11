@@ -111,11 +111,14 @@
         clearInterval(Timer.timer['sys-info'])
       }
 
+      const sysInfoTimer = navigator.appVersion.indexOf("Win") ? 2500 : 1000;
+      this.loadSysInfo();
       Timer.timer['sys-info'] = setInterval(function () {
         if (!document.hidden) {
           self.loadSysInfo()
         }
-      }, 1000)
+      }, sysInfoTimer)
+
     },
     computed: {
       cpuLoadDisplay: function () {

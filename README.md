@@ -1,6 +1,12 @@
 
 # Occulus | EQEmulator Web Admin Panel
 
+**Drone Build Status**
+
+[![Build Status](https://cloud.drone.io/api/badges/Akkadius/eqemu-web-admin/status.svg)](https://cloud.drone.io/Akkadius/eqemu-web-admin) 
+
+<hr>
+
 - [What](#what)
 - [Why](#why)
 - [Features](#features)
@@ -17,9 +23,7 @@
   * [Post Launch](#post-launch)
   * [Feature Requests](#feature-requests)
 
-**Drone Build Status**
-
-[![Build Status](https://cloud.drone.io/api/badges/Akkadius/eqemu-web-admin/status.svg)](https://cloud.drone.io/Akkadius/eqemu-web-admin) 
+<hr>
 
 <p align="center">
   <a href="https://nodejs.org/">

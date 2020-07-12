@@ -7,8 +7,8 @@
 
 <hr>
 
-- [What](#what-is-occulus)
-- [Why](#why-occulus)
+- [What is Occulus?](#what-is-occulus)
+- [Why Occulus?](#why-occulus)
 - [Features](#features)
     + [Dashboard](#dashboard)
     + [Start / Stop / Restart](#start--stop--restart)

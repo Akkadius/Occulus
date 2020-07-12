@@ -221,7 +221,7 @@ eqemu@e155719debeb:~/server/eqemu-web-admin$ npm run watch
 For the frontend, you will run `npm run serve`
 
 ```
-eqemu@e155719debeb:~/server/eqemu-web-admin/frontend$ npm run watch                                                                                               
+eqemu@e155719debeb:~/server/eqemu-web-admin/frontend$ npm run serve                                                                                               
 DONE  Compiled successfully in 5744ms
  
 No type errors found

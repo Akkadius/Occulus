@@ -7,8 +7,8 @@
 
 <hr>
 
-- [What](#what)
-- [Why](#why)
+- [What](#what-is-occulus)
+- [Why](#why-occulus)
 - [Features](#features)
     + [Dashboard](#dashboard)
     + [Start / Stop / Restart](#start--stop--restart)
@@ -43,11 +43,11 @@
 
 ![image](https://user-images.githubusercontent.com/3319450/87236581-d39a8100-c3b0-11ea-94e3-6224330a8b4e.png)
 
-# What
+# What is Occulus?
 
 A web based administrator console for [EverQuest Emulator servers](https://github.com/EQEmu/Server)
 
-# Why
+# Why Occulus?
 
 To simplify administrative and development needs of operators
 

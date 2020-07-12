@@ -186,6 +186,8 @@ Want a feature that isn't already available? Open an issue with the title "[Feat
 
 If you want to contribute to the admin panel, please submit **Pull Requests**
 
+Occulus is open source, built to help others in the EverQuest Emulator community. If you use this admin panel, please remember to contribute back to the community in whichever way that you can
+
 # Developing
 
 To develop the admin panel, clone the repository in the base of your EQEmulator server

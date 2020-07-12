@@ -36,9 +36,9 @@
       width="400"
     />
   </a>
+    <a href="https://vuejs.org" target="_blank" rel="noopener noreferrer"><img width="250" src="https://vuejs.org/images/logo.png" alt="Vue logo">
+    
 </p>
-
-<p align="center"><a href="https://vuejs.org" target="_blank" rel="noopener noreferrer"><img width="300" src="https://vuejs.org/images/logo.png" alt="Vue logo"></a></p>
 
 <hr>
 

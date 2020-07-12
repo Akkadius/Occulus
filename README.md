@@ -9,6 +9,7 @@
 
 - [What is Occulus?](#what-is-occulus)
 - [Why Occulus?](#why-occulus)
+- [Using Occulus](#using-occulus)
 - [Features](#features)
     + [Dashboard](#dashboard)
     + [Start / Stop / Restart](#start--stop--restart)
@@ -50,6 +51,10 @@ A web based administrator console for [EverQuest Emulator servers](https://githu
 # Why Occulus?
 
 To simplify administrative and development needs of operators
+
+# Using Occulus
+
+Occulus is open source, built to help others in the EverQuest Emulator community. If you use this admin panel, please remember to contribute back to the community in whichever  way that you can
 
 # Features
 

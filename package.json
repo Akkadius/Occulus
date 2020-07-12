@@ -1,6 +1,6 @@
 {
   "name": "eqemu-admin",
-  "version": "2.0.4",
+  "version": "2.0.12",
   "private": true,
   "bin": "./app/bin/admin",
   "scripts": {
@@ -14,8 +14,8 @@
       "public/**"
     ],
     "targets": [
-      "node10-linux-x64",
-      "node10-win-x64"
+      "node12-linux-x64",
+      "node12-win-x64"
     ]
   },
   "repository": {

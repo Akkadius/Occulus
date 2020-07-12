@@ -4,10 +4,11 @@
  */
 const express     = require('express');
 const router      = express.Router();
-const { exec }    = require('child_process');
+const {exec}      = require('child_process');
 const pathManager = require('../core/path-manager');
-const fs          = require('fs')
+const fs          = require('fs');
 const path        = require('path');
+const os          = use('/app/core/operating-system');
 
 
 router.get('/:downloadType', function (req, res, next) {
@@ -18,19 +19,27 @@ router.get('/:downloadType', function (req, res, next) {
      */
     const downloadType = req.params.downloadType;
     const emuPath      = pathManager.getEmuServerPath();
-    const exportPath   = path.join(emuPath, 'export')
+    const exportPath   = path.join(emuPath, 'export');
 
     if (!fs.existsSync(exportPath)) {
-      fs.mkdirSync(exportPath)
+      fs.mkdirSync(exportPath);
     }
 
-    let command      = 'cd ../ && ./bin/export_client_files ' + downloadType;
+    let command;
+
+    if (os.isLinux()) {
+      command = 'cd ../ && ./bin/export_client_files ' + downloadType;
+    }
+    if (os.isWindows()) {
+      command = 'cd .. && bin\\export_client_files ' + downloadType;
+    }
+
     const spellsFile = path.join(emuPath, 'export/spells_us.txt');
     if (fs.existsSync(spellsFile)) {
       const stats                = fs.statSync(spellsFile);
       const modifiedTimeUnix     = stats.mtimeMs / 1000;
-      const unixNow              = Math.floor(Date.now() / 1000)
-      const secondsSinceModified = unixNow - modifiedTimeUnix
+      const unixNow              = Math.floor(Date.now() / 1000);
+      const secondsSinceModified = unixNow - modifiedTimeUnix;
 
       if (secondsSinceModified < 60) {
         command = 'echo "noop"';
@@ -65,10 +74,10 @@ router.get('/:downloadType', function (req, res, next) {
           break;
         default:
       }
-      
+
       const fs = require('fs');
       if (!fs.existsSync(file)) {
-        res.send('File does not exist');
+        res.send('File does not exist or you did not do an import of this type yet');
         return;
       }
 

@@ -44,7 +44,6 @@ module.exports = {
     if (!this.appKey) {
       this.appKey = uuidv4();
       eqemuConfigService.setAdminPanelConfig('application.key', this.appKey);
-      eqemuConfigService.saveServerConfig();
     }
 
     return this;
@@ -72,7 +71,7 @@ module.exports = {
         'application.admin.password',
         this.genRandomString(30)
       );
-      
+
       eqemuConfigService.saveServerConfig();
     }
 

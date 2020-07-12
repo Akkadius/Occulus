@@ -72,6 +72,7 @@
   import PlayersOnline from '@/components/PlayersOnline.vue'
   import DashboardProcessCounts from '@/components/dashboard/DashboardProcessCounts.vue'
   import ServerProcessButtonComponent from '@/components/ServerProcessButtonComponent'
+  import Timer from '@/app/core/timer'
 
   export default {
     components: {
@@ -91,8 +92,8 @@
         circleProgressInitialized: null
       }
     },
-    destroyed () {
-      clearInterval(this.statLoop)
+    beforeDestroy() {
+      clearInterval(Timer.timer['sys-info'])
     },
     created: async function () {
       EqemuAdminClient.getDashboardStats().then(response => {
@@ -104,12 +105,20 @@
 
       this.loadSysInfo()
 
-      var self      = this
-      this.statLoop = setInterval(function () {
+      var self = this
+
+      if (Timer.timer['sys-info']) {
+        clearInterval(Timer.timer['sys-info'])
+      }
+
+      const sysInfoTimer = navigator.appVersion.indexOf("Win") ? 2500 : 1000;
+      this.loadSysInfo();
+      Timer.timer['sys-info'] = setInterval(function () {
         if (!document.hidden) {
           self.loadSysInfo()
         }
-      }, 1000)
+      }, sysInfoTimer)
+
     },
     computed: {
       cpuLoadDisplay: function () {

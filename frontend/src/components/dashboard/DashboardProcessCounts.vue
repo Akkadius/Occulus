@@ -29,6 +29,7 @@
 <script>
   import { EqemuAdminClient } from '@/app/core/eqemu-admin-client'
   import ServerProcessEventBus from '@/app/core/bus/server-process-bus'
+  import Timer from '@/app/core/timer'
 
   export default {
     name: 'DashboardProcessCounts',
@@ -40,6 +41,7 @@
     },
 
     beforeDestroy () {
+      clearInterval(Timer.timer['process-counts'])
       ServerProcessEventBus.$off('process-change')
     },
 
@@ -64,8 +66,13 @@
        * Timer update
        * @type {default}
        */
-      let self        = this
-      this.updateLoop = setInterval(async function () {
+      let self = this;
+
+      if (Timer.timer['process-counts']) {
+        clearInterval(Timer.timer['process-counts'])
+      }
+
+      Timer.timer['process-counts'] = setInterval(async function () {
         self.loaded = false
         if (!document.hidden) {
           self.processCounts = await EqemuAdminClient.getProcessCounts()
@@ -73,13 +80,6 @@
         self.loaded = true
       }, 5000)
     },
-
-    /**
-     * Destroy
-     */
-    destroyed () {
-      clearInterval(this.updateLoop)
-    }
   }
 </script>
 

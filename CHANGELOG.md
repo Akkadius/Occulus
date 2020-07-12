@@ -4,6 +4,41 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.12]
+* Windows support
+
+## [2.0.11]
+* Launcher improvements
+
+## [2.0.10]
+* Debugging Windows issues
+
+## [2.0.9]
+* Update meta endpoint to include players online
+
+## [2.0.8]
+* Add endpoints
+  * GET /v1/api/admin/logs/list
+  * GET /v1/api/admin/logs/view/:file
+  * GET /v1/api/server/meta
+  * GET /v1/api/server/schema
+
+## [2.0.7]
+* Add build cancel endpoint
+
+## [2.0.6]
+* Fix build endpoint to be async
+
+## [2.0.5]
+* Add new endpoints
+  * POST /v1/api/git/update/quests
+  * POST /v1/api/git/update/maps
+  * POST /v1/api/code/git/update
+  * POST /v1/api/code/build
+  * GET /v1/api/code/build/status
+  * POST /v1/api/code/git/branch/:branch
+  * GET /v1/api/code/git/branches
+
 ## [2.0.4]
 * Fix for database editing
 

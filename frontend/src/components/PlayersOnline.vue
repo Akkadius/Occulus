@@ -31,67 +31,68 @@
 
         <app-loader :is-loading="!loaded" padding="4"></app-loader>
 
-          <div class="table-responsive" v-if="filteredClientList">
+        <div class="table-responsive" v-if="filteredClientList">
 
-            <div v-if="Object.keys(filteredClientList).length > listLimitSize && !fullList" class="m-4">
-              <b-alert variant="primary" show><i class="fe fe-info"></i>
-                Too many online to display, for full list see
-                <router-link class="ml-2 btn btn-sm btn-white" to="/players-online"><i class="fe fe-user"></i> Players
-                  Online
-                </router-link>
-              </b-alert>
-            </div>
+          <div v-if="Object.keys(filteredClientList).length > listLimitSize && !fullList" class="m-4">
+            <b-alert variant="primary" show><i class="fe fe-info"></i>
+              Too many online to display, for full list see
+              <router-link class="ml-2 btn btn-sm btn-white" to="/players-online"><i class="fe fe-user"></i> Players
+                Online
+              </router-link>
+            </b-alert>
+          </div>
 
-            <table class="table table-sm table-nowrap players-online">
-              <thead>
-              <tr>
-                <th style="width: 100px"></th>
-                <th>Player</th>
-                <th style="width: 75px">Level</th>
-                <th style="min-width: 100px">Zone</th>
-                <th style="width: 150px">Client</th>
-                <th>IP</th>
-              </tr>
-              </thead>
+          <table class="table table-sm table-nowrap players-online">
+            <thead>
+            <tr>
+              <th style="width: 100px"></th>
+              <th>Player</th>
+              <th style="width: 75px">Level</th>
+              <th style="min-width: 100px">Zone</th>
+              <th style="width: 150px">Client</th>
+              <th>IP</th>
+            </tr>
+            </thead>
 
-              <tbody v-if="Object.keys(filteredClientList).length > 0" style="padding: 30px; overflow-y: scroll !important">
+            <tbody v-if="Object.keys(filteredClientList).length > 0"
+                   style="padding: 30px; overflow-y: scroll !important">
 
-              <tr v-for="(client, index) in filteredClientList.slice().reverse().slice(0, listLimitSize)" :key="index">
-                <td class="w-10" style="text-align:center">
-                  <div class="avatar-list avatar-list-stacked">
-                    <img class="avatar-img rounded-circle" style="width:25px" :src="getClassImage(client.class)">
-                    <img class="avatar-img rounded-circle" style="width:25px" :src="getRaceImage(client.race)">
-                  </div>
-                </td>
-                <td style="align-content: center">{{client.name}}</td>
-                <td>{{client.level}}</td>
-                <td>
+            <tr v-for="(client, index) in filteredClientList.slice().reverse().slice(0, listLimitSize)" :key="index">
+              <td class="w-10" style="text-align:center">
+                <div class="avatar-list avatar-list-stacked">
+                  <img class="avatar-img rounded-circle" style="width:25px" :src="getClassImage(client.class)">
+                  <img class="avatar-img rounded-circle" style="width:25px" :src="getRaceImage(client.race)">
+                </div>
+              </td>
+              <td style="align-content: center">{{client.name}}</td>
+              <td>{{client.level}}</td>
+              <td>
             <span v-if="client.server && client.server.zone_name">
               {{client.server.zone_name}}
               <span class="badge badge-soft-primary">{{client.server.zone_id}} ({{client.server.instance_id}})</span>
             </span>
-                  <span v-if="!client.server && client.online == 1">
+                <span v-if="!client.server && client.online == 1">
               Character Select
             </span>
-                  <span v-if="!client.server && client.online > 0">
+                <span v-if="!client.server && client.online > 0">
               Zoning
             </span>
-                </td>
-                <td>
+              </td>
+              <td>
             <span v-if="client.client_version">
               {{eqClientVersionConstants[client.client_version]}}
             </span>
-                </td>
-                <td>
+              </td>
+              <td>
             <span v-if="client.ip">
               {{intToIP(client.ip)}}
             </span>
-                </td>
-              </tr>
-              </tbody>
-            </table>
+              </td>
+            </tr>
+            </tbody>
+          </table>
 
-          </div>
+        </div>
 
 
         <div class="card-body" v-if="!clientList && loaded">
@@ -105,11 +106,12 @@
 </template>
 
 <script>
-  import { EqemuAdminClient } from '@/app/core/eqemu-admin-client'
+  import {EqemuAdminClient} from '@/app/core/eqemu-admin-client'
   import eqClassIconConstants from '@/app/core/eq-class-icon-constants'
   import eqClassIntToStringConstants from '@/app/core/eq-class-int-to-string-constants'
   import eqRaceIconConstants from '@/app/core/eq-race-icon-constants'
   import eqClientVersionConstants from '@/app/core/eq-client-version-constants'
+  import Timer from '@/app/core/timer'
 
   import util from 'util'
 
@@ -123,7 +125,7 @@
       }
     },
 
-    data () {
+    data() {
       return {
         listLimitSize: null,
         loaded: false,
@@ -138,7 +140,7 @@
       }
     },
 
-    mounted () {
+    mounted() {
       this.listLimitSize = (this.fullList ? 10000 : 50)
     },
 
@@ -211,7 +213,7 @@
        *
        * @returns {boolean}
        */
-      async buildPlayersOnlineList () {
+      async buildPlayersOnlineList() {
         this.refreshing     = true
         const apiClientList = await EqemuAdminClient.getWorldClientList()
         this.refreshing     = false
@@ -243,8 +245,8 @@
     /**
      * Destroy
      */
-    destroyed () {
-      clearInterval(this.updateLoop)
+    beforeDestroy() {
+      clearInterval(Timer.timer['players-online'])
     },
 
     /**
@@ -252,14 +254,18 @@
      *
      * @returns {Promise<void>}
      */
-    async created () {
+    async created() {
 
       await this.buildPlayersOnlineList()
 
       this.loaded = true
+      var self    = this
 
-      var self        = this
-      this.updateLoop = setInterval(function () {
+      if (Timer.timer['players-online']) {
+        clearInterval(Timer.timer['players-online'])
+      }
+
+      Timer.timer['players-online'] = setInterval(function () {
         if (!document.hidden) {
           self.buildPlayersOnlineList()
         }

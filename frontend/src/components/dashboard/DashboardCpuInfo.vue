@@ -23,7 +23,7 @@
                       </small>
                     </div>
                     <div class="float-right">
-                      <small class="text-muted">{{truncate(cpuInfo, 20)}}</small>
+                      <small class="text-muted">{{truncate(cpuInfo, 15)}}</small>
                     </div>
                   </div>
 

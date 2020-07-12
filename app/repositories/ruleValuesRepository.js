@@ -3,6 +3,18 @@ const database = require('../core/database')
 module.exports = {
 
   /**
+   * @return {boolean}
+   */
+  getCurrentExpansion: async function () {
+    return (await database.connection.query('SELECT * from rule_values WHERE rule_name = :varname',
+      {
+        replacements: { varname: 'Expansion:CurrentExpansion' },
+        type: 'SELECT'
+      }
+    ))[0];
+  },
+
+  /**
    * @returns array
    */
   getAllRuleValues: async function() {

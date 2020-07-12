@@ -2,22 +2,23 @@
  * app.js
  * @type {createApplication}
  */
-const express            = require('express');
-const cookieParser       = require('cookie-parser');
-const logger             = require('morgan');
-const app                = express();
-const path               = require('path');
-const pathManager        = require('./app/core/path-manager');
-const eqemuConfigService = require('./app/core/eqemu-config-service');
-const authService        = require('./app/core/auth-service');
-const database           = require('./app/core/database');
-const hotReloadService   = require('./app/core/hot-reload-service');
+const express          = require('express');
+const cookieParser     = require('cookie-parser');
+const logger           = require('morgan');
+const app              = express();
+const path             = require('path');
+const pathManager      = require('./app/core/path-manager');
+const config           = require('./app/core/eqemu-config-service');
+const authService      = require('./app/core/auth-service');
+const database         = require('./app/core/database');
+const hotReloadService = require('./app/core/hot-reload-service');
+const debug            = require('debug')('eqemu-admin:app');
 
 /**
  * Init services
  */
 pathManager.init(__dirname);
-eqemuConfigService.init();
+config.init();
 authService.initializeAppKey();
 authService.initializeAdminPasswordIfNotSet();
 
@@ -102,3 +103,14 @@ setInterval(function () {
   netstatListener.prune();
   netstatListener.listen();
 }, 1000);
+
+/**
+ * Watchdog supervisor for launcher
+ */
+const serverProcessManager = use('/app/core/server-process-manager');
+serverProcessManager.checkIfLauncherNeedsToBeRevived();
+
+setInterval(() => {
+  debug('[www] Running watchdog');
+  serverProcessManager.checkIfLauncherNeedsToBeRevived();
+}, 60 * 1000);

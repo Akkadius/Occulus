@@ -22,7 +22,9 @@
 - [Installation](#installation)
   * [Run the Web Interface](#run-the-web-interface)
   * [Post Launch](#post-launch)
-  * [Feature Requests](#feature-requests)
+- [Feature Requests](#feature-requests)
+- [Contributing](#contributing)
+- [Developing](#developing)
 
 <hr>
 
@@ -176,6 +178,97 @@ eqemu@f8905f80723c:~/server$ cat eqemu_config.json | jq '.["web-admin"]'
 }
 ```
 
-## Feature Requests
+# Feature Requests
 
 Want a feature that isn't already available? Open an issue with the title "[Feature Request]" and we will see about getting it added
+
+# Contributing
+
+If you want to contribute to the admin panel, please submit **Pull Requests**
+
+# Developing
+
+To develop the admin panel, clone the repository in the base of your EQEmulator server
+
+The project is a Vue SPA with a NodeJS backend; so you will need to have two watcher processes watching for file changes to see the changes locally
+
+Make sure you have [NodeJS](https://nodejs.org/en/download/) installed and install nodemon `npm install -g nodemon`
+
+## Create Watches
+
+For the backend, at the base of the project run `npm run watch`
+
+```
+eqemu@e155719debeb:~/server/eqemu-web-admin$ npm run watch
+
+> eqemu-admin@2.0.13 watch /home/eqemu/server/eqemu-web-admin
+> nodemon --ignore public/ --exec node ./app/bin/admin web
+
+[nodemon] 2.0.4
+[nodemon] to restart at any time, enter `rs`
+[nodemon] watching path(s): *.*
+[nodemon] watching extensions: js,mjs,json
+[nodemon] starting `node ./app/bin/admin web`
+[www] Listening on port 3000
+[database] MySQL Attempting to connect (default) | Host [mariadb:3306] Database [peq] User [eqemu]
+[database] MySQL Connected (default) | Host [mariadb:3306] Database [peq] User [eqemu]
+[HRM] Starting HRM listener (Hot-Reload Module) v1.0
+[HRM] Watching scripts [/home/eqemu/server/quests]
+[HRM] Watching scripts [/home/eqemu/server/lua_modules]
+[HRM] Watching scripts [/home/eqemu/server/plugins]
+```
+
+For the frontend, you will run `npm run serve`
+
+```
+eqemu@e155719debeb:~/server/eqemu-web-admin/frontend$ npm run watch                                                                                               
+DONE  Compiled successfully in 5744ms
+ 
+No type errors found
+Version: typescript 3.4.5
+Time: 3661ms
+
+  App running at:
+  - Local:   http://localhost:8080/
+
+  It seems you are running Vue CLI inside a container.
+  Access the dev server via http://localhost:<your container's external mapped port>/
+
+  Note that the development build is not optimized.
+  To create a production build, run npm run build.
+```
+
+## Frontend Development Configuration
+
+**Note** For the frontend, you will need to make sure that you set `VUE_APP_BACKEND_BASE_URL` environment variable in a `.env` file at the base of the `frontend` folder, this will tell your web client what endpoint it needs to talk to for API calls
+
+`eqemu@e155719debeb:~/server/eqemu-web-admin/frontend$ cp .env.example .env`
+
+In my case; I have my development environment living in a VM and I need to point my web client to where the backend lives
+
+```
+VUE_APP_BACKEND_BASE_URL=http://192.168.98.200:3000
+```
+
+The VM is 192.168.98.200, usually if you have this running on the same machine, you would just use `localhost`
+
+If you have are developing against a backend that is remote, you will need to make sure that you add your host / ip to the CORS config on the backend under `app.js` (temporarily)
+
+Other than these small considerations, you should be on your way to developing fairly quickly
+
+```
+var cors = require('cors')
+app.use(
+  cors(
+    {
+      origin: [
+        'http://localhost:8080',
+        'http://192.168.98.200:8080',
+        'http://docker:8080',
+        'http://localhost:5000'
+      ],
+      exposedHeaders: ['Content-Disposition']
+    }
+  )
+);
+```

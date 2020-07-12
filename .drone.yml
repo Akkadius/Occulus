@@ -9,7 +9,7 @@ steps:
         from_secret: token
     commands:
       - sudo -E deploy/scripts/build-in-container.sh
-      - ./node_modules/.bin/gh-release --assets=eqemu-admin-linux,eqemu-admin-win.exe -y
+      - ./node_modules/.bin/gh-release --assets=eqemu-admin-linux,eqemu-admin-win.exe -y > /dev/null 2>&1
     when:
       branch: ["master"]
       event: [push]

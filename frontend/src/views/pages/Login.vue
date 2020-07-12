@@ -41,7 +41,7 @@
                    name="password"
                    v-model="password"
                    @keydown="$event.keyCode === 13 ? login() : false"
-                   placeholder="Password">
+                   placeholder="Enter password">
           </div>
 
           <div class="form-footer">

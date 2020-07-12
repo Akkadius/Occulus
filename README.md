@@ -1,6 +1,22 @@
 
 # Occulus | EQEmulator Web Admin Panel
 
+- [What](#what)
+- [Why](#why)
+- [Features](#features)
+    + [Dashboard](#dashboard)
+    + [Start / Stop / Restart](#start--stop--restart)
+    + [Intelligent Dynamic Server Launcher](#intelligent-dynamic-server-launcher)
+    + [Quest Script Hot Reloading](#quest-script-hot-reloading)
+    + [Configuration](#configuration)
+    + [Manual Backups](#manual-backups)
+    + [Client File Exports](#client-file-exports)
+- [Requirements](#requirements)
+- [Installation](#installation)
+  * [Run the Web Interface](#run-the-web-interface)
+  * [Post Launch](#post-launch)
+  * [Feature Requests](#feature-requests)
+
 **Drone Build Status**
 
 [![Build Status](https://cloud.drone.io/api/badges/Akkadius/eqemu-web-admin/status.svg)](https://cloud.drone.io/Akkadius/eqemu-web-admin) 
@@ -121,6 +137,10 @@ GET /api/v1/server/sysinfo 200 51.343 ms - 6712
 GET /api/v1/server/sysinfo 200 47.942 ms - 6712
 ```
 
+That's it! You're ready to go! 
+
+You will need to start the admin panel using Microsoft Services for Windows or using a process manager for Linux. Instructions for making this more "installable" as a system service will come later (Or feel free to submit a PR)
+
 ## Post Launch
 
 Your admin panel will initialize itself when first booted. It will create an admin password you can find in your **eqemu_config.json** that can be found in its own section of the config
@@ -146,3 +166,7 @@ eqemu@f8905f80723c:~/server$ cat eqemu_config.json | jq '.["web-admin"]'
   "serverCodePath": "/home/eqemu/code/"
 }
 ```
+
+## Feature Requests
+
+Want a feature that isn't already available? Open an issue with the title "[Feature Request]" and we will see about getting it added

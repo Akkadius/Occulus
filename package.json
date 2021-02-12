@@ -1,12 +1,12 @@
 {
   "name": "eqemu-admin",
-  "version": "2.0.13",
+  "version": "2.0.14",
   "private": true,
   "bin": "./app/bin/admin",
   "scripts": {
     "start": "node ./app/bin/admin web",
     "debug": "DEBUG=eqemu-admin:*; node ./app/bin/admin web",
-    "watch": "nodemon --ignore public/ --exec node ./app/bin/admin web"
+    "watch": "nodemon --ignore public/ --ignore eqemu_config.json --exec node ./app/bin/admin web"
   },
   "pkg": {
     "assets": [
@@ -23,6 +23,7 @@
     "url": "https://github.com/Akkadius/eqemu-web-admin.git"
   },
   "dependencies": {
+    "axios": "^0.21.1",
     "chalk": "^3.0.0",
     "child_process": "^1.0.2",
     "commander": "^2.20.0",
@@ -51,6 +52,5 @@
     "uuid": "^3.4.0",
     "ws": "^7.3.0",
     "yazl": "^2.5.1"
-  },
-  "devDependencies": {}
+  }
 }

@@ -48,6 +48,10 @@ export default new Router({
               component: () => import('./views/pages/configuration/UcsSettings.vue')
             },
             {
+              path: 'settings/discord',
+              component: () => import('./views/pages/configuration/DiscordSettings.vue')
+            },
+            {
               path: 'settings/database',
               component: () => import('./views/pages/configuration/Database.vue')
             },

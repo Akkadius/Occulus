@@ -59,6 +59,10 @@ module.exports = {
      * Lua Modules
      */
     watch(pathManager.getEmuLuaModulesPath(), { recursive: true }, function (evt, file) {
+      if (!["lua", "pl"].includes(file.split('.').pop())) {
+        return false
+      }
+
       if (evt === 'update') {
         const changedFile = path.dirname(file).split(path.sep).pop() + '/' + path.basename(file);
 
@@ -74,6 +78,10 @@ module.exports = {
      * Plugins
      */
     watch(pathManager.getEmuPluginsPath(), { recursive: true }, function (evt, file) {
+      if (!["lua", "pl"].includes(file.split('.').pop())) {
+        return false
+      }
+
       if (evt === 'update') {
         const changedFile = path.dirname(file).split(path.sep).pop() + '/' + path.basename(file);
 
@@ -90,6 +98,10 @@ module.exports = {
      * Quests
      */
     watch(pathManager.getEmuQuestsPath(), { recursive: true }, function (evt, file) {
+      if (!["lua", "pl"].includes(file.split('.').pop())) {
+        return false
+      }
+
       if (evt === 'update') {
         const changedFile = path.dirname(file).split(path.sep).pop() + '/' + path.basename(file);
         const changedZone = path.dirname(file).split(path.sep).pop();

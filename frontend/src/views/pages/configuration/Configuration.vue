@@ -55,6 +55,7 @@
                 </router-link>
               </li>
 
+
               <li class="nav-item">
                 <router-link
                   to="/admin/configuration/settings/database"
@@ -87,6 +88,20 @@
                   Rules
                 </router-link>
               </li>
+
+              <li class="nav-item">
+                <router-link
+                  to="/admin/configuration/settings/discord"
+                  active-class=""
+                  exact-active-class="active"
+                  class="nav-link">
+                  <span class="icon mr-1">
+                    <img src="~@/assets/img/icons/discord-logo-small.png" style="height: 25px;">
+                  </span>
+                  Discord
+                </router-link>
+              </li>
+
             </ul>
 
           </div>

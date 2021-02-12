@@ -12,6 +12,7 @@ const config           = require('./app/core/eqemu-config-service');
 const authService      = require('./app/core/auth-service');
 const database         = require('./app/core/database');
 const hotReloadService = require('./app/core/hot-reload-service');
+const fileEventWatcher = require('./app/core/file-event-watcher');
 const debug            = require('debug')('eqemu-admin:app');
 
 /**
@@ -114,3 +115,5 @@ setInterval(() => {
   debug('[www] Running watchdog');
   serverProcessManager.checkIfLauncherNeedsToBeRevived();
 }, 60 * 1000);
+
+fileEventWatcher.watchCrashLogs();

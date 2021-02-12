@@ -44,6 +44,11 @@ module.exports = {
       });
     }
 
+    // init defaults
+    if (this.getAdminPanelConfig("discord.crash_log_webhook", "") === '') {
+      this.setAdminPanelConfig("discord.crash_log_webhook", "")
+    }
+
     debug('Loaded [%s]', this.getServerConfigPath());
 
     return this;

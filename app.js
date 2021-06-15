@@ -42,6 +42,7 @@ app.use(
       origin: [
         'http://localhost:8080',
         'http://192.168.98.200:8080',
+        'http://192.168.65.229:8080',
         'http://docker:8080',
         'http://localhost:5000'
       ],

@@ -2,7 +2,7 @@
   <div>
     <dashboard-navbar></dashboard-navbar>
     <div class="main-content">
-      <div class="container">
+      <div class="container content-area">
         <router-view></router-view>
       </div>
     </div>

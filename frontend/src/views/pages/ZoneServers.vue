@@ -50,6 +50,13 @@
                   <span v-if="zone.instance_id">Instance: {{ zone.instance_id }}</span>
                 </span>
                 <span class="text-muted ml-2" style="font-size:12px">  </span>
+                <router-link
+                  class="text-muted ml-2"
+                  :to="`zoneservers/${zone.client_port}/logs`"
+                  style="font-size:12px">
+                  <i class="fe fe-play"></i> Stream Logs
+                </router-link>
+
               </div>
 
             </h4>

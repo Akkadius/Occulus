@@ -13,7 +13,7 @@ let dataService            = use('/app/core/eqemu-data-service-client.js');
 
 
 router.get('/hello', function (req, res, next) {
-  res.send({ 'data': 'hello' });
+  res.send({'data': 'hello'});
 });
 
 router.get('/websocket-authorization', async function (req, res, next) {
@@ -23,18 +23,18 @@ router.get('/websocket-authorization', async function (req, res, next) {
 });
 
 let lastCachedTime = 0;
-let lastCpuInfo = {};
+let lastCpuInfo    = {};
 
 async function getCpuInfo() {
   const currentTime = Math.floor(new Date() / 1000);
 
   cpuInfo = lastCpuInfo;
   if (currentTime - 30 > lastCachedTime || Object.keys(lastCpuInfo).length === 0) {
-    cpuInfo = {
+    cpuInfo        = {
       info: await si.cpu(),
       speed: await si.cpuCurrentspeed()
     };
-    lastCpuInfo = cpuInfo;
+    lastCpuInfo    = cpuInfo;
     lastCachedTime = currentTime;
   }
 
@@ -76,26 +76,26 @@ router.get('/sysinfo', async function (req, res, next) {
 
 router.get('/stop', function (req, res, next) {
   serverProcessManager.stopServer();
-  res.send({ 'data': 'Server has been stopped successfully' });
+  res.send({'data': 'Server has been stopped successfully'});
 });
 
 router.get('/start', function (req, res, next) {
   serverProcessManager.startServerLauncher();
-  res.send({ 'data': 'Server has been started successfully!' });
+  res.send({'data': 'Server has been started successfully!'});
 });
 
 router.post('/restart/cancel', function (req, res, next) {
   serverProcessManager.cancelRestart(req.body);
-  res.send({ 'data': 'Server restart cancelled' });
+  res.send({'data': 'Server restart cancelled'});
 });
 
 router.post('/restart', function (req, res, next) {
   serverProcessManager.restartServer(req.body);
-  res.send({ 'data': 'Server restart starting' });
+  res.send({'data': 'Server restart starting'});
 });
 
 router.get('/launcher/config', function (req, res, next) {
-  res.send({ 'data': config.getAdminPanelConfig('launcher') });
+  res.send({'data': config.getAdminPanelConfig('launcher')});
 });
 
 router.post('/launcher/config', function (req, res, next) {
@@ -103,7 +103,7 @@ router.post('/launcher/config', function (req, res, next) {
     .setAdminPanelConfig('launcher', req.body)
     .saveServerConfig()
 
-  res.send({ 'data': 'Launcher config updated!' });
+  res.send({'data': 'Launcher config updated!'});
 });
 
 router.get('/process_counts', async function (req, res, next) {
@@ -113,8 +113,11 @@ router.get('/process_counts', async function (req, res, next) {
 
 router.get('/log_categories', async function (req, res, next) {
   res.send(
-    await models['logsys_categories'].resource.findAll({ order: [['log_category_description', 'ASC']] })
-  );
+    (await
+        connection.query('select * from logsys_categories ORDER BY log_category_description ASC'),
+        {type: 'SELECT'}
+    )
+  )
 });
 
 router.get('/meta', async function (req, res, next) {

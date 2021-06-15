@@ -1,10 +1,28 @@
 <template>
   <div class="col-12">
+
+    <div class="header">
+      <div class="header-body">
+        <div class="row align-items-center">
+          <div class="col">
+            <h6 class="header-pretitle">
+              Streaming
+            </h6>
+
+            <h1 class="header-title">
+              Zoneserver Log Streaming
+            </h1>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="row">
       <div class="col-lg-2 order-lg-0 mb-4" v-bind:style="{ height: panelHeight * 1.1 + 'px', overflowY: 'scroll' }">
         <div class="form-group">
-          <div class="form-label">Logging Categories</div>
-          <div class="custom-controls-stacked">
+          <h4>Logging Categories</h4>
+          <div class="custom-controls-stacked" style="font-size: 11px;">
             <label class="custom-control custom-checkbox" v-for="(category, index) in logCategories"
                    :key="index">
               <input type="checkbox"
@@ -32,19 +50,24 @@
           <div class="card-body">
             <div class="row">
               <div class="col-lg-12">
-                <div class="form-group">
-                <textarea class="form-control"
-                          v-bind:style="{ fontSize: '1rem', height: panelHeight + 'px' }"
-                          v-model="logData"></textarea>
-                </div>
+
+
+                  <div class="card-footer bg-dark pb-0">
+                    <pre class="highlight html bg-dark hljs xml mb-0" style="color: rgb(235 235 235);; height: 70vh; overflow-y: scroll;">{{logData}}</pre>
+
+                  </div>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+
+
+
   </div>
 </template>
+
 
 <script>
   import {EqemuWebsocketClient} from '@/app/core/eqemu-websocket-client'
@@ -64,6 +87,13 @@
       }
     },
     async created() {
+
+      // viewport
+      setTimeout(() => {
+        const container = document.getElementsByClassName("content-area")[0];
+        container.setAttribute( 'style', 'max-width: 95% !important' );
+      }, 100)
+
       this.panelHeight = window.innerHeight * .7
       this.zonePort    = this.$route.params.port
 
@@ -108,6 +138,10 @@
           self.logData    = logString.substring(0, LOG_STREAM_TRUNCATE_CHARACTER_LENGTH)
         }
       }
+    },
+    beforeDestroy() {
+      const container = document.getElementsByClassName("content-area")[0];
+      container.style.maxWidth = null;
     },
     destroyed() {
       this.ws.close()

@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.15]
+* Hack together zone log streaming support again (Relies on server configured for Websockets)
+
 ## [2.0.14]
 * Add Discord Webhook support in configuration tab for crash logs
 * Hot reload module for quests no longer triggers on anything but Lua or Perl scripts

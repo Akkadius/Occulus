@@ -392,9 +392,10 @@ module.exports = {
   restartServer: async function (options = []) {
     this.init(options, true);
 
-    /**
-     * Delayed restart
-     */
+    // reset timed restart if triggered restart again
+    this.cancelTimedRestart = false;
+
+    // delayed restart
     if (options.timer && options.timer > 0) {
 
       const startTime     = Math.floor(new Date() / 1000);

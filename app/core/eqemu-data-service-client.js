@@ -89,7 +89,7 @@ module.exports = {
 
     // reformat
     response = response.replace("Worldserver Uptime |", "")
-    response = response.replace(",", "")
+    response = response.replaceAll(",", "")
     response = response.replace("and", "")
     response = response.replace(" Days", "d")
     response = response.replace(" Day", "d")

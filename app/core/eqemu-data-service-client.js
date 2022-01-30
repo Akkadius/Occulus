@@ -92,10 +92,17 @@ module.exports = {
     response = response.replace(",", "")
     response = response.replace("and", "")
     response = response.replace(" Days", "d")
+    response = response.replace(" Day", "d")
     response = response.replace(" Weeks", "w")
+    response = response.replace(" Week", "w")
     response = response.replace(" Months", "m")
+    response = response.replace(" Month", "m")
+    response = response.replace(" Hours", "h")
+    response = response.replace(" Hour", "h")
     response = response.replace(" Minutes", "m")
+    response = response.replace(" Minute", "m")
     response = response.replace(" Seconds", "s")
+    response = response.replace(" Second", "s")
     response = response.replace(/^\s+|\s+$/g, "")
 
     return response.trim();

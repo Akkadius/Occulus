@@ -82,12 +82,23 @@ module.exports = {
    * @returns {Promise<string>}
    */
   getWorldUptime: async function () {
-    const response = await telnetService.execWorld('uptime 0');
+    let response = await telnetService.execWorld('uptime 0');
     if (!response) {
       return 0;
     }
 
-    return response.replace('Worldserver Uptime: ', '').trim();
+    // reformat
+    response = response.replace("Worldserver Uptime |", "")
+    response = response.replace(",", "")
+    response = response.replace("and", "")
+    response = response.replace(" Days", "d")
+    response = response.replace(" Weeks", "w")
+    response = response.replace(" Months", "m")
+    response = response.replace(" Minutes", "m")
+    response = response.replace(" Seconds", "s")
+    response = response.replace(/^\s+|\s+$/g, "")
+
+    return response.trim();
   },
 
   /**

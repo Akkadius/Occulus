@@ -47,7 +47,7 @@
 
           <!-- Tools -->
           <li class="nav-item dropdown">
-            <router-link to="/admin/tools" class="nav-link">
+            <router-link :to="ROUTES.TOOLS" class="nav-link">
               <i class="fa fa-wrench mr-2"></i> Tools
             </router-link>
           </li>
@@ -86,6 +86,7 @@
 
   import {EqemuAdminClient}    from "@/app/core/eqemu-admin-client";
   import ServerProcessEventBus from '@/app/core/bus/server-process-bus'
+  import {ROUTES}              from "@/routes";
 
   export default {
     components: {
@@ -95,7 +96,9 @@
       return {
         username: null,
         launcher: null,
-        delayedRestart: 0
+        delayedRestart: 0,
+
+        ROUTES: ROUTES,
       }
     },
 

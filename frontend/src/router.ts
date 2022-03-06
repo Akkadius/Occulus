@@ -70,17 +70,21 @@ export default new Router({
           component: () => import('./views/pages/PlayersOnline.vue'),
         },
         {
-          path: 'admin/tools',
+          path: 'tools',
           component: () => import('./views/pages/tools/Tools.vue'),
           children: [
             {
               path: '/',
+              component: () => import('./views/pages/tools/Logs.vue')
+            },
+            {
+              path: 'backups',
               component: () => import('./views/pages/tools/Backups.vue')
             },
             {
-              path: 'client/assets',
+              path: 'client-assets',
               component: () => import('./views/pages/tools/ClientAssets.vue')
-            }
+            },
           ]
         }
       ]

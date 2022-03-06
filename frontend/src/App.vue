@@ -39,7 +39,7 @@ export default {
           self.$router.push(ROUTES.CONFIGURATION)
           break
         case '5':
-          self.$router.push(ROUTES.TOOLS)
+          self.$router.push(ROUTES.TOOLS_LOGS)
           break
         case 'p':
           self.$root.$emit('bv::show::modal', 'start-server-modal')

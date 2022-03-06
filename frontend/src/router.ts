@@ -1,4 +1,4 @@
-import Vue    from 'vue'
+import Vue from 'vue'
 import Router from 'vue-router'
 
 Vue.use(Router)
@@ -74,12 +74,16 @@ export default new Router({
           component: () => import('./views/pages/tools/Tools.vue'),
           children: [
             {
-              path: '/',
+              path: 'logs',
               component: () => import('./views/pages/tools/Logs.vue')
             },
             {
               path: 'backups',
               component: () => import('./views/pages/tools/Backups.vue')
+            },
+            {
+              path: 'server-code',
+              component: () => import('./views/pages/tools/ServerCode.vue')
             },
             {
               path: 'client-assets',

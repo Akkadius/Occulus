@@ -130,7 +130,7 @@ export default {
 
       const log = this.$route.query.log
 
-      let r = await EqemuAdminClient.getServerLog(log, true)
+      let r = await EqemuAdminClient.getServerLog(log)
       if (r && r.status === 200) {
         this.logOutput = r.data.fileContents
       }

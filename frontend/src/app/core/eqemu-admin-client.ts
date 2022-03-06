@@ -117,9 +117,14 @@ export class EqemuAdminClient {
   /**
    * @param url
    * @param data
+   * @param returnResponse
    */
-  static async post(url: string, data: any) {
+  static async post(url: string, data: any, returnResponse = false) {
     try {
+      if (returnResponse) {
+        return await this.client().post(url, data)
+      }
+
       const response = await this.client().post(url, data)
 
       return response.data
@@ -259,7 +264,43 @@ export class EqemuAdminClient {
 
   static async getServerLog(fileName: string) {
     return (await this.get(
-      util.format('/admin/logs/view/%s', encodeURIComponent(fileName))
-    , true))
+      util.format('/admin/logs/view/%s', encodeURIComponent(fileName)), true
+    ))
   }
+
+  static async getServerCodeBranches() {
+    return (await this.get('/admin/code/git/branches', true))
+  }
+
+  static async getServerCodeBranch() {
+    return (await this.get('/admin/code/git/branch', true))
+  }
+
+  static async setServerCodeBranch(branch: string) {
+    return this.post(
+      util.format(
+        '/admin/code/git/branch/%s',
+        encodeURIComponent(branch)
+      ),
+      {},
+      true
+    )
+  }
+
+  static async getBuildStatus() {
+    return (await this.get('/admin/code/build/status', true))
+  }
+
+  static async buildServerCode() {
+    return this.post('/admin/code/build', {}, true)
+  }
+
+  static async updateServerCode() {
+    return this.post('/admin/code/git/update', {}, true)
+  }
+
+  static async cancelServerBuild() {
+    return this.post('/admin/code/build/cancel', {}, true)
+  }
+
 }

@@ -22,10 +22,21 @@
                   :to="ROUTES.TOOLS_LOGS"
                   active-class=""
                   exact-active-class="active"
-                  class="nav-link"
+                  :class="'nav-link ' + (hasRoute(ROUTES.TOOLS_LOGS) ? 'active' : '')"
                 >
                   <i class="fe fe-book mr-2"></i>
                   Logs
+                </router-link>
+              </li>
+
+              <li class="nav-item">
+                <router-link
+                  :to="ROUTES.TOOLS_SERVER_CODE"
+                  active-class=""
+                  exact-active-class="active"
+                  class="nav-link">
+                  <i class="fe fe-download-cloud mr-2"></i>
+                  Server Code (Linux)
                 </router-link>
               </li>
 
@@ -78,5 +89,10 @@ export default {
       ROUTES: ROUTES
     }
   },
+  methods: {
+    hasRoute: function (partial) {
+      return (this.$route.path.indexOf(partial) > -1)
+    },
+  }
 }
 </script>

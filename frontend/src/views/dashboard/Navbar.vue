@@ -47,7 +47,7 @@
 
           <!-- Tools -->
           <li class="nav-item dropdown">
-            <router-link :to="ROUTES.TOOLS" class="nav-link">
+            <router-link :to="ROUTES.TOOLS_LOGS" class="nav-link">
               <i class="fa fa-wrench mr-2"></i> Tools
             </router-link>
           </li>

@@ -128,7 +128,8 @@ module.exports = {
           accessToken = req.get('authorization').split('Bearer ')[1].trim();
         } catch (e) {
           debug('[auth-service] Authorization token is invalid')
-          res.send(401, 'Authorization token is invalid');
+          res.status(401).send('Authorization token is not valid');
+          return true
         }
       }
 
@@ -139,11 +140,13 @@ module.exports = {
         debug('[v1-route] [%s]', requestedUrl);
 
         if (accessToken === '') {
-          res.send(401, 'Authorization token is not valid');
+          res.status(401).send('Authorization token is not valid');
+          return true
         }
 
         if (!self.isTokenValid(accessToken)) {
-          res.send(401, 'Authorization token is not valid');
+          res.status(401).send('Authorization token is not valid');
+          return true
         } else {
           next();
         }

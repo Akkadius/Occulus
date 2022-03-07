@@ -4,6 +4,8 @@
 
 <script>
 
+import {ROUTES} from "@/routes";
+
 export default {
   name: 'example',
   data () {
@@ -25,19 +27,19 @@ export default {
           toggleDarkMode()
           break
         case '1':
-          self.$router.push('/')
+          self.$router.push(ROUTES.ROOT)
           break
         case '2':
-          self.$router.push('/players-online')
+          self.$router.push(ROUTES.PLAYERS_ONLINE)
           break
         case '3':
-          self.$router.push('/zoneservers')
+          self.$router.push(ROUTES.ZONESERVERS)
           break
         case '4':
-          self.$router.push('/admin/configuration')
+          self.$router.push(ROUTES.CONFIGURATION)
           break
         case '5':
-          self.$router.push('/admin/tools')
+          self.$router.push(ROUTES.TOOLS_LOGS)
           break
         case 'p':
           self.$root.$emit('bv::show::modal', 'start-server-modal')

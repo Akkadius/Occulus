@@ -20,7 +20,8 @@
         class="form-control form-control-prepended list-search"
         @keyup="filterRules"
         v-model="ruleFilter"
-        placeholder="Search rules...">
+        placeholder="Search rules..."
+      >
 
       <div class="input-group-prepend">
         <div class="input-group-text">
@@ -52,31 +53,36 @@
 
               <!-- Loop through rules -->
               <tr v-for="(rule, index) in filteredRules" :key="index">
-                <td class="">{{rule.ruleset_id}}</td>
-                <td>{{rule.rule_name}}</td>
+                <td class="">{{ rule.ruleset_id }}</td>
+                <td>{{ rule.rule_name }}</td>
 
                 <td class="text-muted" style="overflow: auto; white-space: normal;">
-                  {{rule.notes}}
+                  {{ rule.notes }}
                 </td>
 
                 <td>
 
-                  <label class="pb-2 pt-2"
-                         v-if="rule.rule_value === 'true' || rule.rule_value === 'false'">
-                    <input type="checkbox"
-                           name="custom-switch-checkbox"
-                           v-bind:true-value="'true'"
-                           v-bind:false-value="'false'"
-                           v-model="rule.rule_value"
-                           @change="updateRule(rule)"
-                           class="custom-switch-input">
+                  <label
+                    class="pb-2 pt-2"
+                    v-if="rule.rule_value === 'true' || rule.rule_value === 'false'"
+                  >
+                    <input
+                      type="checkbox"
+                      name="custom-switch-checkbox"
+                      v-bind:true-value="'true'"
+                      v-bind:false-value="'false'"
+                      v-model="rule.rule_value"
+                      @change="updateRule(rule)"
+                      class="custom-switch-input"
+                    >
                     <span class="custom-switch-indicator"></span>
                   </label>
 
-                  <span v-if="Number.isInteger(parseInt(rule.rule_value))">
-                      <input type="text" class="form-control"
-                             v-model="rule.rule_value"
-                             @change="updateRule(rule)"
+                  <span v-if="!(rule.rule_value === 'true' || rule.rule_value === 'false')">
+                      <input
+                        type="text" class="form-control"
+                        v-model="rule.rule_value"
+                        @change="updateRule(rule)"
                       >
                   </span>
 
@@ -94,52 +100,52 @@
 </template>
 
 <script>
-  import {EqemuAdminClient} from '@/app/core/eqemu-admin-client'
+import {EqemuAdminClient} from '@/app/core/eqemu-admin-client'
 
-  export default {
-    data() {
-      return {
-        rules: null,
-        filteredRules: null,
-        loaded: false,
-        ruleFilter: null
+export default {
+  data() {
+    return {
+      rules: null,
+      filteredRules: null,
+      loaded: false,
+      ruleFilter: null
+    }
+  },
+  async created() {
+    this.rules = await EqemuAdminClient.getServerRules();
+    this.filterRules();
+    this.loaded = true;
+    this.initTable()
+  },
+  methods: {
+    async updateRule(rule) {
+      const response = await EqemuAdminClient.postServerRule(rule);
+      if (response.success) {
+        this.$toast.info(
+          response.success,
+          'Rule Updated',
+          { position: 'bottomRight' }
+        )
       }
     },
-    async created() {
-      this.rules = await EqemuAdminClient.getServerRules();
-      this.filterRules();
-      this.loaded = true;
-      this.initTable()
-    },
-    methods: {
-      async updateRule(rule) {
-        const response = await EqemuAdminClient.postServerRule(rule);
-        if (response.success) {
-          this.$toast.info(
-            response.success,
-            'Rule Updated',
-            { position: 'bottomRight' }
-          )
-        }
-      },
-      filterRules() {
-        if (!this.ruleFilter) {
-          this.filteredRules = this.rules;
-          return;
-        }
-
-        let filteredRules = [];
-        this.rules.forEach(row => {
-          if (
-            row.rule_name.toLowerCase().includes(this.ruleFilter.toLowerCase()) ||
-            row.notes.toLowerCase().includes(this.ruleFilter.toLowerCase())
-          ) {
-            filteredRules.push(row)
-          }
-        });
-
-        this.filteredRules = filteredRules
+    filterRules() {
+      if (!this.ruleFilter) {
+        this.filteredRules = this.rules;
+        return;
       }
+
+      let filteredRules = [];
+      this.rules.forEach(row => {
+        if (
+          row.rule_name.toLowerCase().includes(this.ruleFilter.toLowerCase()) ||
+          row.notes.toLowerCase().includes(this.ruleFilter.toLowerCase())
+        ) {
+          filteredRules.push(row)
+        }
+      });
+
+      this.filteredRules = filteredRules
     }
   }
+}
 </script>

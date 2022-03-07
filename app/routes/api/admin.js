@@ -103,6 +103,81 @@ router.post('/git/update/maps', async function (req, res, next) {
 });
 
 /**
+ * Quests
+ */
+router.get('/code/git/quests/branch', async function (req, res, next) {
+  const codePath = path.join(pathManager.getEmuServerPath(), 'quests/')
+  const command  = util.format(
+    'cd %s && git rev-parse --abbrev-ref HEAD',
+    codePath
+  )
+
+  let result
+
+  try {
+    result = require('child_process')
+      .execSync(command)
+      .toString();
+  } catch (err) {
+    result = err.toString()
+  }
+
+  res.send(result);
+});
+
+router.post('/code/git/quests/branch/:branch', async function (req, res, next) {
+  const codePath = path.join(pathManager.getEmuServerPath(), 'quests/')
+  const command  = util.format(
+    'cd %s && git fetch origin && git checkout -f %s && git pull',
+    codePath,
+    req.params.branch
+  )
+
+  let result
+
+  try {
+    result = require('child_process')
+      .execSync(command)
+      .toString();
+  } catch (err) {
+    result = err.toString()
+  }
+
+  res.send(result);
+});
+
+router.get('/code/git/quests/branches', async function (req, res, next) {
+  const codePath = path.join(pathManager.getEmuServerPath(), 'quests/')
+  const command  = util.format(
+    'cd %s && git fetch origin && git branch -a',
+    codePath
+  );
+
+  let result;
+
+  try {
+    result = require('child_process')
+      .execSync(command)
+      .toString();
+  } catch (err) {
+    result = err.toString()
+  }
+
+  result = result.split('\n').filter(function (line) {
+    return line.indexOf('->') === -1;
+  }).join('\n');
+
+  result = result
+    .trim()
+    .replace(/^ +/gm, '')
+    .replace(/remotes\/origin\//g, '')
+    .replace(/\* /g, '')
+    .split('\n');
+
+  res.json({ branches: result });
+});
+
+/**
  * Code
  */
 router.post('/code/git/update', async function (req, res, next) {
@@ -147,7 +222,7 @@ router.post('/code/build', async function (req, res, next) {
 
 router.post('/code/build/cancel', async function (req, res, next) {
   require('child_process')
-    .exec('pkill -9 make', function (err, stdout) {
+    .exec('pkill -9 make && pkill -9 ninja', function (err, stdout) {
     });
 
   res.json({ message: 'Build job killed' });

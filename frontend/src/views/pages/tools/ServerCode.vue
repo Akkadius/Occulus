@@ -1,8 +1,16 @@
 <template>
   <div>
+
+    <div class="mb-3 alert alert-primary">
+      <i class="fe fe-info"></i>
+      <span class="font-weight-bold ml-3">serverCodePath</span>
+      must be set in <span class="font-weight-bold">eqemu_config.json</span> (defaults /home/eqemu/code)
+    </div>
+
     <app-loader :is-loading="!(branches && currentBranch)"/>
 
     <div class="card" v-if="branches && currentBranch">
+
       <div class="card-body">
 
         <b-input-group prepend="Current Branch">
@@ -26,7 +34,7 @@
       <div class="card-footer bg-dark pb-0" v-if="buildOutput">
         <pre
           id="build-output" class="highlight html bg-dark hljs xml mb-0"
-          style="color: #569CD6; max-height: 600px; overflow-y: scroll"
+          style="color: #569CD6; height: 50vh; overflow-y: scroll"
         >
 {{ buildOutput }}
         </pre>
@@ -105,7 +113,7 @@ export default {
 
         let element = document.getElementById("build-output");
         if (element) {
-          element.scrollTop = element.scrollHeight + 500;
+          element.scrollTop = element.scrollHeight;
         }
       }, 500);
     },

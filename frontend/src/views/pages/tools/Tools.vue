@@ -35,8 +35,20 @@
                   active-class=""
                   exact-active-class="active"
                   class="nav-link">
-                  <i class="fe fe-download-cloud mr-2"></i>
+                  <i class="fa fa-code-fork mr-2"></i>
                   Server Code (Linux)
+                </router-link>
+              </li>
+
+
+              <li class="nav-item">
+                <router-link
+                  :to="ROUTES.TOOLS_QUESTS"
+                  active-class=""
+                  exact-active-class="active"
+                  class="nav-link">
+                  <i class="fa fa-code-fork mr-2"></i>
+                  Quests
                 </router-link>
               </li>
 

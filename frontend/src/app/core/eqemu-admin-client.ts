@@ -303,4 +303,23 @@ export class EqemuAdminClient {
     return this.post('/admin/code/build/cancel', {}, true)
   }
 
+
+  static async getServerQuestsBranches() {
+    return (await this.get('/admin/code/git/quests/branches', true))
+  }
+
+  static async getServerQuestsBranch() {
+    return (await this.get('/admin/code/git/quests/branch', true))
+  }
+
+  static async setServerQuestsBranch(branch: string) {
+    return this.post(
+      util.format(
+        '/admin/code/git/quests/branch/%s',
+        encodeURIComponent(branch)
+      ),
+      {},
+      true
+    )
+  }
 }

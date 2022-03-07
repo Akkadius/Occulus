@@ -5,6 +5,7 @@ export const ROUTES = {
   TOOLS_BACKUPS: '/tools/backups',
   TOOLS_LOGS: '/tools/logs',
   TOOLS_SERVER_CODE: '/tools/server-code',
+  TOOLS_QUESTS: '/tools/server-quests',
   CONFIGURATION: '/admin/configuration',
   ZONESERVERS: '/zoneservers',
   PLAYERS_ONLINE: '/players-online'

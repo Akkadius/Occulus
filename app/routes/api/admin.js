@@ -206,9 +206,10 @@ router.post('/code/build', async function (req, res, next) {
   const codePath   = config.getAdminPanelConfig('serverCodePath', '/home/eqemu/code/')
   const buildCores = parseInt(require('os').cpus().length / 2).toString();
   const command    = util.format(
-    'cd %s && make -j%s || ninja -j%s > %s &',
+    'cd %s && bash -c \'make -j%s > %s || ninja -j%s > %s\' &',
     path.join(codePath, 'build'),
     buildCores,
+    TEMP_BUILD_OUTPUT_PATH,
     buildCores,
     TEMP_BUILD_OUTPUT_PATH
   );

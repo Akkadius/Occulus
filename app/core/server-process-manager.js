@@ -44,7 +44,9 @@ module.exports = {
   init: function (options, skipConfigWatch = false) {
     this.launchOptions = options;
 
-    process.title = "eqemu-server-launcher";
+    if (process.platform === "win32") {
+      process.title = "EQEmu Server Launcher"
+    }
 
     config.init(skipConfigWatch);
 

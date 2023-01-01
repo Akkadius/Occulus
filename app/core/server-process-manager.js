@@ -1,17 +1,18 @@
 /**
  * server-process-manager.js
  */
-const {exec, execSync}  = require('child_process');
-const serverDataService = require('./eqemu-data-service-client.js');
-const pathManager       = require('./path-manager');
-const fs                = require('fs');
-const path              = require('path');
-const util              = require('util');
-const psList            = require('ps-list');
-const debug             = require('debug')('eqemu-admin:process-manager');
-const config            = require('./eqemu-config-service');
-const systemProc        = require('process');
-const os                = use('/app/core/operating-system');
+const { exec, execSync } = require('child_process');
+const serverDataService  = require('./eqemu-data-service-client.js');
+const pathManager        = require('./path-manager');
+const fs                 = require('fs');
+const path               = require('path');
+const util               = require('util');
+const psList             = require('ps-list');
+const debug              = require('debug')('eqemu-admin:process-manager');
+const config             = require('./eqemu-config-service');
+const systemProc         = require('process');
+const { static }         = require("express");
+const os                 = use('/app/core/operating-system');
 
 /**
  * Constants
@@ -30,6 +31,7 @@ module.exports = {
   erroredStartsMaxHalt: 5,
   processCount: {},
   serverProcessNames: ['zone', 'world', 'ucs', 'queryserv', 'loginserver'],
+  onlineStatics: [],
   systemProcessList: {},
   launchOptions: {},
   watchDogTimer: null,
@@ -50,12 +52,20 @@ module.exports = {
 
     config.init(skipConfigWatch);
 
-    let self = this;
-    this.serverProcessNames.forEach(function (process_name) {
-      self.erroredStartsCount[process_name]    = 0;
-      self.hasErroredHaltMessage[process_name] = 0;
-      self.processCount[process_name]          = 0;
+    this.serverProcessNames.forEach((processName) => {
+      this.erroredStartsCount[processName]    = 0;
+      this.hasErroredHaltMessage[processName] = 0;
+      this.processCount[processName]          = 0;
     });
+  },
+
+  getStatics() {
+    const statics = config.getAdminPanelConfig('launcher.staticZones', "load2,cshome")
+    if (statics.length > 0) {
+      return statics.split(",")
+    }
+
+    return []
   },
 
   /**
@@ -70,9 +80,8 @@ module.exports = {
    */
   isEqemuServerOnline() {
     let isServerOnline = false;
-    let self           = this;
-    this.serverProcessNames.forEach(function (processName) {
-      if (self.processCount[processName] > 0) {
+    this.serverProcessNames.forEach((processName) => {
+      if (this.processCount[processName] > 0) {
         isServerOnline = true;
       }
     });
@@ -106,13 +115,12 @@ module.exports = {
       debug('Running shared memory');
 
       if (os.isLinux()) {
-        execSync('./bin/shared_memory', {cwd: pathManager.emuServerPath}).toString();
+        execSync('./bin/shared_memory', { cwd: pathManager.emuServerPath }).toString();
       }
 
       if (os.isWindows()) {
-        execSync('bin\\shared_memory', {cwd: pathManager.emuServerPath}).toString();
+        execSync('bin\\shared_memory', { cwd: pathManager.emuServerPath }).toString();
       }
-
     }
 
     if (config.getAdminPanelConfig('launcher.runLoginserver', false)) {
@@ -139,11 +147,17 @@ module.exports = {
       /**
        * @type {exports}
        */
-      let self = this;
-      for (const process_name of ['loginserver', 'ucs', 'world', 'queryserv']) {
-        if (self.doesProcessNeedToBoot(process_name) && !await self.isProcessRunning(process_name)) {
-          debug('starting unique process [' + process_name + ']');
-          self.startProcess(process_name);
+      for (const processName of ['loginserver', 'ucs', 'world', 'queryserv']) {
+        if (this.doesProcessNeedToBoot(processName) && !await this.isProcessRunning(processName)) {
+          debug('starting unique process [' + processName + ']');
+          this.startProcess(processName);
+        }
+      }
+
+      // statics
+      for (let s of this.getStatics()) {
+        if (!this.onlineStatics.includes(s)) {
+          this.startProcess("zone", [s])
         }
       }
 
@@ -151,7 +165,7 @@ module.exports = {
        * Zone
        */
       while (this.doesProcessNeedToBoot('zone')) {
-        await self.startProcess('zone');
+        await this.startProcess('zone');
       }
 
       await this.sleep(LAUNCHER_MAIN_LOOP_TIMER);
@@ -161,44 +175,44 @@ module.exports = {
   },
 
   /**
-   * @param process_name
+   * @param processName
    * @returns {boolean}
    */
-  doesProcessNeedToBoot: function (process_name) {
-    if (this.erroredStartsCount[process_name] >= this.erroredStartsMaxHalt) {
-      if (!this.hasErroredHaltMessage[process_name]) {
-        console.error('Process [%s] has tried to boot too many (%s) times... Halting attempts', process_name, this.erroredStartsMaxHalt);
-        this.hasErroredHaltMessage[process_name] = 1;
+  doesProcessNeedToBoot: function (processName) {
+    if (this.erroredStartsCount[processName] >= this.erroredStartsMaxHalt) {
+      if (!this.hasErroredHaltMessage[processName]) {
+        console.error('Process [%s] has tried to boot too many (%s) times... Halting attempts', processName, this.erroredStartsMaxHalt);
+        this.hasErroredHaltMessage[processName] = 1;
       }
 
       return false;
     }
 
-    if (process_name === 'zone' &&
-      this.processCount[process_name] < (this.zoneBootedProcessCount + config.getAdminPanelConfig('launcher.minZoneProcesses', 3))) {
+    if (processName === 'zone' &&
+      this.processCount[processName] < (this.zoneBootedProcessCount + config.getAdminPanelConfig('launcher.minZoneProcesses', 3))) {
 
       return true;
     }
 
-    if (process_name === 'loginserver') {
-      return this.launchOptions && this.launchOptions.withLoginserver && this.processCount[process_name] === 0;
+    if (processName === 'loginserver') {
+      return this.launchOptions && this.launchOptions.withLoginserver && this.processCount[processName] === 0;
     }
 
-    if (process_name === 'queryserv') {
-      return this.launchOptions && this.launchOptions.withQueryserv && this.processCount[process_name] === 0;
+    if (processName === 'queryserv') {
+      return this.launchOptions && this.launchOptions.withQueryserv && this.processCount[processName] === 0;
     }
 
-    debug('[doesProcessNeedToBoot] [%s] returning [%s]', process_name, this.processCount[process_name] === 0);
+    debug('[doesProcessNeedToBoot] [%s] returning [%s]', processName, this.processCount[processName] === 0);
 
-    return this.processCount[process_name] === 0;
+    return this.processCount[processName] === 0;
   },
 
   /**
-   * @param zone_short_name
+   * @param zoneShortName
    * @returns {Promise<void>}
    */
-  startStaticZone: async function (zone_short_name) {
-    return await this.startProcess('zone', [zone_short_name]);
+  startStaticZone: async function (zoneShortName) {
+    return await this.startProcess('zone', [zoneShortName]);
   },
 
   /**
@@ -208,16 +222,15 @@ module.exports = {
     this.init([], true);
 
     await this.pollProcessList();
-    let self = this;
 
     debug('[stopServer] Stopping server...');
 
     /**
      * Kill launcher
      */
-    this.systemProcessList.forEach(function (process) {
+    this.systemProcessList.forEach((process) => {
       if (process.cmd.includes('server-launcher')) {
-        self.killProcess(process.pid);
+        this.killProcess(process.pid);
 
         debug('[stopServer] Killing launcher [%s] pid [%s]', process.name, process.pid);
       }
@@ -226,9 +239,9 @@ module.exports = {
     /**
      * Kill server processes
      */
-    this.systemProcessList.forEach(function (process) {
-      if (self.serverProcessNames.includes(process.name)) {
-        self.killProcess(process.pid);
+    this.systemProcessList.forEach((process) => {
+      if (this.serverProcessNames.includes(process.name)) {
+        this.killProcess(process.pid);
 
         debug('[stopServer] Killing server process [%s] pid [%s]', process.name, process.pid);
       }
@@ -265,8 +278,6 @@ module.exports = {
       }
 
       if (os.isWindows()) {
-
-
         if (
           proc.cmd.includes('server-launcher') &&
           parseInt(proc.pid) !== parseInt(systemProc.pid)
@@ -441,10 +452,9 @@ module.exports = {
 
     this.stopServer();
 
-    let self = this;
-    setTimeout(function () {
-      self.startServerLauncher();
-    }, 300);
+    setTimeout(() => {
+      this.startServerLauncher();
+    }, 300)
 
     return this;
   },
@@ -463,19 +473,21 @@ module.exports = {
    * @returns {Promise<number>}
    */
   getBootedZoneCount: async function () {
-    const zone_list             = await serverDataService.getZoneList();
+    const zoneList              = await serverDataService.getZoneList();
     this.zoneBootedProcessCount = 0;
-    let self                    = this;
 
-    if (!zone_list) {
+    if (!zoneList) {
       return 0;
     }
 
-    zone_list.forEach(function (zone) {
+    zoneList.forEach((zone) => {
       if (zone.zone_id > 0) {
-        self.zoneBootedProcessCount++;
+        this.zoneBootedProcessCount++;
       }
     });
+
+    // we don't want statics to count against our dynamic booted pool...
+    this.zoneBootedProcessCount -= this.onlineStatics.length;
 
     return this.zoneBootedProcessCount;
   },
@@ -487,15 +499,17 @@ module.exports = {
    */
   startProcess: async function (process_name, args = []) {
     let argString = '';
-    args.forEach(function (arg) {
-      argString += arg + ' ';
-    });
+
+    if (args.length > 0) {
+      argString = args.join(" ")
+    }
 
     let startProcessString = '';
     if (os.isWindows()) {
       startProcessString =
-        util.format('bin\\%s',
-          process_name + '.exe'
+        util.format('bin\\%s %s',
+          process_name + '.exe',
+          argString
         );
 
       require('child_process').spawn(startProcessString,
@@ -531,6 +545,11 @@ module.exports = {
       pathManager.getEmuServerPath()
     );
 
+    // we don't count statics
+    if (process_name === "zone" && args.length > 0) {
+      return
+    }
+
     this.processCount[process_name]++;
   },
 
@@ -556,16 +575,31 @@ module.exports = {
   pollProcessList: async function () {
     this.systemProcessList = await this.getProcessList();
 
-    let self = this;
-    this.serverProcessNames.forEach(function (process_name) {
-      self.processCount[process_name] = 0;
+    this.serverProcessNames.forEach((process_name) => {
+      this.processCount[process_name] = 0;
     });
 
-    this.systemProcessList.forEach(function (process) {
-      if (self.serverProcessNames.includes(process.name)) {
-        self.processCount[process.name]++;
+    this.onlineStatics = []
+    this.systemProcessList.forEach((process) => {
+
+      // statics
+      if (process.name.includes("zone") && process.cmd.includes(" ")) {
+        try {
+          const zone = process.cmd.split(" ")[1].trim()
+          this.onlineStatics.push(zone)
+
+          // return because we don't want to count statics
+          return
+        } catch (e) {
+        }
+      }
+
+      // dynamics
+      if (this.serverProcessNames.includes(process.name)) {
+        this.processCount[process.name]++;
       }
     });
+
   },
 
   async getProcessList() {
@@ -606,7 +640,6 @@ module.exports = {
     }
 
     return processList;
-
   },
 
   /**
@@ -660,29 +693,28 @@ module.exports = {
    * Purges server logs
    */
   purgeServerLogs() {
-    exec('rm -rf logs/zone/*.log', {cwd: pathManager.emuServerPath});
-    exec('rm -rf logs/*.log', {cwd: pathManager.emuServerPath});
+    exec('rm -rf logs/zone/*.log', { cwd: pathManager.emuServerPath });
+    exec('rm -rf logs/*.log', { cwd: pathManager.emuServerPath });
   },
 
   /**
    * Monitors server launcher for communication drift with world to be restarted
    */
   startWatchDog() {
-    let self           = this;
-    this.watchDogTimer = setInterval(function () {
+    this.watchDogTimer = setInterval(() => {
 
       let processStatus = {
-        'Zone Processes': self.processCount['zone'],
-        'Booted Zone Processes': self.zoneBootedProcessCount,
-        'World Processes': self.processCount['world'],
-        'Loginserver Processes': self.processCount['loginserver'],
-        'UCS Processes': self.processCount['ucs'],
-        'Watchdog Polling Delta': self.getWatchDogPollDelta() + ' / ' + MAX_PROCESS_POLL_DELTA_SECONDS_BEFORE_KILL
+        'Zone Processes': this.processCount['zone'],
+        'Booted Zone Processes': this.zoneBootedProcessCount,
+        'World Processes': this.processCount['world'],
+        'Loginserver Processes': this.processCount['loginserver'],
+        'UCS Processes': this.processCount['ucs'],
+        'Watchdog Polling Delta': this.getWatchDogPollDelta() + ' / ' + MAX_PROCESS_POLL_DELTA_SECONDS_BEFORE_KILL
       };
 
       console.table(processStatus);
 
-      if (self.getWatchDogPollDelta() > MAX_PROCESS_POLL_DELTA_SECONDS_BEFORE_KILL) {
+      if (this.getWatchDogPollDelta() > MAX_PROCESS_POLL_DELTA_SECONDS_BEFORE_KILL) {
         console.log('HIT WATCHDOG THRESHOLD. TERMINATING...');
 
         const data    = new Date() + ' watchdog killed launcher\n';

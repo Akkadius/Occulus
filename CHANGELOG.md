@@ -4,6 +4,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0]
+
+* Add launcher support for running statics
+* Simply define a comma separated static list in your launcher config `launcher.staticZones`
+
+Example
+
+```json
+    "launcher": {
+      "runSharedMemory": true,
+      "runLoginserver": false,
+      "runQueryServ": false,
+      "isRunning": true,
+      "minZoneProcesses": 3,
+      "staticZones": "load2,cshome"
+    },
+
+```
+
+Will keep 3 dynamics alive along with 2 statics
+
+![image](https://user-images.githubusercontent.com/3319450/210170926-b3e61521-a2d3-4a38-805f-49c8d34ab1a9.png)
+
+
 ## [2.0.20]
 
 * Fix bug with build status not properly checking for file existence before polling it

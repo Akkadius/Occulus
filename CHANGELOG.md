@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.20]
+
+* Fix bug with build status not properly checking for file existence before polling it
+* Fix bug where file downloads were racily deleting files causing the webserver to crash
+* Additional functionality to support integration with Spire
+
 ## [2.0.19]
 
 * Fix minor bug with how process name matching in restart

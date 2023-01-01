@@ -102,6 +102,8 @@ module.exports = {
         return false
       }
 
+      self.message(util.format(chalk`[{bold Quests}] File [{bold %s}] changed`, file));
+
       if (evt === 'update') {
         const changedFile = path.dirname(file).split(path.sep).pop() + '/' + path.basename(file);
         const changedZone = path.dirname(file).split(path.sep).pop();

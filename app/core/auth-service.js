@@ -133,7 +133,7 @@ module.exports = {
         }
       }
 
-      if (requestedUrl.includes('/api/v1/auth/')) {
+      if (requestedUrl.includes('/api/v1/auth/') || requestedUrl.includes('/api/v1/download/')) {
         debug('[auth-route] [%s]', requestedUrl)
         next();
       } else if (requestedUrl.includes('/api/v1/')) {

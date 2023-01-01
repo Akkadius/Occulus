@@ -230,8 +230,13 @@ router.post('/code/build/cancel', async function (req, res, next) {
 });
 
 router.get('/code/build/status', async function (req, res, next) {
+  let contents = ""
+  if (fs.existsSync(TEMP_BUILD_OUTPUT_PATH)) {
+    contents = fs.readFileSync(TEMP_BUILD_OUTPUT_PATH, 'utf8')
+  }
+
   res.json(
-    { log: fs.readFileSync(TEMP_BUILD_OUTPUT_PATH, 'utf8') }
+    { log: contents }
   );
 });
 

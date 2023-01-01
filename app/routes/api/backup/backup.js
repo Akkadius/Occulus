@@ -53,10 +53,15 @@ router.get('/:download', async function (req, res, next) {
     zip.outputStream.pipe(
       fs.createWriteStream(zipFile)
     ).on('close', function () {
-      fs.unlinkSync(dumpFile);
+
+      if (fs.existsSync(dumpFile)) {
+        fs.unlinkSync(dumpFile);
+      }
 
       res.download(zipFile, path.basename(zipFile), function (err) {
-        fs.unlinkSync(zipFile);
+        if (fs.existsSync(dumpFile)) {
+          fs.unlinkSync(dumpFile);
+        }
       });
     });
 

@@ -189,7 +189,7 @@ module.exports = {
     }
 
     if (processName === 'zone' &&
-      this.processCount[processName] < (this.zoneBootedProcessCount + config.getAdminPanelConfig('launcher.minZoneProcesses', 3))) {
+      this.processCount[processName] < (this.zoneBootedProcessCount + config.getAdminPanelConfig('launcher.minZoneProcesses', 10))) {
 
       return true;
     }
@@ -488,6 +488,9 @@ module.exports = {
 
     // we don't want statics to count against our dynamic booted pool...
     this.zoneBootedProcessCount -= this.onlineStatics.length;
+    if (this.zoneBootedProcessCount < 0) {
+      this.zoneBootedProcessCount = 0
+    }
 
     return this.zoneBootedProcessCount;
   },
@@ -507,17 +510,16 @@ module.exports = {
     let startProcessString = '';
     if (os.isWindows()) {
       startProcessString =
-        util.format('bin\\%s %s',
+        util.format('bin\\%s',
           process_name + '.exe',
-          argString
         );
 
-      require('child_process').spawn(startProcessString,
+      require('child_process').spawn(startProcessString, args,
         {
           cwd: pathManager.emuServerPath,
           detached: true,
           stdio: 'ignore',
-          windowsHide: false
+          windowsHide: false,
         }
       );
     }
@@ -649,7 +651,7 @@ module.exports = {
     await this.pollProcessList();
 
     return {
-      'zone': this.processCount['zone'],
+      'zone': this.processCount['zone'] + this.onlineStatics.length,
       'world': this.processCount['world'],
       'ucs': this.processCount['ucs'],
       'queryserv': this.processCount['queryserv'],

@@ -21,7 +21,7 @@ router.get('/:download', async function (req, res, next) {
   const dateFileString = now.getFullYear() + '-' + now.getMonth() + '-' + now.getDate();
   const archiveName    = slugify(
     util.format('(%s)-%s-%s.zip', download, dateFileString, serverLongName.toLowerCase()),
-    { remove : /[*+~()'"!:@]/g }
+    { remove: /[*+~()'"!:@]/g }
   )
 
   let requestedDownloadPath = '';
@@ -41,7 +41,7 @@ router.get('/:download', async function (req, res, next) {
       requestedDownloadPath = './';
       break;
     default:
-      res.json({ error : 'Invalid download requested' })
+      res.json({ error: 'Invalid download requested' })
   }
 
   if (download === 'database') {
@@ -53,15 +53,14 @@ router.get('/:download', async function (req, res, next) {
     zip.outputStream.pipe(
       fs.createWriteStream(zipFile)
     ).on('close', function () {
-
-      if (fs.existsSync(dumpFile)) {
-        fs.unlinkSync(dumpFile);
-      }
+      try {
+      fs.unlinkSync(dumpFile);
+      } catch (e) {}
 
       res.download(zipFile, path.basename(zipFile), function (err) {
-        if (fs.existsSync(zipFile)) {
-          fs.unlinkSync(zipFile);
-        }
+        try {
+        fs.unlinkSync(zipFile);
+        } catch (e) {}
       });
     });
 
@@ -120,19 +119,20 @@ router.get('/:download', async function (req, res, next) {
       console.debug('zip file downloaded: ' + zipFile);
 
       res.download(zipFile, path.basename(zipFile), function (err) {
-        if (fs.existsSync(zipFile)) {
+        try {
           fs.unlinkSync(zipFile);
+        } catch (e) {
         }
-
         if (download === 'full') {
-          if (fs.existsSync(mysqldump.getBackupFullSqlFilePath())) {
+          try {
             fs.unlinkSync(mysqldump.getBackupFullSqlFilePath());
+          } catch (e) {
           }
         }
       });
-
-      zip.end();
     });
+
+    zip.end();
 
   }
 });

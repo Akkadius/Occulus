@@ -59,8 +59,8 @@ router.get('/:download', async function (req, res, next) {
       }
 
       res.download(zipFile, path.basename(zipFile), function (err) {
-        if (fs.existsSync(dumpFile)) {
-          fs.unlinkSync(dumpFile);
+        if (fs.existsSync(zipFile)) {
+          fs.unlinkSync(zipFile);
         }
       });
     });
@@ -120,14 +120,19 @@ router.get('/:download', async function (req, res, next) {
       console.debug('zip file downloaded: ' + zipFile);
 
       res.download(zipFile, path.basename(zipFile), function (err) {
-        fs.unlinkSync(zipFile);
+        if (fs.existsSync(zipFile)) {
+          fs.unlinkSync(zipFile);
+        }
+
         if (download === 'full') {
-          fs.unlinkSync(mysqldump.getBackupFullSqlFilePath());
+          if (fs.existsSync(mysqldump.getBackupFullSqlFilePath())) {
+            fs.unlinkSync(mysqldump.getBackupFullSqlFilePath());
+          }
         }
       });
-    });
 
-    zip.end();
+      zip.end();
+    });
 
   }
 });

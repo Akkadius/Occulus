@@ -19,7 +19,8 @@ RUN apt-get update -yqq && \
 RUN apt-get update && apt-get install -y \
 	bash \
 	git \
-	sudo
+	sudo \
+        qemu-user-binfmt
 
 #######################################################################
 # node

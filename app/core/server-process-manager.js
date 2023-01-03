@@ -269,7 +269,6 @@ module.exports = {
          */
         if (
           proc.cmd.includes('server-launcher') &&
-          proc.cmd.includes('admin') &&
           parseInt(proc.pid) !== parseInt(systemProc.pid) &&
           !proc.cmd.includes('while')
         ) {

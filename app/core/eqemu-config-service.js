@@ -146,10 +146,16 @@ module.exports = {
    */
   saveServerConfig(data = undefined) {
     if (!data) {
+      this.reload()
       data = this.getServerConfig();
     }
 
     debug('[saveServerConfig] writing config');
+
+    if (typeof data !== "undefined" && data.length === 0) {
+      this.reload()
+      return
+    }
 
     fs.writeFileSync(
       this.getServerConfigPath(),

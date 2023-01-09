@@ -36,6 +36,7 @@ module.exports = {
   launchOptions: {},
   watchDogTimer: null,
   cancelTimedRestart: false,
+  cancelTimedShutdown: false,
   lastProcessPollTime: Math.floor(new Date() / 1000),
 
   /**
@@ -218,8 +219,52 @@ module.exports = {
   /**
    * @returns {Promise<void>}
    */
-  stopServer: async function () {
+  stopServer: async function (options = []) {
     this.init([], true);
+
+    // reset timed restart if triggered restart again
+    this.cancelTimedShutdown = false;
+
+    // delayed restart
+    if (options.timer && options.timer > 0) {
+      const startTime     = Math.floor(new Date() / 1000);
+      const endTime       = startTime + parseInt(options.timer);
+      let shutdownTime    = false;
+      let lastWarningTime = Math.floor(new Date() / 1000) - 1000;
+
+      while (!shutdownTime) {
+        const minutesRemaining = (endTime - Math.floor(new Date() / 1000)) / 60;
+        const unixTimeNow      = Math.floor(new Date() / 1000);
+
+        if ((lastWarningTime + 30) <= unixTimeNow) {
+          lastWarningTime = unixTimeNow;
+
+          const worldMessage = util.format(
+            '[SERVER MESSAGE] The world will be coming down in [%s] minute(s), please log out before this time...',
+            Number((minutesRemaining).toFixed(2))
+          );
+
+          await serverDataService.messageWorld(worldMessage);
+
+          debug('Sending world message | %s', worldMessage);
+        }
+
+        if (unixTimeNow > endTime) {
+          shutdownTime = true;
+        }
+
+        if (this.cancelTimedShutdown) {
+          break;
+        }
+
+        await this.sleep(1000);
+      }
+    }
+
+    if (this.cancelTimedShutdown) {
+      debug('Shutdown cancelled');
+      return false;
+    }
 
     await this.pollProcessList();
 
@@ -394,7 +439,8 @@ module.exports = {
   async cancelRestart(options = []) {
     if (options.cancel) {
       this.cancelTimedRestart = true;
-      await serverDataService.messageWorld('[SERVER MESSAGE] Server restart cancelled');
+      this.cancelTimedShutdown = true;
+      await serverDataService.messageWorld('[SERVER MESSAGE] Server stop cancelled');
     }
   },
 
@@ -409,7 +455,6 @@ module.exports = {
 
     // delayed restart
     if (options.timer && options.timer > 0) {
-
       const startTime     = Math.floor(new Date() / 1000);
       const endTime       = startTime + parseInt(options.timer);
       let rebootTime      = false;

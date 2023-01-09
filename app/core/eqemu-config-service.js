@@ -176,11 +176,18 @@ module.exports = {
    * @returns {module.exports}
    */
   setAdminPanelConfig(accessor, value) {
-    dot.override = true;
+    if (this.getAdminPanelConfig(accessor) !== value) {
+      console.log(chalk`{green [{bold EQEmuConfig}] [setAdminPanelConfig] Setting [${accessor}] to [${value}] }`);
 
-    dot.str('web-admin.' + accessor, value, this.getServerConfig());
+      dot.override = true;
+      dot.str('web-admin.' + accessor, value, this.getServerConfig());
 
-    this.saveServerConfig(this.serverConfig);
+      this.saveServerConfig(this.serverConfig);
+
+      return this
+    }
+
+    console.log(chalk`{yellow [{bold EQEmuConfig}] [setAdminPanelConfig] Failed to set [${accessor}] to [${value}] because it was already set }`);
 
     return this;
   },

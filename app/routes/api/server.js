@@ -74,8 +74,8 @@ router.get('/sysinfo', async function (req, res, next) {
   );
 });
 
-router.get('/stop', function (req, res, next) {
-  serverProcessManager.stopServer();
+router.post('/stop', function (req, res, next) {
+  serverProcessManager.stopServer(req.body);
   res.send({'data': 'Server has been stopped successfully'});
 });
 

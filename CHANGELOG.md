@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0]
+
+* [Server] Implement timed server stops similar to timed server restarts
+* [Config] Only save EQEmu config when the values change
+* [Hot Reload] Update file watching logic to only watch files that end in extensions `.pl` `.lua` without hyper extensions eg (`.pl.swp` or `.lua.swp`) 
+
 ## [2.1.2]
 
 * Fix edge case where the server config can possibly be saved with no data

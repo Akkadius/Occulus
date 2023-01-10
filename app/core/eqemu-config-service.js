@@ -2,14 +2,14 @@
  * eqemu-config-service.js
  * @type {any}
  */
-let pathManager = require('../../app/core/path-manager');
-let fs          = require('fs');
-const dot       = require('dot-object');
-const debug     = require('debug')('eqemu-admin:eqemu-config-service');
-const path      = require('path');
-const watch     = require('node-watch');
-const chalk     = require('chalk');
-const util      = require('util');
+let pathManager        = require('../../app/core/path-manager');
+let fs                 = require('fs');
+const dot              = require('dot-object');
+const debug            = require('debug')('eqemu-admin:eqemu-config-service');
+const path             = require('path');
+const watch            = require('node-watch');
+const chalk            = require('chalk');
+const util             = require('util');
 
 /**
  * @type {{getServerConfig(): *, init: (function(): exports), serverConfig: {}}}
@@ -211,6 +211,6 @@ module.exports = {
       this.setAdminPanelConfig(accessor, defaultValue);
     }
 
-    return (configVar ? configVar : defaultValue);
+    return (typeof configVar !== 'undefined' ? configVar : defaultValue);
   }
 };

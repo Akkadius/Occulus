@@ -11,6 +11,8 @@ const eqemuConfigService = use('/app/core/eqemu-config-service')
 const chalk              = require('chalk');
 const util               = require('util');
 const path               = require('path');
+const fs                 = require("fs");
+const config             = require("./eqemu-config-service");
 const zoneRepository     = use('/app/repositories/zoneRepository');
 
 module.exports = {
@@ -45,8 +47,8 @@ module.exports = {
   /**
    * @return {boolean}
    */
-  startWatchers: async function (options) {
-    await eqemuConfigService.init();
+  init: async function (options) {
+    await eqemuConfigService.init(true);
     await database.init();
     await this.loadZones();
 
@@ -57,12 +59,32 @@ module.exports = {
 
     debug('Starting listener for [%s]', pathManager.getEmuQuestsPath())
 
+    watch(eqemuConfigService.getServerConfigPath(), (evt, file) => {
+      this.message('Detected configuration change')
+      console.log(chalk`{green [{bold EQEmuConfig}] [HRM] File change detected, reloading... }`);
+
+      this.stopWatchers()
+
+      setTimeout(() => {
+        const hotReload = eqemuConfigService.getAdminPanelConfig('quests.hotReload', true)
+        if (hotReload) {
+          this.startWatchers();
+        }
+
+      }, 1000)
+    });
+
+    this.startWatchers()
+  },
+
+  startWatchers: function () {
+    this.message('Starting watchers')
     this.startLuaModulesWatcher()
     this.startPluginsWatcher()
     this.startQuestWatcher()
   },
 
-  stopWatchers: function() {
+  stopWatchers: function () {
     this.message('Stopping watchers')
 
     let watchers = [
@@ -72,13 +94,17 @@ module.exports = {
     ];
 
     for (let w of watchers) {
-      if (!w.isClosed()) {
+      if (w && !w.isClosed()) {
         w.close()
       }
     }
+
+    this.luaModulesWatcher = null
+    this.pluginWatcher     = null
+    this.questWatcher      = null
   },
 
-  startLuaModulesWatcher: function() {
+  startLuaModulesWatcher: function () {
     this.luaModulesWatcher = watch(
       pathManager.getEmuLuaModulesPath(),
       {
@@ -98,7 +124,7 @@ module.exports = {
     );
   },
 
-  startPluginsWatcher: function() {
+  startPluginsWatcher: function () {
     this.pluginWatcher = watch(
       pathManager.getEmuPluginsPath(),
       {
@@ -119,7 +145,7 @@ module.exports = {
     );
   },
 
-  startQuestWatcher: function() {
+  startQuestWatcher: function () {
     this.questWatcher = watch(
       pathManager.getEmuQuestsPath(),
       {
@@ -156,7 +182,7 @@ module.exports = {
       }
     );
   },
-  watchedFiles: function(f) {
+  watchedFiles: function (f) {
     return f.endsWith('.pl') || f.endsWith('.lua')
   }
 };

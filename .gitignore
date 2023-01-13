@@ -8,7 +8,5 @@ app-key
 eqemu-admin
 eqemu-admin-linux
 eqemu-admin-win.exe
-eqemu-admin-linux-x64
-eqemu-admin-win-x64.exe
 eqemu-admin-linux-arm64
 public/

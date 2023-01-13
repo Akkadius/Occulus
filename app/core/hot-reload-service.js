@@ -11,10 +11,17 @@ const eqemuConfigService = use('/app/core/eqemu-config-service')
 const chalk              = require('chalk');
 const util               = require('util');
 const path               = require('path');
+const fs                 = require("fs");
+const config             = require("./eqemu-config-service");
 const zoneRepository     = use('/app/repositories/zoneRepository');
 
 module.exports = {
   zones: null,
+
+  // pointer to the watcher(s)
+  questWatcher: null,
+  pluginWatcher: null,
+  luaModulesWatcher: null,
 
   loadZones: async function () {
     this.zones = await zoneRepository.all();
@@ -40,9 +47,8 @@ module.exports = {
   /**
    * @return {boolean}
    */
-  startListener: async function (options) {
-
-    await eqemuConfigService.init();
+  init: async function (options) {
+    await eqemuConfigService.init(true);
     await database.init();
     await this.loadZones();
 
@@ -53,83 +59,130 @@ module.exports = {
 
     debug('Starting listener for [%s]', pathManager.getEmuQuestsPath())
 
-    let self = this;
+    watch(eqemuConfigService.getServerConfigPath(), (evt, file) => {
+      this.message('Detected configuration change')
+      console.log(chalk`{green [{bold EQEmuConfig}] [HRM] File change detected, reloading... }`);
 
-    /**
-     * Lua Modules
-     */
-    watch(pathManager.getEmuLuaModulesPath(), { recursive: true }, function (evt, file) {
-      if (!["lua", "pl"].includes(file.split('.').pop())) {
-        return false
-      }
+      this.stopWatchers()
 
-      if (evt === 'update') {
-        const changedFile = path.dirname(file).split(path.sep).pop() + '/' + path.basename(file);
-
-        self.message(util.format(
-          chalk`[{bold lua_modules}] Reloading [{bold All Zones}] File [{bold %s}]`,
-          changedFile
-        ));
-        serverDataService.hotReloadZoneQuests('all');
-      }
-    });
-
-    /**
-     * Plugins
-     */
-    watch(pathManager.getEmuPluginsPath(), { recursive: true }, function (evt, file) {
-      if (!["lua", "pl"].includes(file.split('.').pop())) {
-        return false
-      }
-
-      if (evt === 'update') {
-        const changedFile = path.dirname(file).split(path.sep).pop() + '/' + path.basename(file);
-
-        self.message(util.format(
-          chalk`[{bold plugins}] Reloading [{bold All Zones}] File [{bold %s}]`,
-          changedFile
-        ));
-
-        serverDataService.hotReloadZoneQuests('all');
-      }
-    });
-
-    /**
-     * Quests
-     */
-    watch(pathManager.getEmuQuestsPath(), { recursive: true }, function (evt, file) {
-      if (!["lua", "pl"].includes(file.split('.').pop())) {
-        return false
-      }
-
-      self.message(util.format(chalk`[{bold Quests}] File [{bold %s}] changed`, file));
-
-      if (evt === 'update') {
-        const changedFile = path.dirname(file).split(path.sep).pop() + '/' + path.basename(file);
-        const changedZone = path.dirname(file).split(path.sep).pop();
-
-        const changedData = util.format(
-          chalk`File [{bold %s}]`,
-          changedFile
-        );
-
-        /**
-         * Zone
-         */
-        if (self.doesZoneExist(changedZone)) {
-          self.message(util.format(chalk`[{bold zone}] Reloading [{bold %s}] %s`, changedZone, changedData));
-          serverDataService.hotReloadZoneQuests(changedZone);
+      setTimeout(() => {
+        const hotReload = eqemuConfigService.getAdminPanelConfig('quests.hotReload', true)
+        if (hotReload) {
+          this.startWatchers();
         }
 
-        /**
-         * Global
-         */
-        if (changedZone === 'global') {
-          self.message(util.format(chalk`[{bold global}] Reloading [{bold %s}] %s`, 'All Zones', changedData));
+      }, 1000)
+    });
+
+    this.startWatchers()
+  },
+
+  startWatchers: function () {
+    this.message('Starting watchers')
+    this.startLuaModulesWatcher()
+    this.startPluginsWatcher()
+    this.startQuestWatcher()
+  },
+
+  stopWatchers: function () {
+    this.message('Stopping watchers')
+
+    let watchers = [
+      this.luaModulesWatcher,
+      this.pluginWatcher,
+      this.questWatcher,
+    ];
+
+    for (let w of watchers) {
+      if (w && !w.isClosed()) {
+        w.close()
+      }
+    }
+
+    this.luaModulesWatcher = null
+    this.pluginWatcher     = null
+    this.questWatcher      = null
+  },
+
+  startLuaModulesWatcher: function () {
+    this.luaModulesWatcher = watch(
+      pathManager.getEmuLuaModulesPath(),
+      {
+        recursive: true,
+        filter: f => this.watchedFiles(f)
+      }, (e, file) => {
+        if (e === 'update') {
+          const changedFile = path.dirname(file).split(path.sep).pop() + '/' + path.basename(file);
+
+          this.message(util.format(
+            chalk`[{bold lua_modules}] Reloading [{bold All Zones}] File [{bold %s}]`,
+            changedFile
+          ));
           serverDataService.hotReloadZoneQuests('all');
         }
       }
-    });
+    );
+  },
 
+  startPluginsWatcher: function () {
+    this.pluginWatcher = watch(
+      pathManager.getEmuPluginsPath(),
+      {
+        recursive: true,
+        filter: f => this.watchedFiles(f)
+      }, (e, file) => {
+        if (e === 'update') {
+          const changedFile = path.dirname(file).split(path.sep).pop() + '/' + path.basename(file);
+
+          this.message(util.format(
+            chalk`[{bold plugins}] Reloading [{bold All Zones}] File [{bold %s}]`,
+            changedFile
+          ));
+
+          serverDataService.hotReloadZoneQuests('all');
+        }
+      }
+    );
+  },
+
+  startQuestWatcher: function () {
+    this.questWatcher = watch(
+      pathManager.getEmuQuestsPath(),
+      {
+        recursive: true,
+        filter: f => this.watchedFiles(f)
+      }, (e, file) => {
+        this.message(util.format(chalk`[{bold Quests}] File [{bold %s}] changed`, file));
+
+        if (e === 'update') {
+          const changedFile = path.dirname(file).split(path.sep).pop() + '/' + path.basename(file);
+          const changedZone = path.dirname(file).split(path.sep).pop();
+
+          const changedData = util.format(
+            chalk`File [{bold %s}]`,
+            changedFile
+          );
+
+          /**
+           * Zone
+           */
+          if (this.doesZoneExist(changedZone)) {
+            this.message(util.format(chalk`[{bold zone}] Reloading [{bold %s}] %s`, changedZone, changedData));
+            serverDataService.hotReloadZoneQuests(changedZone);
+          }
+
+          /**
+           * Global
+           */
+          if (changedZone === 'global') {
+            this.message(util.format(chalk`[{bold global}] Reloading [{bold %s}] %s`, 'All Zones', changedData));
+            serverDataService.hotReloadZoneQuests('all');
+          }
+        }
+      }
+    );
+  },
+  watchedFiles: function (f) {
+    return f.endsWith('.pl') || f.endsWith('.lua')
   }
 };

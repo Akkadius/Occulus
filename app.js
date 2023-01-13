@@ -97,7 +97,7 @@ async () => {
 /**
  * Hot Reload Service
  */
-hotReloadService.startListener();
+hotReloadService.init();
 
 /**
  * NetStat Listeners

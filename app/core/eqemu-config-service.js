@@ -2,14 +2,14 @@
  * eqemu-config-service.js
  * @type {any}
  */
-let pathManager = require('../../app/core/path-manager');
-let fs          = require('fs');
-const dot       = require('dot-object');
-const debug     = require('debug')('eqemu-admin:eqemu-config-service');
-const path      = require('path');
-const watch     = require('node-watch');
-const chalk     = require('chalk');
-const util      = require('util');
+let pathManager        = require('../../app/core/path-manager');
+let fs                 = require('fs');
+const dot              = require('dot-object');
+const debug            = require('debug')('eqemu-admin:eqemu-config-service');
+const path             = require('path');
+const watch            = require('node-watch');
+const chalk            = require('chalk');
+const util             = require('util');
 
 /**
  * @type {{getServerConfig(): *, init: (function(): exports), serverConfig: {}}}
@@ -146,10 +146,16 @@ module.exports = {
    */
   saveServerConfig(data = undefined) {
     if (!data) {
+      this.reload()
       data = this.getServerConfig();
     }
 
     debug('[saveServerConfig] writing config');
+
+    if (typeof data !== "undefined" && data.length === 0) {
+      this.reload()
+      return
+    }
 
     fs.writeFileSync(
       this.getServerConfigPath(),
@@ -170,11 +176,18 @@ module.exports = {
    * @returns {module.exports}
    */
   setAdminPanelConfig(accessor, value) {
-    dot.override = true;
+    if (this.getAdminPanelConfig(accessor) !== value) {
+      console.log(chalk`{green [{bold EQEmuConfig}] [setAdminPanelConfig] Setting [${accessor}] to [${value}] }`);
 
-    dot.str('web-admin.' + accessor, value, this.getServerConfig());
+      dot.override = true;
+      dot.str('web-admin.' + accessor, value, this.getServerConfig());
 
-    this.saveServerConfig(this.serverConfig);
+      this.saveServerConfig(this.serverConfig);
+
+      return this
+    }
+
+    console.log(chalk`{yellow [{bold EQEmuConfig}] [setAdminPanelConfig] Failed to set [${accessor}] to [${value}] because it was already set }`);
 
     return this;
   },
@@ -198,6 +211,6 @@ module.exports = {
       this.setAdminPanelConfig(accessor, defaultValue);
     }
 
-    return (configVar ? configVar : defaultValue);
+    return (typeof configVar !== 'undefined' ? configVar : defaultValue);
   }
 };

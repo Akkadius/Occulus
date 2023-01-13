@@ -6,7 +6,7 @@ const util           = require('util')
 const crypto         = require('crypto');
 const apiAuthService = require('./auth-service')
 const file           = 'websocket-auth.js'
-let database       = use('/app/core/database')
+let database         = use('/app/core/database')
 
 module.exports = {
   checkEqemuWebsocketAuthorization: async function () {
@@ -28,7 +28,7 @@ module.exports = {
            FROM account
            where \`name\` = :acc LIMIT 1`,
           {
-            replacements: {'acc': accountName},
+            replacements: { 'acc': accountName },
             type: 'SELECT'
           }
         )
@@ -38,13 +38,13 @@ module.exports = {
       console.log('[%s] We need to create an account', file);
 
       (await
-        database.connection.query(
-          'INSERT INTO account (name, password, status) VALUES (:name, :password, 255)',
-          {
-            replacements: {name: accountName, password: hash},
-            type: 'INSERT'
-          }
-        )
+          database.connection.query(
+            'INSERT INTO account (name, password, status) VALUES (:name, :password, 255)',
+            {
+              replacements: { name: accountName, password: hash },
+              type: 'INSERT'
+            }
+          )
       )
 
       return {
@@ -52,7 +52,8 @@ module.exports = {
         password: hash
       }
 
-    } else if (foundAccount) {
+    }
+    else if (foundAccount) {
       console.log('[%s] Websocket account "%s" already created', file, accountName)
 
       if (foundAccount.password !== hash) {
@@ -62,27 +63,33 @@ module.exports = {
           hash
         );
 
-        (await database.connection.query(
-          'UPDATE account SET password = :password WHERE id = :id',
-          {
-            replacements: {'password': hash, 'id': foundAccount.id},
-            type: 'UPDATE'
-          }
-        )).then(function (user) {
-          console.log('[%s] Websocket account "%s" updated to "%s"',
-            file,
-            accountName,
-            hash
-          );
-        }).catch(function (err) {
-          return {error: 'Unknown error updating entity: ' + err}
-        });
-      }
+        try {
+          const r = (await database.connection.query(
+            'UPDATE account SET password = :password WHERE id = :id',
+            {
+              replacements: { 'password': hash, 'id': foundAccount.id },
+              type: 'UPDATE'
+            }
+          ))
 
-      return {
-        account_name: accountName,
-        password: hash
+          console.log(r)
+
+        } catch (err) {
+          return { error: 'Unknown error updating entity: ' + err }
+        }
+
+        console.log('[%s] Websocket account "%s" updated to "%s"',
+          file,
+          accountName,
+          hash
+        );
+
+
+        return {
+          account_name: accountName,
+          password: hash
+        }
       }
     }
-  },
+  }
 };

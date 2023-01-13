@@ -27,10 +27,13 @@ rm -f eqemu-admin
 pkg .
 
 ###################################
-# Fixme
-# deal with name extensions when
-# building multiple architectures
-# to not break akk-stack
+# amd64 admin panel packaging
 ###################################
-cp -a eqemu-admin-linux-x64 eqemu-admin-linux
-cp -a eqemu-admin-win-x64.exe eqemu-admin-win.exe
+# This will fail if you do not have
+# binfmt support installed on the
+# host. You can safely ignore this.
+# To enable binfmt support on
+# Debian/Ubuntu install
+# qemu-user-static, binfmt-support
+pkg -t node12-linux-arm64 -o eqemu-admin-linux-arm64 . 2>/dev/zero \
+        || echo "amd64 packaging failed due to missing binfmt support."

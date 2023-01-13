@@ -20,7 +20,9 @@ RUN apt-get update && apt-get install -y \
 	bash \
 	git \
 	sudo \
-        qemu-user-binfmt
+	qemu-user-static \
+	binfmt-support
+
 
 #######################################################################
 # node

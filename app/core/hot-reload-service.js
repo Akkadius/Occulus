@@ -15,6 +15,13 @@ const fs                 = require("fs");
 const config             = require("./eqemu-config-service");
 const zoneRepository     = use('/app/repositories/zoneRepository');
 
+const getAllFiles = dir =>
+  fs.readdirSync(dir).reduce((files, file) => {
+    const name        = path.join(dir, file);
+    const isDirectory = fs.statSync(name).isDirectory();
+    return isDirectory ? [...files, ...getAllFiles(name)] : [...files, name];
+  }, []);
+
 module.exports = {
   zones: null,
 
@@ -22,6 +29,9 @@ module.exports = {
   questWatcher: null,
   pluginWatcher: null,
   luaModulesWatcher: null,
+
+  // keeps track of file sizes to prevent no-op reloads
+  fileSizeMap: {},
 
   loadZones: async function () {
     this.zones = await zoneRepository.all();
@@ -42,6 +52,42 @@ module.exports = {
 
   message: function (message) {
     console.log(util.format(chalk`{green [{bold HRM}] %s }`, message))
+  },
+
+  loadPathIntoFileSizeMap: function (filePath) {
+    const files = getAllFiles(filePath).filter((f) => {
+      return !f.includes(".git") && (f.includes(".pl") || f.includes(".lua"))
+    });
+
+    for (let f of files) {
+      const filename                             = path.basename(f)
+      const dirname                              = path.basename(path.dirname(f))
+      const key = dirname + '/' + filename
+      this.fileSizeMap[key] = fs.statSync(f).size;
+    }
+  },
+
+  checkIfModified: function (f) {
+    const filename = path.basename(f)
+    const dirname  = path.basename(path.dirname(f))
+    const size     = fs.statSync(f).size
+    const key = dirname + '/' + filename
+
+    if (!this.fileSizeMap[key]) {
+      this.fileSizeMap[key] = size
+    }
+    else if (this.fileSizeMap[key] && this.fileSizeMap[key] === size) {
+      this.message(util.format(
+        chalk`[{bold lua_modules}] File [{bold %s}] event triggered but size didn't actually change, a 3rd party program might be suspect`,
+        filename
+      ));
+
+      return true
+    }
+
+    this.fileSizeMap[key] = size;
+
+    return false
   },
 
   /**
@@ -79,6 +125,7 @@ module.exports = {
 
   startWatchers: function () {
     this.message('Starting watchers')
+
     this.startLuaModulesWatcher()
     this.startPluginsWatcher()
     this.startQuestWatcher()
@@ -105,6 +152,8 @@ module.exports = {
   },
 
   startLuaModulesWatcher: function () {
+    this.loadPathIntoFileSizeMap(pathManager.getEmuLuaModulesPath())
+
     this.luaModulesWatcher = watch(
       pathManager.getEmuLuaModulesPath(),
       {
@@ -112,6 +161,10 @@ module.exports = {
         filter: f => this.watchedFiles(f)
       }, (e, file) => {
         if (e === 'update') {
+          if (this.checkIfModified(file)) {
+            return
+          }
+
           const changedFile = path.dirname(file).split(path.sep).pop() + '/' + path.basename(file);
 
           this.message(util.format(
@@ -125,6 +178,8 @@ module.exports = {
   },
 
   startPluginsWatcher: function () {
+    this.loadPathIntoFileSizeMap(pathManager.getEmuPluginsPath())
+
     this.pluginWatcher = watch(
       pathManager.getEmuPluginsPath(),
       {
@@ -132,6 +187,10 @@ module.exports = {
         filter: f => this.watchedFiles(f)
       }, (e, file) => {
         if (e === 'update') {
+          if (this.checkIfModified(file)) {
+            return
+          }
+
           const changedFile = path.dirname(file).split(path.sep).pop() + '/' + path.basename(file);
 
           this.message(util.format(
@@ -146,12 +205,18 @@ module.exports = {
   },
 
   startQuestWatcher: function () {
+    this.loadPathIntoFileSizeMap(pathManager.getEmuQuestsPath())
+
     this.questWatcher = watch(
       pathManager.getEmuQuestsPath(),
       {
         recursive: true,
         filter: f => this.watchedFiles(f)
       }, (e, file) => {
+        if (this.checkIfModified(file)) {
+          return
+        }
+
         this.message(util.format(chalk`[{bold Quests}] File [{bold %s}] changed`, file));
 
         if (e === 'update') {

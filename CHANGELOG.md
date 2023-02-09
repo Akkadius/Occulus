@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0]
+
+* [Hot Reload] Add a file size map that will debounce file "change" events where the file contents actually didn't change. This is useful in situations where for example Windows anti-virus programs are constantly pegging files triggering no-op updates.
+
 ## [2.2.1]
 
 * [Hot Reload] Add functionality for the Quest hot reload watcher to stop and start watchers depending on configuration changes of `quests.hotReload`

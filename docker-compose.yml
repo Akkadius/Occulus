@@ -6,7 +6,7 @@ networks:
 
 services:
   eqemu-admin-build:
-    image: akkadius/eqemu-admin-build-pipeline:latest
+    image: mibastian/eqemu-admin-build-pipeline:latest
     volumes:
       - ./:/home/eqemu/build/
       - ./deploy/scripts/:/home/eqemu/scripts

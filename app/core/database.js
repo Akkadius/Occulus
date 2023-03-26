@@ -26,6 +26,7 @@ module.exports = {
     this.connection    = await this.connect(serverConfig.database);
 
     if (eqemuConfigService.getServerConfig().server.content_database
+      && eqemuConfigService.getServerConfig().server.content_database.host
       && eqemuConfigService.getServerConfig().server.content_database.host.trim() !== "") {
       this.contentConnection = await this.connect(serverConfig.content_database, 'content');
     } else {

@@ -562,7 +562,8 @@ module.exports = {
         {
           cwd: pathManager.emuServerPath,
           detached: true,
-          stdio: 'ignore',
+          shell: false,
+          stdio: 'pipe',
           windowsHide: true,
         }
       );

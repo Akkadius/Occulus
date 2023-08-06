@@ -668,11 +668,15 @@ module.exports = {
             const splitLength       = splitRow.length;
             const processId         = splitRow[splitLength - 1].trim();
             const simpleProcessName = splitRow[splitLength - 2].replace('.exe', '').trim();
-            const commandLine       = row
+            const cmdlineSplit       = row
               .replace("," + splitRow[splitLength - 1].trim(), '')
               .replace("," + splitRow[splitLength - 2].trim(), '')
-              .split(",")[1].trim()
-            ;
+              .split(",");
+
+            let commandLine       = "";
+            if (cmdlineSplit.length > 0) {
+              commandLine = cmdlineSplit[1].trim();
+            }
 
             processList.push(
               {

@@ -674,17 +674,17 @@ module.exports = {
               .split(",");
 
             let commandLine       = "";
-            if (cmdlineSplit.length > 1) {
+            if (cmdlineSplit.length > 0) {
               commandLine = cmdlineSplit[1].trim();
             }
 
-            const proc = {
-              "name": simpleProcessName,
-              "pid": processId,
-              "cmd": commandLine
-            };
-
-            processList.push(proc);
+            processList.push(
+              {
+                "name": simpleProcessName,
+                "pid": processId,
+                "cmd": commandLine
+              }
+            );
           }
         }
       });

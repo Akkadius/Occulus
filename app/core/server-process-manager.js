@@ -420,7 +420,15 @@ module.exports = {
         );
       }
 
-      require('child_process').exec(startProcessString);
+      let startArgs = ["/c"].concat(startProcessString.split(" ")).concat(args);
+
+      require('child_process').spawn("cmd.exe", startArgs,
+        {
+          detached: true,
+          stdio: 'ignore',
+          cwd: pathManager.getEmuServerPath()
+        }
+      );
 
       config.setAdminPanelConfig('launcher.isRunning', true);
       console.log("[Process Manager] Starting server launcher...");
@@ -438,7 +446,7 @@ module.exports = {
    */
   async cancelRestart(options = []) {
     if (options.cancel) {
-      this.cancelTimedRestart = true;
+      this.cancelTimedRestart  = true;
       this.cancelTimedShutdown = true;
       await serverDataService.messageWorld('[SERVER MESSAGE] Server stop cancelled');
     }
@@ -558,13 +566,12 @@ module.exports = {
           process_name + '.exe',
         );
 
-      require('child_process').spawn(startProcessString, args,
+      let startArgs = ["/c", "start", "/B"].concat(startProcessString.split(" ")).concat(args);
+      require('child_process').spawn("cmd.exe", startArgs,
         {
-          cwd: pathManager.emuServerPath,
           detached: true,
-          shell: false,
-          stdio: 'pipe',
-          windowsHide: true,
+          stdio: 'ignore',
+          cwd: pathManager.getEmuServerPath()
         }
       );
     }
@@ -578,7 +585,7 @@ module.exports = {
 
       require('child_process').spawn(startProcessString,
         {
-          cwd: pathManager.emuServerPath,
+          cwd: pathManager.getEmuServerPath(),
           encoding: 'utf8',
           shell: '/bin/bash',
           detached: true
@@ -630,7 +637,7 @@ module.exports = {
     this.systemProcessList.forEach((process) => {
 
       // statics
-      if (process.name.includes("zone") && process.cmd.includes(" ")) {
+      if (process.cmd.includes("zone") && process.cmd.includes(" ")) {
         try {
           const zone = process.cmd.split(" ")[1].trim()
           this.onlineStatics.push(zone)
@@ -658,8 +665,8 @@ module.exports = {
 
     if (os.isWindows()) {
       const stdout = require('child_process')
-        .execSync("WMIC path win32_process get Description,Commandline,Processid /format:csv")
-        .toString();
+      .execSync("WMIC path win32_process get Description,Commandline,Processid /format:csv")
+      .toString();
 
       stdout.split('\n').forEach((row) => {
         if (row.includes(",") && !row.includes("Description,ProcessId")) {
@@ -668,12 +675,12 @@ module.exports = {
             const splitLength       = splitRow.length;
             const processId         = splitRow[splitLength - 1].trim();
             const simpleProcessName = splitRow[splitLength - 2].replace('.exe', '').trim();
-            const cmdlineSplit       = row
-              .replace("," + splitRow[splitLength - 1].trim(), '')
-              .replace("," + splitRow[splitLength - 2].trim(), '')
-              .split(",");
+            const cmdlineSplit      = row
+            .replace("," + splitRow[splitLength - 1].trim(), '')
+            .replace("," + splitRow[splitLength - 2].trim(), '')
+            .split(",");
 
-            let commandLine       = "";
+            let commandLine = "";
             if (cmdlineSplit.length > 1) {
               commandLine = cmdlineSplit[1].trim();
             }
@@ -681,7 +688,7 @@ module.exports = {
             const proc = {
               "name": simpleProcessName,
               "pid": processId,
-              "cmd": commandLine
+              "cmd": commandLine.replace(/\s+/g, ' ')
             };
 
             processList.push(proc);

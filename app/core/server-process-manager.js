@@ -45,7 +45,13 @@ module.exports = {
    * @param skipConfigWatch
    */
   init: function (options, skipConfigWatch = false) {
-    this.launchOptions = options;
+    if (typeof options !== "undefined") {
+      this.launchOptions = options;
+    }
+
+    if (typeof this.launchOptions === "undefined") {
+      this.launchOptions = {}
+    }
 
     if (process.platform === "win32") {
       process.title = "EQEmu Server Launcher"
@@ -180,6 +186,7 @@ module.exports = {
    * @returns {boolean}
    */
   doesProcessNeedToBoot: function (processName) {
+
     if (this.erroredStartsCount[processName] >= this.erroredStartsMaxHalt) {
       if (!this.hasErroredHaltMessage[processName]) {
         console.error('Process [%s] has tried to boot too many (%s) times... Halting attempts', processName, this.erroredStartsMaxHalt);
@@ -196,11 +203,11 @@ module.exports = {
     }
 
     if (processName === 'loginserver') {
-      return this.launchOptions && this.launchOptions.withLoginserver && this.processCount[processName] === 0;
+      return config.getAdminPanelConfig('launcher.runLoginserver', false) && this.processCount[processName] === 0;
     }
 
     if (processName === 'queryserv') {
-      return this.launchOptions && this.launchOptions.withQueryserv && this.processCount[processName] === 0;
+      return config.getAdminPanelConfig('launcher.runQueryServ', false) && this.processCount[processName] === 0;
     }
 
     debug('[doesProcessNeedToBoot] [%s] returning [%s]', processName, this.processCount[processName] === 0);
@@ -420,10 +427,16 @@ module.exports = {
         );
       }
 
-      let startArgs = ["/c"].concat(startProcessString.split(" ")).concat(args);
+      // console.log("starting launcher [%s]", startProcessString)
+
+      let startArgs = ["/c"].concat(startProcessString.split(" "));
+
+      let env   = process.env;
+      // env.DEBUG = "eqemu-admin:*"
 
       require('child_process').spawn("cmd.exe", startArgs,
         {
+          env: env,
           detached: true,
           stdio: 'ignore',
           cwd: pathManager.getEmuServerPath()
@@ -555,6 +568,8 @@ module.exports = {
   startProcess: async function (process_name, args = []) {
     let argString = '';
 
+    // console.log("starting process", process_name)
+
     if (args.length > 0) {
       argString = args.join(" ")
     }
@@ -665,8 +680,8 @@ module.exports = {
 
     if (os.isWindows()) {
       const stdout = require('child_process')
-      .execSync("WMIC path win32_process get Description,Commandline,Processid /format:csv")
-      .toString();
+        .execSync("WMIC path win32_process get Description,Commandline,Processid /format:csv")
+        .toString();
 
       stdout.split('\n').forEach((row) => {
         if (row.includes(",") && !row.includes("Description,ProcessId")) {
@@ -676,9 +691,9 @@ module.exports = {
             const processId         = splitRow[splitLength - 1].trim();
             const simpleProcessName = splitRow[splitLength - 2].replace('.exe', '').trim();
             const cmdlineSplit      = row
-            .replace("," + splitRow[splitLength - 1].trim(), '')
-            .replace("," + splitRow[splitLength - 2].trim(), '')
-            .split(",");
+              .replace("," + splitRow[splitLength - 1].trim(), '')
+              .replace("," + splitRow[splitLength - 2].trim(), '')
+              .split(",");
 
             let commandLine = "";
             if (cmdlineSplit.length > 1) {

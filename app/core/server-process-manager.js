@@ -709,9 +709,10 @@ module.exports = {
             // Windows 11 has different formatting -_-
             // Node,CommandLine,Description,ProcessId
             if (splitRow[0].includes("WIN11")) {
-              proc.cmd = splitRow[1].trim();
-              proc.name = splitRow[2].trim();
+              proc.cmd = splitRow[1].replace(/\s+/g, ' ').trim();
+              proc.name = splitRow[2].replace('.exe', '').trim();
               proc.pid = splitRow[3].trim();
+              console.log(proc)
             }
 
             processList.push(proc);

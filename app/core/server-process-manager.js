@@ -712,7 +712,6 @@ module.exports = {
               proc.cmd = splitRow[1].replace(/\s+/g, ' ').trim();
               proc.name = splitRow[2].replace('.exe', '').trim();
               proc.pid = splitRow[3].trim();
-              console.log(proc)
             }
 
             processList.push(proc);

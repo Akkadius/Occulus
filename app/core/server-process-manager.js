@@ -700,11 +700,19 @@ module.exports = {
               commandLine = cmdlineSplit[1].trim();
             }
 
-            const proc = {
+            let proc = {
               "name": simpleProcessName,
               "pid": processId,
               "cmd": commandLine.replace(/\s+/g, ' ')
             };
+
+            // Windows 11 has different formatting -_-
+            // Node,CommandLine,Description,ProcessId
+            if (splitRow[0].includes("WIN11")) {
+              proc.cmd = splitRow[1].trim();
+              proc.name = splitRow[2].trim();
+              proc.pid = splitRow[3].trim();
+            }
 
             processList.push(proc);
           }

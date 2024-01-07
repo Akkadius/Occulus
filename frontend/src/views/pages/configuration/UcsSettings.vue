@@ -25,27 +25,14 @@
       <div class="col-lg-12" v-if="Object.keys(serverConfig).length > 0">
         <div class="form-row">
           <div class="form-group col-md-6">
-            <label class="form-label">Chatserver Host</label>
+            <label class="form-label">Host</label>
             <input type="text" class="form-control" placeholder="0.0.0.0"
-                   v-model="serverConfig.server.chatserver.host"/>
+                   v-model="serverConfig.server.ucs.host"/>
           </div>
 
           <div class="form-group col-md-6">
-            <label class="form-label">Chatserver Port</label>
-            <input type="text" class="form-control" v-model="serverConfig.server.chatserver.port"/>
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group col-md-6">
-            <label class="form-label">Mailserver Host</label>
-            <input type="text" class="form-control" placeholder="0.0.0.0"
-                   v-model="serverConfig.server.mailserver.host"/>
-          </div>
-
-          <div class="form-group col-md-6">
-            <label class="form-label">Mailserver Port</label>
-            <input type="text" class="form-control" v-model="serverConfig.server.mailserver.port"/>
+            <label class="form-label">Port</label>
+            <input type="text" class="form-control" v-model="serverConfig.server.ucs.port"/>
           </div>
         </div>
       </div>
@@ -67,6 +54,13 @@
     },
     async created() {
       this.serverConfig = await EqemuAdminClient.getServerConfig()
+
+      if (!this.serverConfig.server.ucs) {
+        this.serverConfig.server.ucs = {
+          host: "",
+          port: "",
+        }
+      }
 
       this.loaded = true
     },
